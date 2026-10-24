@@ -1,4 +1,83 @@
-# Validação — sprint 0.002.0
+# Validação — sprint 0.004.0
+
+Executada em Windows 11, JDK 17.0.20.1, Minecraft 1.20.1, Forge 47.4.28 e GeckoLib 4.8.4, em 24/10/2026. Os resultados abaixo são desta sprint; os registros da 0.003.0 foram preservados depois desta seção como histórico.
+
+| Verificação | Resultado real | Evidência local |
+| --- | --- | --- |
+| Build e reobf | **Passaram**; JAR 0.004.0 e diretório com as duas dependências prontos | `.tools/gecko-final-tests.log` |
+| Servidor GameTest sem GUI | **31 testes obrigatórios passaram**, zero falhas | Mesmo log, linha `All 31 required tests passed` |
+| GeckoLib no cliente | Carregou e renderizou todos os modelos/clipes usados no cenário | `.tools/gecko-final-visual.log`, `BUILD SUCCESSFUL` |
+| Recursos | JSONs, idiomas, legendas, OGGs, PNGs e hashes passaram | Tarefas `validateAssets` e `validateGeckoAssets` |
+| UV/articulação | 14 ossos, 20 cubos, oito clipes; continuidade de 6+6 linhas das extremidades | Validador e skins vistas nas capturas |
+| Geração reproduzível | SHA-256 dos dois JSONs idênticos antes/depois de regenerar | Comparação efetivamente executada |
+| Alcance | Aproximadamente 2,5 blocos; rejeita alvos distantes, verticais e através de parede | GeckoSprintGameTests |
+| Dano/knockback | Renan 4, Arthur 5, tropa 6; durabilidade e impulso moderado verificados | GameTests e capturas de impacto |
+| Variantes | Equipamentos, ovos, atributos, ID legado e bloqueio de invocação no Combatente passaram | GameTests |
+| Speed I | Só após cast bem-sucedido, infinito, amplificador 0, save/load e sem empilhamento | GameTests |
+| Emergência | Cinco unidades, escalonamento, nenhum ataque antes de acabar, fase preservada ao salvar | GameTests + capturas reais |
+| Novo áudio | Fonte mudou de hash; MP3 5,903667 s convertido inteiro e recurso disponível | FFprobe, hashes e validador; audição humana não presumida |
+| Servidor dedicado convencional | Forge/Gecko userdev chegaram ao bootstrap; servidor parou solicitando aceite da EULA | `.tools/gecko-dedicated.log`; `run-server/eula.txt` mantém `eula=false` |
+| Dois clientes reais | **Pendente**: segunda JVM abriu, alcançou handshake Forge em localhost e não concluiu login | `.tools/gecko-multiplayer-host3.log`, `.tools/gecko-multiplayer-observer3.log` |
+| JAR distribuível | Não contém classes GameTests, cenários visuais ou estrutura de teste | ZIP do JAR inspecionado |
+| Publicação | Commit e push autorizados pelo autor após testar a versão; nenhum merge solicitado | Consultar o histórico Git |
+
+O conjunto possui 22 testes anteriores adaptados ao tempo de emergência e nove novos: variantes/ovos/legado, Combatente sem poder, Speed persistente após sucesso, cast falho sem Speed, alcance/AABB, parede, dano/durabilidade de Arthur, knockback e escalonamento/save da fase. O caso de 700 ticks continua verificando uma e depois duas levas.
+
+As capturas do framebuffer do cliente foram abertas e inspecionadas: [skins](preview/gecko-0.004/skins-variantes.png), [mãos](preview/gecko-0.004/maos.png), [apoio](preview/gecko-0.004/apoio.png), [cotovelos](preview/gecko-0.004/cotovelos.png), [joelhos](preview/gecko-0.004/joelhos.png), [soco de Renan](preview/gecko-0.004/soco-renan.png), [espada de Arthur](preview/gecko-0.004/espada-arthur.png) e [painel](preview/gecko-0.004/painel.png). São imagens do Minecraft em 1280×720; não são mockups. O teste cria uma cópia de mundo isolada e não usa o mundo do jogador em run/.
+
+Durante a implementação, o primeiro cliente falhou no refmap do TextureManagerMixin. A configuração SRG → official dos runs foi corrigida e as execuções gráficas posteriores completaram. Dois testes antigos esperavam emergência em 25 ticks; foram adaptados à regra de 44 ticks e ao escalonamento, depois passaram com o conjunto completo. Na tentativa multiplayer, o primeiro listener foi IPv6; foi corrigido para IPv4 local, mas o handshake continuou sem completar. Esse resultado não constitui aprovação de combate em rede.
+
+Pendentes: login/combate com dois clientes, rede com latência/reconexão, partida no servidor dedicado convencional após aceite pessoal da EULA, audição do efeito novo e avaliação de fluidez/estética pelo autor. O ambiente não permite declarar esses itens aprovados por inferência a partir do build. O funcionamento de skins e falas do protótipo anterior já havia sido confirmado pelo autor; essa confirmação não foi estendida automaticamente à nova animação.
+
+Arquivos e implementação: [GECKOLIB_0.004.md](GECKOLIB_0.004.md).
+
+Verificação adicional do painel: a [prévia 3D completa](preview/gecko-0.004/previa-3d.png) foi capturada após rolar a página e inspecionada. O recorte parcial no fim da página sem rolagem é o scissor do conteúdo; o corpo renderiza inteiro quando a prévia entra na área visível. Log: `.tools/gecko-preview-check.log`, execução concluída. SHA-256 do JAR: `67379a30e7a48738719a20a467b7084be0d70866136de287b84adc62067ccbca` (1.115.886 bytes). O pacote também contém o GeckoLib original, de 1.038.208 bytes.
+
+## Histórico — sprint 0.003.0
+
+24/10/2026. Minecraft 1.20.1, Forge 47.4.28, JDK 17, Gradle 8.8 e ForgeGradle 6.0.54. Os relatórios anteriores estão preservados abaixo.
+
+## Resultados da invocação e animações
+
+| Verificação | Resultado real |
+| --- | --- |
+| Build | `BUILD SUCCESSFUL`; artefato `build/libs/guerra_ezuberante-0.003.0.jar` |
+| Servidor Forge | **22 GameTests obrigatórios passaram**, incluindo as 12 regressões anteriores e dez testes novos |
+| Primeira leva | Agressão válida iniciou cast; nenhuma unidade antes da conclusão; cinco unidades após o cast |
+| Terreno | Posições físicas sem colisão/overlap; terreno sólido bloqueado e lava rejeitados |
+| Emergência | Ataques bloqueados durante a fase de subida, liberados ao concluir os 25 ticks |
+| Espada | Modificadores e durabilidade iguais à espada de ferro; dano efetivo seis no alvo sem resistência/armadura; um ponto de desgaste |
+| Limite por dono | Leva parcial respeitou as duas vagas restantes; limite de um Arthur não impediu a leva de outro |
+| Intervalo | Percorridos mais de 700 ticks; cinco unidades antes da segunda leva e dez após a segunda conclusão |
+| Aliados e alvos | Sem agressão espontânea; invocador, irmãs e Renan protegidos; alvo legítimo do dono compartilhado |
+| Acompanhamento | Unidade ociosa reduziu distância até Arthur usando navegação nativa |
+| Persistência | UUID de dono, emergência, contagem persistente e cooldown de Arthur preservados em save/load |
+| Morte do dono | Unidade dissipada e vaga liberada |
+| Fim de combate | Alvo removido cancelou o cast sem conceder tropas |
+| Animação/impacto | Dano do Renan observado no frame 5 e com valor original quatro, sem duplicação |
+| Áudios anteriores | Regressões do phonk e da fala selecionada de Arthur passaram; eventos e OGGs anteriores preservados |
+| Recursos | Três skins 64×64, espada 16×16, JSONs, traduções, legendas e 11 OGGs verificados |
+| Cliente gráfico | Execução isolada carregou um mundo, capturou conjuração, emergência, combate e painel e encerrou normalmente |
+| Inspeção visual | PNGs do framebuffer foram vistos: atlas correto, subida de baixo do terreno, espada na mão e três opções no painel |
+
+Logs locais: `.tools/summon-final.log`, `.tools/summon-build-final.log` e `.tools/summon-client.log`. Capturas inspecionadas estão em [docs/preview](preview/). O arquivo real `serverconfig/guerra_ezuberante-server.toml` gerado pelo Forge também foi lido e conferido.
+
+Durante a implementação, a inspeção visual identificou inversão do deslocamento vertical no espaço de modelo. A direção foi corrigida e o cliente foi executado novamente em cópia nova do mundo para conferir a subida. Os testes também identificaram a necessidade de considerar os acertos das tropas como progresso de combate do Arthur; a correção foi incluída antes do resultado final aprovado.
+
+## Limitações que permanecem
+
+- Não foi realizada uma partida com dois jogadores reais conectados a um servidor dedicado normal. As verificações de servidor e cliente isolado não equivalem a esse teste.
+- A audição e a mixagem dos sons por jogadores reais ainda precisam ser confirmadas. Foi verificado o recurso real de invocação e o acionamento pelo servidor; não se declara teste auditivo automatizado.
+- Capturas estáticas comprovam estados visuais inspecionados, mas não substituem avaliação humana de toda a fluidez das transições. As animações podem ser refinadas após o autor jogar.
+- A navegação completa das telas, todas as resoluções e uma sessão longa com o limite de tropas cheio não foram avaliadas manualmente.
+- Há avisos de depreciação na stack fixada, sem falhas de compilação ou carregamento.
+
+O harness visual fica em `src/gameTest/`, só é habilitado por `-PvisualTest` e recusa executar fora de `.tools/run-summon-client/`. Ele não entra no JAR distribuído nem modifica o mundo normal do usuário.
+
+Comandos e detalhes: [INVOCACAO_0.003.md](INVOCACAO_0.003.md).
+
+---
+## Histórico — sprint 0.002.0
 
 24/10/2026. Minecraft 1.20.1, Forge 47.4.28, Java 17, Gradle 8.8 e ForgeGradle 6.0.54. Os resultados da primeira versão estão preservados no histórico abaixo.
 

@@ -87,5 +87,14 @@
                                                "stream":  true
                                            }
                                        ]
-                        }
+                        },
+    "arthur.invocacao":  {
+                             "subtitle":  "subtitles.guerra_ezuberante.arthur.invocacao",
+                             "sounds":  [
+                                            {
+                                                "name":  "guerra_ezuberante:arthur/invocacao",
+                                                "stream":  true
+                                            }
+                                        ]
+                         }
 }

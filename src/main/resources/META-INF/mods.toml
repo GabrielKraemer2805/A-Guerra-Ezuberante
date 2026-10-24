@@ -8,13 +8,20 @@ version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
 displayURL="https://github.com/OmarFLK/A-Guerra-Ezuberante"
-description='''Guerra Ezuberante: Renan Santos e Arthur do Val, retaliação corpo a corpo, falas e painel informativo.'''
+description='''Guerra Ezuberante: Renan, Arthur, Exército Ucraniano, espada personalizada, animações de combate e painel informativo.'''
 
 [[dependencies.${mod_id}]]
 modId="forge"
 mandatory=true
 versionRange="[${forge_version},48)"
 ordering="NONE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="geckolib"
+mandatory=true
+versionRange="[4.8.4]"
+ordering="BEFORE"
 side="BOTH"
 
 [[dependencies.${mod_id}]]

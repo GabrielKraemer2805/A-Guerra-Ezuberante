@@ -2,6 +2,8 @@ package io.github.omarflk.guerraezuberante.registry;
 
 import io.github.omarflk.guerraezuberante.GuerraEzuberanteMod;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Tiers;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -15,6 +17,13 @@ public final class ModItems {
 
     public static final RegistryObject<Item> ARTHUR_SPAWN_EGG = REGISTER.register("arthur_do_val_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.ARTHUR_DO_VAL, 0xC7D6E6, 0x314F74, new Item.Properties()));
+
+    public static final RegistryObject<Item> UKRAINIAN_SWORD = REGISTER.register("espada_ucraniana",
+            () -> new SwordItem(Tiers.IRON, 3, -2.4F, new Item.Properties()));
+    public static final RegistryObject<Item> ARTHUR_COMBATENTE_EGG = REGISTER.register("arthur_do_val_combatente_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.ARTHUR_COMBATENTE, 0x314F74, 0xFFDB43, new Item.Properties()));
+    public static final RegistryObject<Item> ARTHUR_INVOCADOR_EGG = REGISTER.register("arthur_do_val_invocador_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.ARTHUR_INVOCADOR, 0xC7D6E6, 0x3954CF, new Item.Properties()));
 
     private ModItems() {}
 }

@@ -22,6 +22,9 @@ minecraft {
         configureEach {
             workingDirectory project.file('run')
             property 'forge.logging.console.level', 'info'
+            // GeckoLib's released refmap uses SRG names; Forge userdev runs with official names.
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', project.file('build/createSrgToMcp/output.srg').absolutePath
             mods {
                 "${mod_id}" { source sourceSets.main }
             }
@@ -31,6 +34,20 @@ minecraft {
             workingDirectory project.file(providers.gradleProperty('clientWorkDir').getOrElse('run'))
             if (providers.gradleProperty('quickPlayWorld').isPresent()) {
                 args '--quickPlaySingleplayer', providers.gradleProperty('quickPlayWorld').get()
+            }
+            if (providers.gradleProperty('quickPlayServer').isPresent()) {
+                args '--quickPlayMultiplayer', providers.gradleProperty('quickPlayServer').get(), '--username', 'Observer'
+            }
+            if (project.hasProperty('visualTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.visualTest', 'true'
+                if (project.hasProperty('multiplayerTest')) { property 'guerra.multiplayerTest', 'true' }
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
+            if (project.hasProperty('observerTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.observerTest', 'true'
+                mods { "${mod_id}" { source sourceSets.gameTest } }
             }
         }
         server {
@@ -49,11 +66,20 @@ minecraft {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}")
 }
+
+configurations { geckoDistribution { transitive = false } }
+dependencies { geckoDistribution "software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}" }
 
 // Fetch common libraries from their original repository instead of Forge's mirror.
 repositories {
     mavenCentral()
+    maven {
+        name = 'GeckoLib'
+        url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content { includeGroupByRegex 'software\\.bernie.*' }
+    }
     configureEach {
         if (it instanceof MavenArtifactRepository && it.url.toString().contains('maven.minecraftforge.net')) {
             content {
@@ -83,3 +109,24 @@ tasks.named('jar', Jar).configure {
 }
 
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+tasks.register('validateGeckoAssets', Exec) {
+    commandLine 'powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'tools/validate_gecko.ps1'
+}
+tasks.named('check') { dependsOn 'validateGeckoAssets' }
+tasks.register('validateAssets', Exec) {
+    commandLine 'powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'tools/validate_assets.ps1'
+}
+tasks.named('check') { dependsOn 'validateAssets' }
+tasks.register('modBundle', Copy) {
+    dependsOn 'reobfJar'
+    from tasks.named('jar', Jar).flatMap { it.archiveFile }
+    from configurations.geckoDistribution
+    into layout.buildDirectory.dir("distributions/guerra-ezuberante-${version}/mods")
+}
+tasks.named('build') { dependsOn 'modBundle' }
+
+// Required before launching a fresh checkout: external mod refmaps are SRG -> official in userdev.
+tasks.matching { it.name in ['prepareRunClient', 'prepareRunServer', 'prepareRunGameTestServer'] }.configureEach {
+    dependsOn 'createSrgToMcp'
+}

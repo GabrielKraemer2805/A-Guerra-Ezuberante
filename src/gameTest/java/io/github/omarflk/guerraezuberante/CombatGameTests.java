@@ -126,7 +126,7 @@ public final class CombatGameTests {
         });
     }
 
-    @GameTest(template = "empty", timeoutTicks = 280)
+    @GameTest(template = "empty", timeoutTicks = 380)
     public static void wallsBlockAttacksAndStalledPursuitEnds(GameTestHelper helper) {
         floor(helper);
         var arthur = spawn(helper, ModEntities.ARTHUR_DO_VAL.get(), 2);
@@ -142,7 +142,7 @@ public final class CombatGameTests {
             }
         }
         arthur.hurt(helper.getLevel().damageSources().mobAttack(aggressor), 1);
-        helper.runAfterDelay(240, () -> {
+        helper.runAfterDelay(340, () -> {
             helper.assertTrue(aggressor.getHealth() == aggressor.getMaxHealth(), "Attack went through a wall");
             helper.assertTrue(arthur.getTarget() == null, "Stalled pursuit did not time out");
             helper.succeed();

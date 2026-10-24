@@ -17,7 +17,9 @@ public final class ModCreativeTabs {
                     .icon(() -> new ItemStack(ModItems.RENAN_SPAWN_EGG.get()))
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.RENAN_SPAWN_EGG.get());
-                        output.accept(ModItems.ARTHUR_SPAWN_EGG.get());
+                        output.accept(ModItems.ARTHUR_COMBATENTE_EGG.get());
+                        output.accept(ModItems.ARTHUR_INVOCADOR_EGG.get());
+                        output.accept(ModItems.UKRAINIAN_SWORD.get());
                     })
                     .build());
 

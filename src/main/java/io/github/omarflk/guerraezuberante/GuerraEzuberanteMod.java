@@ -2,6 +2,8 @@ package io.github.omarflk.guerraezuberante;
 
 import io.github.omarflk.guerraezuberante.entity.RenanSantosEntity;
 import io.github.omarflk.guerraezuberante.entity.ArthurDoValEntity;
+import io.github.omarflk.guerraezuberante.entity.UkrainianFighterEntity;
+import io.github.omarflk.guerraezuberante.config.ModConfig;
 import io.github.omarflk.guerraezuberante.registry.ModCreativeTabs;
 import io.github.omarflk.guerraezuberante.registry.ModEntities;
 import io.github.omarflk.guerraezuberante.registry.ModItems;
@@ -9,6 +11,7 @@ import io.github.omarflk.guerraezuberante.registry.ModSounds;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(GuerraEzuberanteMod.MOD_ID)
@@ -17,6 +20,7 @@ public final class GuerraEzuberanteMod {
 
     public GuerraEzuberanteMod() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, ModConfig.SPEC);
         ModEntities.REGISTER.register(bus);
         ModItems.REGISTER.register(bus);
         ModCreativeTabs.REGISTER.register(bus);
@@ -27,5 +31,8 @@ public final class GuerraEzuberanteMod {
     private void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(ModEntities.RENAN_SANTOS.get(), RenanSantosEntity.createAttributes().build());
         event.put(ModEntities.ARTHUR_DO_VAL.get(), ArthurDoValEntity.createAttributes().build());
+        event.put(ModEntities.ARTHUR_COMBATENTE.get(), ArthurDoValEntity.createAttributes().build());
+        event.put(ModEntities.ARTHUR_INVOCADOR.get(), ArthurDoValEntity.createAttributes().build());
+        event.put(ModEntities.UKRAINIAN_FIGHTER.get(), UkrainianFighterEntity.createAttributes().build());
     }
 }

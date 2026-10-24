@@ -1,6 +1,14 @@
-# Áudios — inventário da sprint 0.002.0
+# Áudios — inventário atualizado na sprint 0.004.0
 
 Originais preservados em `audios/`; cópias de entrada em `assets-entrada/audio/renan/` e `assets-entrada/audio/arthur/`. Os OGGs usam Vorbis mono a 44.100 Hz, sem cortes, alteração de velocidade ou de duração.
+
+## Efeito novo: invocação
+
+O autor substituiu o efeito por `audios/ucraniana/efeito sonoro spawn ucrania.MP3`. Duração medida: **5,903667 s**. SHA-256: `5162b84a34516322de7dd0307c20fb26cf328d3eb23413c9ff01a2ce3e47f354`. O hash difere do MP3 anterior; a troca foi confirmada pelo conteúdo, além do nome e da data.
+
+A cópia normalizada fica em `assets-entrada/audio/arthur/invocacao.mp3`; o recurso atualizado é `sounds/arthur/invocacao.ogg`. Evento `guerra_ezuberante:arthur.invocacao`, com streaming e legenda. Somente Arthur Invocador e o ID legado disparam o efeito uma vez no início do cast; as cinco combatentes não repetem o mesmo som. Uma trava de **120 ticks** evita sobreposição caso o intervalo configurado fique menor que a duração do arquivo. A conversão preservou a gravação inteira, em Vorbis mono 44.100 Hz.
+
+O efeito é separado das sete falas do botão direito e da reação É vagabundo sim. Os dez OGGs de falas/phonk anteriores mantêm seus bytes; somente invocacao.ogg foi substituído. O mod empacota **11 OGGs**. O original novo na pasta audios permanece intacto. [Mecânica e limites da validação](GECKOLIB_0.004.md).
 
 ## Renan
 

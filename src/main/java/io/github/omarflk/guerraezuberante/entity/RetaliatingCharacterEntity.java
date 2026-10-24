@@ -3,6 +3,9 @@ package io.github.omarflk.guerraezuberante.entity;
 import io.github.omarflk.guerraezuberante.registry.ModSounds;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -18,16 +21,29 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
 /** Peaceful unless hurt by a valid attacker. No proximity-based target selection. */
-public abstract class RetaliatingCharacterEntity extends PathfinderMob {
+public abstract class RetaliatingCharacterEntity extends PathfinderMob implements software.bernie.geckolib.animatable.GeoEntity {
+    private final software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache animationCache =
+            software.bernie.geckolib.util.GeckoLibUtil.createInstanceCache(this);
+    public static final double MELEE_GAP = 1.9D;
+    public static final int ATTACK_LENGTH = 12;
+    public static final int ATTACK_IMPACT = 5;
+    private static final EntityDataAccessor<Long> ATTACK_START = SynchedEntityData.defineId(
+            RetaliatingCharacterEntity.class, EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<Boolean> ATTACK_LEFT = SynchedEntityData.defineId(
+            RetaliatingCharacterEntity.class, EntityDataSerializers.BOOLEAN);
+    private LivingEntity pendingStrike;
+    private int attackSequence;
     private static final int STALLED_PURSUIT_LIMIT = 200;
     private int voiceCooldown;
     private int combatAudioCooldown;
     private int stalledPursuitTicks;
     private double lastTargetDistanceSample = Double.MAX_VALUE;
+    private Vec3 lastTargetPosition;
     private String lastReaction = "";
 
     protected RetaliatingCharacterEntity(EntityType<? extends RetaliatingCharacterEntity> type, Level level) {
@@ -42,25 +58,65 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob {
     }
 
     @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(ATTACK_START, -1000L);
+        entityData.define(ATTACK_LEFT, false);
+    }
+
+    public float attackAnimationAge(float partialTick) {
+        return (float) (level().getGameTime() - entityData.get(ATTACK_START)) + partialTick;
+    }
+
+    public boolean isLeftPunch() { return entityData.get(ATTACK_LEFT); }
+    public long attackAnimationToken() { return entityData.get(ATTACK_START); }
+    public boolean isActionLocked() { return false; }
+    protected void noteCombatProgress() { stalledPursuitTicks = 0; }
+
+    protected void cancelStrike() {
+        pendingStrike = null;
+        entityData.set(ATTACK_START, -1000L);
+    }
+
+    @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
         goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.15D, true) {
             @Override
+            protected double getAttackReachSqr(LivingEntity target) {
+                double reach = MELEE_GAP + (getBbWidth() + target.getBbWidth()) * 0.5D;
+                return reach * reach;
+            }
+            @Override
+            public boolean canUse() { return !isActionLocked() && super.canUse(); }
+
+            @Override
+            public boolean canContinueToUse() { return !isActionLocked() && super.canContinueToUse(); }
+
+            @Override
             protected void checkAndPerformAttack(LivingEntity target, double distanceSquared) {
-                // Vanilla reach/attack interval, with an explicit wall/visibility check.
-                if (getSensing().hasLineOfSight(target)) {
-                    super.checkAndPerformAttack(target, distanceSquared);
+                if (!isActionLocked() && pendingStrike == null && isTimeToAttack()
+                        && isWithinMeleeReach(target) && isValidAggressor(target)
+                        && getSensing().hasLineOfSight(target)) {
+                    resetAttackCooldown();
+                    pendingStrike = target;
+                    entityData.set(ATTACK_LEFT, getMainHandItem().isEmpty() && ++attackSequence % 3 == 0);
+                    entityData.set(ATTACK_START, level().getGameTime());
                 }
             }
         });
-        goalSelector.addGoal(2, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+        goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0D) {
+            @Override
+            public boolean canUse() { return !isActionLocked() && super.canUse(); }
+        });
         goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F));
         goalSelector.addGoal(4, new RandomLookAroundGoal(this));
     }
 
-    private boolean isValidAggressor(LivingEntity attacker) {
+    protected boolean isValidAggressor(LivingEntity attacker) {
         return attacker != this && attacker.isAlive() && !attacker.isRemoved()
-                && attacker.level() == level() && canAttack(attacker)
+                && attacker.level() == level() && !isAlliedTo(attacker) && !attacker.isAlliedTo(this)
+                && canAttack(attacker)
                 && (!(attacker instanceof Player player) || (!player.isCreative()
                 && !player.isSpectator() && !player.getAbilities().invulnerable));
     }
@@ -74,6 +130,7 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob {
             boolean enteringCombat = getTarget() == null || !isValidAggressor(getTarget());
             if (getTarget() != attacker) {
                 lastTargetDistanceSample = distanceToSqr(attacker);
+                lastTargetPosition = attacker.position();
                 stalledPursuitTicks = 0;
             }
             setTarget(attacker);
@@ -104,12 +161,16 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob {
 
     @Override
     public boolean doHurtTarget(Entity target) {
-        if (!getSensing().hasLineOfSight(target)) {
+        if (isActionLocked() || !isWithinMeleeReach(target) || !getSensing().hasLineOfSight(target)
+                || isAlliedTo(target) || target.isAlliedTo(this)) {
             return false;
         }
         boolean hit = super.doHurtTarget(target);
         if (hit) {
             stalledPursuitTicks = 0;
+            if (target instanceof LivingEntity living) {
+                living.knockback(0.2D, getX() - target.getX(), getZ() - target.getZ());
+            }
         }
         return hit;
     }
@@ -119,6 +180,17 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob {
         super.tick();
         if (level().isClientSide) {
             return;
+        }
+        if (pendingStrike != null) {
+            float age = attackAnimationAge(0);
+            if (isActionLocked() || pendingStrike != getTarget() || !isValidAggressor(pendingStrike)) {
+                cancelStrike();
+            } else if (age == ATTACK_IMPACT) {
+                if (isWithinMeleeReach(pendingStrike) && getSensing().hasLineOfSight(pendingStrike)) {
+                    doHurtTarget(pendingStrike);
+                }
+            }
+            if (age >= ATTACK_LENGTH) { pendingStrike = null; }
         }
         if (voiceCooldown > 0) { voiceCooldown--; }
         if (combatAudioCooldown > 0) { combatAudioCooldown--; }
@@ -135,8 +207,13 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob {
             double distance = distanceToSqr(target);
             if (distance < lastTargetDistanceSample - 0.25D) {
                 stalledPursuitTicks = 0;
+                lastTargetDistanceSample = distance;
             }
-            lastTargetDistanceSample = distance;
+            // Ignore collision jitter around a stationary blocked target; rebase when the target moves.
+            if (lastTargetPosition == null || target.position().distanceToSqr(lastTargetPosition) > 0.25D) {
+                lastTargetDistanceSample = distance;
+            }
+            lastTargetPosition = target.position();
         }
         if (++stalledPursuitTicks >= STALLED_PURSUIT_LIMIT) {
             endRetaliation();
@@ -144,11 +221,13 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob {
     }
 
     private void endRetaliation() {
+        cancelStrike();
         setTarget(null);
         setLastHurtByMob(null);
         getNavigation().stop();
         stalledPursuitTicks = 0;
         lastTargetDistanceSample = Double.MAX_VALUE;
+        lastTargetPosition = null;
     }
 
     @Override
@@ -196,5 +275,25 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob {
     @Override
     public boolean removeWhenFarAway(double distance) {
         return false;
+    }
+
+    /** Distance between real collision boxes. For two 0.6-wide mobs this permits 2.5 blocks between centres. */
+    public boolean isWithinMeleeReach(Entity other) {
+        var a = getBoundingBox();
+        var b = other.getBoundingBox();
+        double dx = Math.max(0, Math.max(a.minX - b.maxX, b.minX - a.maxX));
+        double dy = Math.max(0, Math.max(a.minY - b.maxY, b.minY - a.maxY));
+        double dz = Math.max(0, Math.max(a.minZ - b.maxZ, b.minZ - a.maxZ));
+        return dx * dx + dy * dy + dz * dz <= MELEE_GAP * MELEE_GAP;
+    }
+
+    @Override
+    public software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animationCache;
+    }
+
+    @Override
+    public void registerControllers(software.bernie.geckolib.core.animation.AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new io.github.omarflk.guerraezuberante.animation.CharacterAnimationController(this));
     }
 }

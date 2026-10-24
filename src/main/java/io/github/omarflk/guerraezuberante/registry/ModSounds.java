@@ -17,6 +17,7 @@ public final class ModSounds {
     public static final RegistryObject<SoundEvent> ME_RESPEITA = register("renan.me_respeita");
     public static final RegistryObject<SoundEvent> RISADINHA = register("renan.risadinha");
     public static final RegistryObject<SoundEvent> PHONK = register("renan.phonk");
+    public static final RegistryObject<SoundEvent> SUMMON = register("arthur.invocacao");
     public static final RegistryObject<SoundEvent> E_VAGABUNDO_SIM = register("arthur.e_vagabundo_sim");
     public static final RegistryObject<SoundEvent> FICOU_OFENDIDINHO = register("arthur.ficou_ofendidinho");
     public static final RegistryObject<SoundEvent> LIMPA = register("arthur.limpa_o_cu_com_a_linuga");
@@ -50,6 +51,7 @@ public final class ModSounds {
             new VoiceLine(RISADINHA, "risadinha", 80));
 
     public static final VoiceLine RENAN_PHONK = new VoiceLine(PHONK, "phonk", 280);
+    public static final VoiceLine ARTHUR_SUMMON = new VoiceLine(SUMMON, "arthur", "invocacao", 120);
     public static final List<VoiceLine> ARTHUR_VOICES = List.of(
             new VoiceLine(E_VAGABUNDO_SIM, "arthur", "e_vagabundo_sim", 220),
             new VoiceLine(FICOU_OFENDIDINHO, "arthur", "ficou_ofendidinho", 360),

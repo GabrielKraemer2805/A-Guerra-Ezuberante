@@ -8,6 +8,8 @@ A documentação principal está no [README](../README.md), com a implementaçã
 
 Atualização de implementação: **0.002.0** adiciona Arthur do Val e retaliação compartilhada. A lore abaixo permanece preservada; estado da sprint em [COMBATE_0.002.md](COMBATE_0.002.md), [AUDIOS.md](AUDIOS.md) e [VALIDACAO.md](VALIDACAO.md).
 
+Atualização da sprint **0.004.0**: GeckoLib 4.8.4 obrigatório, humanoide articulado, emergência corporal em 44 ticks, alcance corrigido e dois Arthurs estão implementados. O Exército Ucraniano e a Espada Ucraniana da sprint anterior foram preservados. Estado real e arquivos em [GECKOLIB_0.004.md](GECKOLIB_0.004.md); as seções abaixo preservam o planejamento original.
+
 ## 1. Escopo inicial e estado atual
 
 Este documento começou como registro da ideia. Em seguida, o autor autorizou a implementação do Renan e forneceu a skin e duas falas. A implementação atual está documentada no README, preservando aqui a lore e o roadmap original.
@@ -251,7 +253,7 @@ Esta seção registra a proposta recebida, sem fixar versões ou validar compati
 | Forge | Integração, registros, entidades, itens e eventos | 47.4.28 |
 | Gradle | Compilação e dependências | Wrapper 8.8 e ForgeGradle 6.0.54 |
 | Blockbench | Modelos e animações | Recursos visuais adiados |
-| GeckoLib | Animações avançadas | Opcional, conforme necessidade |
+| GeckoLib 4.8.4 | Animações articuladas | Obrigatório desde 0.004.0 |
 | JSON | Dados configuráveis de personagens e poderes | Formato/esquema a definir |
 | IntelliJ + Codex | Ambiente sugerido na fonte | Sugestão, sem impor troca de editor |
 | Git/GitHub | Versionamento e colaboração | Repositório inicializado |
@@ -376,7 +378,7 @@ Um quadro Trello ou GitHub Projects foi sugerido na fonte, mas não foi criado n
 | Personagem piloto | Renan Santos confirmado e implementado |
 | Aparência do primeiro teste | Skin clássica 64×64 do autor integrada e confirmada no jogo |
 | Identificador técnico e pacote Java | guerra_ezuberante e io.github.omarflk.guerraezuberante |
-| GeckoLib e formato de animação | Opcionais, conforme necessidade |
+| GeckoLib e formato de animação | GeckoLib 4.8.4 obrigatório; modelos e clipes gerados por código |
 | Atributos e balanceamento | Sem valores definidos |
 | Regras detalhadas de alianças, progressão e troca de facção | Ainda não especificadas |
 | Formato final dos recursos visuais e áudio | A definir com o autor |

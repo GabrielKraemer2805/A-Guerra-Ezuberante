@@ -5,6 +5,7 @@ import io.github.omarflk.guerraezuberante.client.gui.ModPanelScreen;
 import io.github.omarflk.guerraezuberante.client.input.ModKeyBindings;
 import io.github.omarflk.guerraezuberante.client.renderer.RenanRenderer;
 import io.github.omarflk.guerraezuberante.client.renderer.ArthurRenderer;
+import io.github.omarflk.guerraezuberante.client.renderer.UkrainianFighterRenderer;
 import io.github.omarflk.guerraezuberante.registry.ModEntities;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
@@ -21,6 +22,9 @@ public final class ClientModEvents {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.RENAN_SANTOS.get(), RenanRenderer::new);
         event.registerEntityRenderer(ModEntities.ARTHUR_DO_VAL.get(), ArthurRenderer::new);
+        event.registerEntityRenderer(ModEntities.ARTHUR_COMBATENTE.get(), ArthurRenderer::new);
+        event.registerEntityRenderer(ModEntities.ARTHUR_INVOCADOR.get(), ArthurRenderer::new);
+        event.registerEntityRenderer(ModEntities.UKRAINIAN_FIGHTER.get(), UkrainianFighterRenderer::new);
     }
 
     @SubscribeEvent

@@ -6,7 +6,8 @@
 
 **Seis facções · Personagens com IA · Exércitos invocáveis · Multiplayer**
 
-![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.002.0-DBA434?style=for-the-badge)
+![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.004.0-DBA434?style=for-the-badge)
+![GeckoLib](https://img.shields.io/badge/GeckoLib-4.8.4-58A64B?style=for-the-badge)
 ![Plataforma](https://img.shields.io/badge/PLATAFORMA-MINECRAFT_JAVA-62B447?style=for-the-badge)
 ![Primeiro marco](https://img.shields.io/badge/PRIMEIRO_MARCO-v0.001-6488EA?style=for-the-badge)
 ![Foco](https://img.shields.io/badge/FOCO-MULTIPLAYER-A875D6?style=for-the-badge)
@@ -19,9 +20,165 @@ Guerra Ezuberante é um projeto de mod de Minecraft Java Edition em que personag
 
 Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pretendida e o caminho de desenvolvimento. Os ataques, nomes de poderes e eventos pertencem a uma sátira fictícia de videogame.
 
-> **Estado atual — sprint 0.002.0 compilada e testada no servidor.** Renan e Arthur possuem retaliação corpo a corpo: ficam pacíficos até receber dano de um agressor válido. O build e os 12 GameTests passaram, incluindo invocação pelos dois ovos. O cliente da sprint iniciou em mundo isolado; visual do Arthur e multiplayer com dois jogadores ainda precisam de confirmação manual. O Renan toca o phonk na entrada em combate. As sete gravações únicas do Arthur estão no botão direito; ao entrar em combate ele toca “É vagabundo sim”, escolhida pelo autor, com recarga de 11 s. Consulte [combate](docs/COMBATE_0.002.md), [áudios](docs/AUDIOS.md) e [validação](docs/VALIDACAO.md).
+> **Estado atual — sprint 0.004.0.** GeckoLib **4.8.4** é obrigatório no cliente e no servidor. Renan, os dois Arthurs e as combatentes usam um humanoide articulado, gerado por código com as skins originais. A emergência dura 44 ticks, com mãos, cotovelos e joelhos independentes. Alcance corrigido, impacto no tick 5 e knockback moderado. [Entrega técnica e arquivos](docs/GECKOLIB_0.004.md), [resultados reais](docs/VALIDACAO.md).
 
-## Sprint 0.002.0: executar e testar
+O projeto segue o desafio de desenvolvimento **100% por IA**. Código, UVs, modelos, keyframes, conversões, validações e correções são responsabilidade do agente. O autor fornece ideias, assets e feedback; não precisa configurar Blockbench ou editar Java/JSON.
+
+## Dois Arthurs, uma implementação
+
+| Personagem | Equipamento ao nascer | Habilidade | Movimento |
+| --- | --- | --- | --- |
+| Arthur do Val — Combatente | Espada Ucraniana | Não invoca; usa golpes de espada | Base 0,24; sem Velocidade por invocação |
+| Arthur do Val — Invocador | Sem arma | Conjura até cinco tropas por leva | Base 0,24; Velocidade I infinita após primeira leva bem-sucedida |
+| Arthur antigo (`arthur_do_val`) | Sem arma | Preservado como Invocador para compatibilidade | Mesma regra do Invocador |
+
+Os dois novos ovos ficam na aba Guerra Ezuberante. A entidade e o ovo antigos continuam registrados, mas o ovo legado não ocupa espaço na aba. Ambos mantêm 32 HP, atributo básico de dano 5, escala 0,88, hitbox 0,528 × 1,584 e as falas existentes. O Arthur Combatente mantém **5 HP de dano final**: seu cálculo de ataque exclui o modificador da arma para preservar o balanceamento pedido. O item continua idêntico a uma espada de ferro, e as tropas continuam com dano total 6.
+
+```mermaid
+flowchart TD
+    Base[ArthurDoValEntity: skin, atributos, falas e persistência] --> C[Combatente: espada]
+    Base --> I[Invocador: punhos]
+    Base --> L[ID legado: Invocador]
+    C --> S[Golpes com espada, sem invocações]
+    I --> M[Conjuração após agressão válida]
+    L --> M
+    M --> V{Criou ao menos uma tropa?}
+    V -- Sim --> P[HasSummoned persistido + Velocidade I infinita]
+    V -- Não --> N[Sem bônus de velocidade]
+```
+
+## Modelos e animações gerados por IA
+
+`tools/GenerateGeckoAssets.java` gera `geo/humanoid.geo.json` e `animations/humanoid.animation.json`. O modelo compartilhado possui 14 ossos: root, body, torso, head, braços, antebraços, mãos, coxas e canelas. Cada segmento de braço/perna recebe seis linhas da região de 12 pixels da skin original, inclusive a camada externa. Os rostos e as roupas não foram redesenhados; os PNGs permanecem idênticos às fontes.
+
+| Clipe | Duração | Movimento |
+| --- | --- | --- |
+| `idle` | 2 s, repetido | Respiração e oscilação leve dos braços |
+| `walk` | 0,8 s, repetido | Braços e pernas alternados, joelhos articulados |
+| `punch_right`, `punch_left` | 0,6 s | Preparação, extensão no impacto e recuperação |
+| `sword_attack` | 0,6 s | Preparação alta, corte e recuperação |
+| `hurt` | 0,5 s | Recuo do tronco e da cabeça |
+| `cast` | 1 s | Braços e cotovelos levantam e liberam a invocação |
+| `ukrainian_emerge` | 2,2 s | Mãos → apoio → tração → joelhos → postura de combate |
+
+```mermaid
+flowchart LR
+    PNG[Skins clássicas 64x64 preservadas] --> UV[UV por face e por segmento]
+    Script[Gerador Java versionado] --> UV
+    UV --> GEO[Humanoide GeckoLib articulado]
+    Script --> KF[Keyframes a 20 Hz com smoothstep]
+    KF --> ANIM[Oito clipes de animação]
+    GEO --> Render[GeoEntityRenderer + item na mão]
+    ANIM --> Render
+    Clock[Estados e relógio sincronizados pelo servidor] --> Render
+```
+
+### Saída do chão
+
+```mermaid
+flowchart LR
+    A[0–400 ms: uma mão, depois a outra] --> B[400–800 ms: cotovelos e apoio]
+    B --> C[800–1400 ms: braços puxam o tronco inclinado]
+    C --> D[1400–1900 ms: joelhos e pernas saem]
+    D --> E[1900–2200 ms: espada aparece e postura se firma]
+    E --> F[Servidor libera seguir e atacar]
+```
+
+A fase é calculada pelo relógio do mundo, com atraso de **0, 2, 4, 6 e 8 ticks** entre as cinco unidades. A animação usa rotação de membros e translação não uniforme do root. A posição física continua acima do solo, com colisão normal, sem destruir blocos e sem ataques antes do término. O salvamento preserva a fase e o atraso restantes.
+
+### Alcance e impacto
+
+O ataque mede a distância entre as **hitboxes reais**, permitindo uma folga máxima de 1,9 bloco entre suas superfícies. Para duas entidades com largura 0,6, equivale a aproximadamente **2,5 blocos entre os centros**; alvos maiores são tratados por suas dimensões. Não há aumento de hitbox. Tanto a preparação quanto o impacto exigem alcance e linha de visão.
+
+O servidor aplica dano uma vez no **tick 5 / 250 ms**. Os clipes têm uma pose de impacto nesse instante, e o controller consulta o início de ataque sincronizado para buscar o frame correto, inclusive quando um cliente começa a observar a entidade depois. Um impulso horizontal adicional de 0,2, sujeito à resistência a knockback vanilla, torna o acerto perceptível.
+
+```mermaid
+sequenceDiagram
+    participant S as Servidor Forge
+    participant A as Cliente A
+    participant B as Cliente B
+    S->>S: Alvo legítimo + alcance entre caixas + linha de visão
+    S-->>A: SynchedEntityData: início e lado do golpe
+    S-->>B: Mesmo estado e relógio do mundo
+    A->>A: GeckoLib busca pose no tempo do ataque
+    B->>B: GeckoLib busca pose no tempo do ataque
+    S->>S: Tick 5: revalida alcance/visão, aplica dano uma vez
+    S-->>A: Dano e movimento vanilla
+    S-->>B: Dano e movimento vanilla
+```
+
+## Exército Ucraniano: novidades desta versão
+
+| Recurso | Funcionamento |
+| --- | --- |
+| Invocação de Arthur | Só o Invocador, em combate legítimo; conjura por 20 ticks e cria até cinco unidades |
+| Recarga | 700 ticks por Arthur; não espera 35 segundos pela primeira leva |
+| Capacidade | 30 unidades por dono, configurável; uma leva parcial só ocupa as vagas restantes |
+| Combatentes | Skin 64×64 original, 15 HP padrão e espada de ferro personalizada |
+| Espada Ucraniana | Mesmo tier, modificadores, durabilidade e velocidade da espada de ferro; dano nominal total 6, sem bônus do Arthur |
+| Emergência | 44 ticks articulados, mais atraso individual; hitbox sobre terreno válido e ataques bloqueados até terminar |
+| IA | Seguir e defender o próprio Arthur, compartilhar alvos legítimos e revidar; sem ataques contra o dono, suas irmãs ou Renan |
+| Animações | Oito clipes GeckoLib 4; braços, cotovelos, coxas e joelhos independentes; impacto no tick 5 |
+| Áudio | Novo efeito de 5,90 s em `audios/ucraniana/efeito sonoro spawn ucrania.MP3`, inteiro e uma vez por cast |
+| Ciclo de vida | UUID de dono persistido, contagem inclui tropas descarregadas, morte do dono dissipa unidades; duração padrão de 5 minutos carregados |
+| Painel | Quatro opções: Renan, Combatente, Invocador e Ucraniana; prévias e informações por variante |
+
+GeckoLib 4.8.4 é a biblioteca oficial obrigatória. Ars Nouveau e Iron's Spells continuam sem dependência no projeto. [APIs, decisões e fontes oficiais](docs/GECKOLIB_0.004.md).
+
+### Configurar a habilidade
+
+Forge gera o arquivo `serverconfig/guerra_ezuberante-server.toml` na pasta do mundo:
+
+```toml
+[arthur]
+arthur_summon_enabled = true
+arthur_summon_count = 5
+arthur_summon_cooldown_ticks = 700
+arthur_max_active_summons = 30
+ukrainian_fighter_max_health = 15.0
+ukrainian_fighter_emergence_ticks = 44
+ukrainian_fighter_lifetime_ticks = 6000
+ukrainian_fighter_orphan_grace_ticks = 200
+```
+
+Os tempos em segundos pressupõem 20 TPS. A vida configurada é aplicada a novas invocações. A contagem por dono é salva em SavedData, incluindo unidades descarregadas; mudanças de configuração não removem à força tropas já existentes. [Detalhes de segurança e persistência](docs/INVOCACAO_0.003.md).
+
+```mermaid
+flowchart LR
+    A["Arthur recebe agressão válida"] --> B["Preparação e conjuração: 20 ticks"]
+    B --> C["Valida terreno e vagas do dono"]
+    C --> D["Cria até cinco unidades"]
+    D --> E["Emergência articulada: 44 ticks + atraso"]
+    E --> F["Seguir, defender e lutar com espada"]
+    F --> G{"Combate continua após 700 ticks?"}
+    G -- Sim, com vagas --> B
+    G -- Não --> H["Sem novas levas"]
+```
+
+Para testar: invoque Arthur e Renan pelos ovos, confirme a paz inicial e ataque Arthur em Survival/Adventure. Observe o cast, as unidades, as espadas e a emergência. Para dar a espada ao jogador, use `/give @p guerra_ezuberante:espada_ucraniana`. As combatentes entram pela habilidade; não existe ovo avulso delas nesta versão.
+
+### Prévia capturada no Minecraft
+
+![Skins originais nos modelos articulados: Arthur Combatente, Arthur Invocador e Renan](docs/preview/gecko-0.004/skins-variantes.png)
+
+![Combatentes usando os braços ao emergir do chão](docs/preview/gecko-0.004/cotovelos.png)
+
+<details>
+<summary>Ver combate e painel</summary>
+
+![Renan no impacto do soco e Arthur preparando o corte](docs/preview/gecko-0.004/soco-renan.png)
+
+![Arthur no impacto do corte com a Espada Ucraniana](docs/preview/gecko-0.004/espada-arthur.png)
+
+![Painel com Renan, Combatente, Invocador e Ucraniana](docs/preview/gecko-0.004/painel.png)
+
+![Prévia 3D completa de Renan após rolar a página](docs/preview/gecko-0.004/previa-3d.png)
+
+</details>
+
+As imagens são capturas do cliente de validação em mundo isolado. O relatório distingue os testes de servidor, a inspeção visual e o multiplayer com dois jogadores que ainda não foi executado.
+
+## Sprint 0.004.0: executar e testar
 
 ### O que foi implementado
 
@@ -37,10 +194,10 @@ Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pre
 | Cooldown | Renan: falas 15/4 s e phonk 14 s. Arthur: falas de 9 a 18 s. Recargas individuais e persistentes; sem reinício a cada golpe |
 | Rede | Som disparado pelo servidor; reação de combate vinculada à entidade e acompanhando sua posição pelo protocolo nativo |
 | Painel | Tecla K configurável: Início, Personagens, Facções, Habilidades e Sobre |
-| Apresentação | Design preto/cinza/amarelo preservado; seleção de Renan ou Arthur com atributos e prévia 3D, dentro de um mundo |
+| Apresentação | Design preto/cinza/amarelo preservado; seleção de Renan, Arthur ou Ucraniana com atributos e prévia 3D, dentro de um mundo |
 | Traduções | Português do Brasil e inglês; nomes, mensagens, legendas e páginas traduzíveis |
 
-Facções e habilidades do painel são **informativas**. Ouvir “Me Respeita” não executa o ataque giratório. O arquivo “Me respeita, creu creu - PHONK” foi fornecido nesta sprint e integrado separadamente. Nenhum áudio foi inventado, acelerado ou cortado.
+A escolha de facção e os poderes ainda planejados são **informativos**; a invocação de Arthur já é funcional e automática em combate. Ouvir “Me Respeita” não executa o ataque giratório. O arquivo “Me respeita, creu creu - PHONK” foi fornecido nesta sprint e integrado separadamente. Nenhum áudio foi inventado, acelerado ou cortado.
 
 ### Ambiente e IntelliJ
 
@@ -77,7 +234,7 @@ Com `JAVA_HOME` apontando para um JDK 17, o Wrapper também funciona diretamente
 1. Crie um mundo de teste em modo criativo.
 2. Abra a aba **Guerra Ezuberante** e pegue os ovos do Renan e do Arthur.
 3. Invoque ambos, observe as skins e compare a altura. Eles devem conviver sem agressão espontânea.
-4. Botão direito reproduz falas. Para testar combate, mude para Survival ou Adventure e ataque um personagem: ele revida. Renan inicia o phonk; Arthur toca “É vagabundo sim”, sem reiniciar a cada golpe.
+4. Botão direito reproduz falas. Para testar combate, mude para Survival ou Adventure e ataque um personagem: ele revida. Renan inicia o phonk; Arthur toca sua reação e conjura as combatentes quando há vagas; os eventos de áudio anteriores permanecem.
 5. Pressione **K** e navegue pelas cinco páginas. A tecla pode ser alterada em Opções → Controles.
 6. Salve e reabra o mundo para conferir a persistência. Para as legendas das falas, ative as legendas nas opções de acessibilidade do Minecraft.
 
@@ -88,9 +245,13 @@ Com comandos habilitados:
 /summon guerra_ezuberante:renan_santos ~ ~ ~
 /give @p guerra_ezuberante:arthur_do_val_spawn_egg
 /summon guerra_ezuberante:arthur_do_val ~2 ~ ~
+/give @p guerra_ezuberante:arthur_do_val_combatente_spawn_egg
+/give @p guerra_ezuberante:arthur_do_val_invocador_spawn_egg
+/summon guerra_ezuberante:arthur_do_val_combatente ~2 ~ ~
+/summon guerra_ezuberante:arthur_do_val_invocador ~4 ~ ~
 ```
 
-O JAR esperado fica em **`build/libs/guerra_ezuberante-0.002.0.jar`**. Para jogar fora do ambiente de desenvolvimento, use Minecraft Java 1.20.1 com Forge 47.4.28 e coloque esse JAR na pasta `mods/` do cliente e do servidor. Não distribua a pasta `.tools/` ou o cache Gradle.
+O JAR fica em **`build/libs/guerra_ezuberante-0.004.0.jar`**. O build também prepara **`build/distributions/guerra-ezuberante-0.004.0/mods/`** com o mod e o GeckoLib 4.8.4 original. Esse par é necessário no cliente e no servidor Forge 1.20.1. Não distribua `.tools/` ou caches, nem instale múltiplas versões do mod juntas.
 
 ### Áudios: entrada, conversão e novas falas
 
@@ -111,20 +272,20 @@ O script procura FFmpeg no PATH ou em `.tools/ffmpeg/`. Aceita `-Character`, `-F
 
 Os nove MP3s do Arthur correspondem a sete gravações únicas, entre 7,89 e 16,69 s. Todos foram preservados, e os sete OGGs únicos foram registrados. Consulte [o inventário completo](docs/AUDIOS.md) para nomes, duplicatas e recargas. O autor escolheu a gravação inteira “É vagabundo sim” para a reação de combate, com recarga de 11 s.
 
-Para adicionar outra fala: coloque o MP3 na entrada, converta, registre o evento em `ModSounds.java`, adicione sua definição a `sounds.json`, acrescente legendas em `pt_br.json` e `en_us.json` e inclua a fala na lista `RENAN_VOICES` com uma recarga compatível com a duração. Converter um novo MP3 sozinho não o registra no jogo.
+O autor fornece novos MP3s. O agente converte as gravações e atualiza `ModSounds.java`, `sounds.json`, legendas e listas de fala, com recarga compatível. Converter um MP3 sozinho não o registra no jogo; essa integração é feita pelo agente.
 
 Se um OGG estiver ausente, a interação ignora aquela fala. Se nenhuma estiver instalada, o jogo informa a falta dos arquivos em vez de tentar reproduzi-los.
 
 ### Trocar a skin
 
-Use uma skin **PNG 64×64, modelo clássico/Steve**. Copie o novo arquivo para ambos os caminhos:
+O autor fornece uma skin **PNG 64×64, modelo clássico/Steve**. O agente integra o arquivo nos dois caminhos:
 
 - `assets-entrada/skins/renan_santos_skin_64x64.png` — fonte de trabalho.
 - `src/main/resources/assets/guerra_ezuberante/textures/entity/renan_santos.png` — textura carregada pelo jogo.
 
 Para Arthur, use `assets-entrada/skins/arthur_do_val_skin_64x64_corrigida.png` e `src/main/resources/assets/guerra_ezuberante/textures/entity/arthur_do_val.png`. O PNG continua 64×64: escala 0,88, hitbox e altura dos olhos pertencem à entidade e ao renderer.
 
-Reconstrua o JAR após a alteração. O renderer usa o modelo humanoide nativo, com braços clássicos, sem GeckoLib. A lógica da entidade não precisa mudar para substituir somente a textura.
+O agente integra as texturas e recompila o JAR. O renderer GeckoLib usa UVs clássicas 64×64, com braços e pernas subdivididos por script. Uma troca de skin no mesmo padrão dispensa modelagem ou keyframes manuais.
 
 ### Verificações de recursos
 
@@ -132,7 +293,7 @@ Reconstrua o JAR após a alteração. O renderer usa o modelo humanoide nativo, 
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/validate_assets.ps1
 ```
 
-O validador verifica JSONs, paridade das traduções, legendas, referências de OGG, tamanho da skin e igualdade entre a textura fonte e a empacotada. Os resultados de compilação e execução estão registrados em [docs/VALIDACAO.md](docs/VALIDACAO.md).
+O validador verifica JSONs, paridade das traduções, legendas, referências de OGG, tamanho da skin e igualdade entre a textura fonte e a empacotada. `validate_gecko.ps1` também verifica ossos, UVs subdivididas, timestamps, clipes e dependência. Ambos fazem parte do build. `generate_gecko.ps1` regenera os modelos e as animações sem edição manual. Os resultados reais estão em [docs/VALIDACAO.md](docs/VALIDACAO.md).
 
 O idioma do painel acompanha o idioma escolhido no Minecraft. Para usar os textos em português, selecione **Português (Brasil)** nas opções de idioma do jogo. Os testes em `src/gameTest/` são executados separadamente e não entram no JAR distribuído.
 
@@ -376,11 +537,11 @@ O Gradle Wrapper oficial do MDK está versionado e utiliza Gradle 8.8. O ForgeGr
 
 | Tecnologia | Para que serve | Por que usar neste projeto | Situação |
 | --- | --- | --- | --- |
-| ![Blockbench](https://img.shields.io/badge/Blockbench-Modelos_e_Texturas-1E93D9?style=for-the-badge&logo=blockbench&logoColor=white) | Criar modelos, texturas e animações | Ferramentas de modelagem com poucos polígonos, pintura e animação para desenvolver a identidade dos personagens | Etapa posterior |
-| ![GeckoLib](https://img.shields.io/badge/GeckoLib-Animacao_3D-58A64B?style=for-the-badge) | Executar animações mais elaboradas | Poderá atender giros, danças, transformações e sequências de ataque por keyframes | Opcional |
+| ![Gerador Java](https://img.shields.io/badge/Java-Modelos_e_Keyframes-1E93D9?style=for-the-badge) | Gerar modelos, UVs e animações | Pipeline determinístico mantido pelo agente, com validação; dispensa Blockbench e ajustes manuais do autor | Implementado |
+| ![GeckoLib](https://img.shields.io/badge/GeckoLib-4.8.4-58A64B?style=for-the-badge) | Biblioteca oficial de animações | Modelos articulados, oito clipes e renderização por ossos; dependência obrigatória no cliente e servidor | Implementado |
 | ![JSON](https://img.shields.io/badge/JSON-Dados_Configuraveis-444444?style=for-the-badge&logo=json&logoColor=white) | Descrever dados e recursos nos formatos definidos | Ajustar parâmetros suportados sem espalhar valores fixos por várias classes | Esquema futuro |
 
-Blockbench possui ferramentas de modelos, texturas e animação. GeckoLib é uma biblioteca de animação para mods; a necessidade de usá-la dependerá dos modelos e dos movimentos desejados. [Blockbench](https://www.blockbench.net/), [GeckoLib](https://github.com/bernie-g/geckolib).
+GeckoLib 4.8.4 já executa os modelos e as animações articuladas. O gerador Java substitui a modelagem e a criação manual de keyframes no Blockbench; o autor não precisa usar esse editor. [Documentação oficial GeckoLib 4](https://github.com/bernie-g/geckolib/wiki/Installation-(Geckolib4)).
 
 Os dados personalizados em JSON precisarão de leitores e validação implementados pelo mod. JSON poderá configurar os comportamentos suportados; comportamentos novos continuarão exigindo programação. Os recursos do Minecraft seguirão os formatos da versão alvo.
 
@@ -404,9 +565,9 @@ flowchart LR
     J["Código Java"] --> G["Gradle: compilar e empacotar"]
     N["Forge: integração com Minecraft"] --> G
     D["Dados e recursos JSON"] --> G
-    B["Blockbench: modelos e texturas"] --> R["Recursos exportados"]
+    B["Gerador Java + skins do autor"] --> R["Recursos JSON e PNG preservados"]
     R --> G
-    K["GeckoLib, se necessária"] -.-> G
+    K["GeckoLib 4.8.4 obrigatório"] --> G
     G --> M["JAR do mod"]
     M --> C["Minecraft cliente"]
     M --> S["Servidor compatível"]
@@ -648,7 +809,7 @@ Metas numéricas de desempenho e limites serão definidos quando houver um prot�
 
 O autor forneceu a primeira skin do Renan e duas gravações de áudio. Os recursos visuais dos demais personagens serão desenvolvidos posteriormente.
 
-Para o Renan, o formato escolhido é skin PNG 64×64 no modelo clássico/Steve, aplicada ao PlayerModel nativo. Novos personagens poderão exigir modelos e animações próprios.
+Renan, Arthur e as combatentes usam skins PNG 64×64 no padrão clássico/Steve, aplicadas ao humanoide articulado GeckoLib gerado por código. Novos personagens podem reutilizar esse padrão; modelos diferentes também serão gerados pelo agente.
 
 As imagens anexadas nesta etapa são diagramas de conceito e uma captura de indicadores, não sprites, texturas ou modelos prontos para o Minecraft.
 
@@ -888,7 +1049,7 @@ O README deverá acompanhar as funcionalidades implementadas. Mudanças de desig
 | Identificador técnico | `guerra_ezuberante` | Configurado |
 | Pacote Java | `io.github.omarflk.guerraezuberante` | Configurado |
 | Aparência inicial | Skin clássica 64×64 fornecida | Integrada |
-| GeckoLib | Opcional | Ao definir animações |
+| GeckoLib | 4.8.4 obrigatório | Integrado desde a sprint 0.004.0 |
 | Atributos e recargas | Vida e recarga de voz definidas; poderes pendentes | Expandir na v0.002 |
 | Fogo amigo e alianças | Aliados da mesma facção por padrão; detalhes pendentes | Ao implementar facções |
 | Troca de facção | Permissão administrativa prevista; regras pendentes | Ao criar seleção e persistência |
@@ -896,7 +1057,7 @@ O README deverá acompanhar as funcionalidades implementadas. Mudanças de desig
 | Limites de tropas | Configuráveis, sem números fixados | Ao implementar invocações |
 | Distribuição e instalação | JAR local disponível; sem release publicada | Publicação futura |
 
-A v0.002 já contém retaliação básica para os dois personagens. O próximo passo é confirmar visualmente Arthur e o áudio escolhido, testar multiplayer e só depois iniciar v0.003 com o primeiro poder. Sprites dos outros personagens e poderes complexos ficam para etapas posteriores.
+A versão 0.004.0 migrou as animações para GeckoLib, articulou braços e pernas, separou os dois Arthurs e corrigiu alcance e emergência. O teste completo com dois clientes segue pendente após uma tentativa que parou no handshake Forge. O próximo ajuste visual depende do feedback do autor; sprites de outros personagens e novos poderes ficam para pedidos posteriores.
 
 <a id="referencias"></a>
 

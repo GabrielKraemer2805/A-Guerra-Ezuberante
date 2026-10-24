@@ -8,7 +8,8 @@ if ($difference) { throw 'As traduções pt_br e en_us possuem chaves diferentes
 
 foreach ($skin in @(
     @{ Texture = 'renan_santos'; Source = 'renan_santos_skin_64x64.png' },
-    @{ Texture = 'arthur_do_val'; Source = 'arthur_do_val_skin_64x64_corrigida.png' }
+    @{ Texture = 'arthur_do_val'; Source = 'arthur_do_val_skin_64x64_corrigida.png' },
+    @{ Texture = 'combatente_ucraniana'; Source = 'skin-loira.png' }
 )) {
     $skinPath = Join-Path $assets ('textures\entity\' + $skin.Texture + '.png')
     $bytes = [IO.File]::ReadAllBytes($skinPath)
@@ -27,6 +28,14 @@ foreach ($skin in @(
         (Get-FileHash -LiteralPath $source).Hash -ne (Get-FileHash -LiteralPath $skinPath).Hash) {
         throw "Skin fonte e recurso diferentes: $skinPath"
     }
+}
+$swordPath = Join-Path $assets 'textures\item\espada_ucraniana.png'
+$sword = [IO.File]::ReadAllBytes($swordPath)
+if ([BitConverter]::ToString($sword, 0, 8) -ne '89-50-4E-47-0D-0A-1A-0A' -or
+    [BitConverter]::ToString($sword, 16, 8) -ne '00-00-00-10-00-00-00-10') { throw 'A espada deve ser PNG 16 x 16.' }
+$swordSource = Join-Path $projectRoot 'assets-entrada\texturas\espada_bandeira_ucrania_16x16.png'
+if ((Get-FileHash -LiteralPath $swordSource).Hash -ne (Get-FileHash -LiteralPath $swordPath).Hash) {
+    throw 'A textura da espada deve preservar o sprite original.'
 }
 $sounds = Get-Content -LiteralPath (Join-Path $assets 'sounds.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 foreach ($event in $sounds.PSObject.Properties) {
