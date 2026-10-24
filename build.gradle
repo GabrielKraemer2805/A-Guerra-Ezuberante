@@ -1,0 +1,85 @@
+plugins {
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '6.0.54'
+}
+
+version = mod_version
+group = mod_group_id
+base { archivesName = mod_id }
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+sourceSets {
+    gameTest {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+
+minecraft {
+    mappings channel: 'official', version: minecraft_version
+    copyIdeResources = true
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'info'
+            mods {
+                "${mod_id}" { source sourceSets.main }
+            }
+        }
+        client {
+            // Optional isolated workspace for validation, preserving the player's development world.
+            workingDirectory project.file(providers.gradleProperty('clientWorkDir').getOrElse('run'))
+            if (providers.gradleProperty('quickPlayWorld').isPresent()) {
+                args '--quickPlaySingleplayer', providers.gradleProperty('quickPlayWorld').get()
+            }
+        }
+        server {
+            workingDirectory project.file('run-server')
+            args '--nogui'
+        }
+        gameTestServer {
+            workingDirectory project.file('run-gametest')
+            property 'forge.enabledGameTestNamespaces', mod_id
+            mods {
+                "${mod_id}" { source sourceSets.gameTest }
+            }
+        }
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+}
+
+// Fetch common libraries from their original repository instead of Forge's mirror.
+repositories {
+    mavenCentral()
+    configureEach {
+        if (it instanceof MavenArtifactRepository && it.url.toString().contains('maven.minecraftforge.net')) {
+            content {
+                includeGroupByRegex 'net\\.minecraftforge.*'
+                includeGroupByRegex 'de\\.oceanlabs.*'
+                includeGroupByRegex 'cpw\\.mods.*'
+                includeGroupByRegex 'org\\.spongepowered.*'
+            }
+        }
+    }
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    def properties = [mod_id: mod_id, mod_name: mod_name, mod_version: mod_version,
+                      mod_authors: mod_authors, forge_version: forge_version]
+    inputs.properties properties
+    filesMatching('META-INF/mods.toml') { expand properties }
+}
+
+tasks.named('jar', Jar).configure {
+    manifest.attributes([
+        'Implementation-Title': mod_name,
+        'Implementation-Version': mod_version,
+        'Implementation-Vendor': mod_authors
+    ])
+    finalizedBy 'reobfJar'
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }

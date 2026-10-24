@@ -6,7 +6,7 @@
 
 **Seis facções · Personagens com IA · Exércitos invocáveis · Multiplayer**
 
-![Status](https://img.shields.io/badge/STATUS-EM_PLANEJAMENTO-DBA434?style=for-the-badge)
+![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.002.0-DBA434?style=for-the-badge)
 ![Plataforma](https://img.shields.io/badge/PLATAFORMA-MINECRAFT_JAVA-62B447?style=for-the-badge)
 ![Primeiro marco](https://img.shields.io/badge/PRIMEIRO_MARCO-v0.001-6488EA?style=for-the-badge)
 ![Foco](https://img.shields.io/badge/FOCO-MULTIPLAYER-A875D6?style=for-the-badge)
@@ -19,7 +19,122 @@ Guerra Ezuberante é um projeto de mod de Minecraft Java Edition em que personag
 
 Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pretendida e o caminho de desenvolvimento. Os ataques, nomes de poderes e eventos pertencem a uma sátira fictícia de videogame.
 
-> **Estado atual — documentação e planejamento.** Ainda não existe projeto Java/Gradle, personagem implementado, sistema de facções ou JAR jogável. Os diagramas descrevem o funcionamento planejado. A versão do Minecraft e as dependências serão definidas antes da implementação. Arte, sprites e modelos serão trabalhados depois, com o autor.
+> **Estado atual — sprint 0.002.0 compilada e testada no servidor.** Renan e Arthur possuem retaliação corpo a corpo: ficam pacíficos até receber dano de um agressor válido. O build e os 12 GameTests passaram, incluindo invocação pelos dois ovos. O cliente da sprint iniciou em mundo isolado; visual do Arthur e multiplayer com dois jogadores ainda precisam de confirmação manual. O Renan toca o phonk na entrada em combate. As sete gravações únicas do Arthur estão no botão direito; ao entrar em combate ele toca “É vagabundo sim”, escolhida pelo autor, com recarga de 11 s. Consulte [combate](docs/COMBATE_0.002.md), [áudios](docs/AUDIOS.md) e [validação](docs/VALIDACAO.md).
+
+## Sprint 0.002.0: executar e testar
+
+### O que foi implementado
+
+| Recurso | Implementação |
+| --- | --- |
+| Renan Santos | Entidade `guerra_ezuberante:renan_santos`, skin original, 30 HP e dano 4 |
+| Arthur do Val | Entidade `guerra_ezuberante:arthur_do_val`, skin 64×64 do autor, 32 HP e dano 5; escala 0,88 |
+| Comportamento | Caminhada e observação; perseguição e socos somente após agressão válida, sem iniciar brigas espontaneamente |
+| Atributos | Renan: velocidade 0,25 e hitbox 0,6 × 1,8. Arthur: 0,24 e hitbox 0,528 × 1,584. Ambos recebem dano, morrem e perseguem até 20 blocos |
+| Persistência | Sem desaparecimento por distância; dados e recarga de voz salvos com a entidade |
+| Spawn eggs | Renan preto/amarelo e Arthur azul-claro/jeans, juntos na aba Guerra Ezuberante |
+| Falas | Duas falas do Renan e sete gravações únicas do Arthur, completas e escolhidas aleatoriamente pelo botão direito |
+| Cooldown | Renan: falas 15/4 s e phonk 14 s. Arthur: falas de 9 a 18 s. Recargas individuais e persistentes; sem reinício a cada golpe |
+| Rede | Som disparado pelo servidor; reação de combate vinculada à entidade e acompanhando sua posição pelo protocolo nativo |
+| Painel | Tecla K configurável: Início, Personagens, Facções, Habilidades e Sobre |
+| Apresentação | Design preto/cinza/amarelo preservado; seleção de Renan ou Arthur com atributos e prévia 3D, dentro de um mundo |
+| Traduções | Português do Brasil e inglês; nomes, mensagens, legendas e páginas traduzíveis |
+
+Facções e habilidades do painel são **informativas**. Ouvir “Me Respeita” não executa o ataque giratório. O arquivo “Me respeita, creu creu - PHONK” foi fornecido nesta sprint e integrado separadamente. Nenhum áudio foi inventado, acelerado ou cortado.
+
+### Ambiente e IntelliJ
+
+1. Abra a pasta do repositório como projeto Gradle no IntelliJ IDEA.
+2. Configure **Project SDK e Gradle JVM como JDK 17**. Java 8 não serve para esta base.
+3. Aguarde a importação das dependências oficiais. O Wrapper é **Gradle 8.8** e o ForgeGradle está fixado em **6.0.54**.
+4. Execute `genIntellijRuns` para gerar as configurações de execução da IDE, se necessário.
+
+Há um JDK 17 portátil em `.tools/jdk17/` neste workspace para os testes locais. Ele não é versionado. Em outro computador, instale um JDK 17 e configure `JAVA_HOME`.
+
+O auxiliar PowerShell escolhe o JDK portátil, quando presente, e mantém o cache em `.gradle-user/`. Na raiz do projeto:
+
+```powershell
+# Compilar e gerar o JAR
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gradle.ps1 build
+
+# Abrir o Minecraft de desenvolvimento
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gradle.ps1 runClient
+
+# Iniciar o servidor dedicado de desenvolvimento
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gradle.ps1 runServer
+
+# Gerar configurações para o IntelliJ
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gradle.ps1 genIntellijRuns
+
+# Testes de integração no servidor Forge, sem interface gráfica
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gradle.ps1 runGameTestServer
+```
+
+Com `JAVA_HOME` apontando para um JDK 17, o Wrapper também funciona diretamente: `./gradlew.bat build`, `./gradlew.bat runClient` e `./gradlew.bat runServer`. O servidor de desenvolvimento usa `run-server/`; leia e aceite pessoalmente a EULA, quando solicitada pelo Minecraft, antes de usá-lo.
+
+### Teste dentro do jogo
+
+1. Crie um mundo de teste em modo criativo.
+2. Abra a aba **Guerra Ezuberante** e pegue os ovos do Renan e do Arthur.
+3. Invoque ambos, observe as skins e compare a altura. Eles devem conviver sem agressão espontânea.
+4. Botão direito reproduz falas. Para testar combate, mude para Survival ou Adventure e ataque um personagem: ele revida. Renan inicia o phonk; Arthur toca “É vagabundo sim”, sem reiniciar a cada golpe.
+5. Pressione **K** e navegue pelas cinco páginas. A tecla pode ser alterada em Opções → Controles.
+6. Salve e reabra o mundo para conferir a persistência. Para as legendas das falas, ative as legendas nas opções de acessibilidade do Minecraft.
+
+Com comandos habilitados:
+
+```mcfunction
+/give @p guerra_ezuberante:renan_spawn_egg
+/summon guerra_ezuberante:renan_santos ~ ~ ~
+/give @p guerra_ezuberante:arthur_do_val_spawn_egg
+/summon guerra_ezuberante:arthur_do_val ~2 ~ ~
+```
+
+O JAR esperado fica em **`build/libs/guerra_ezuberante-0.002.0.jar`**. Para jogar fora do ambiente de desenvolvimento, use Minecraft Java 1.20.1 com Forge 47.4.28 e coloque esse JAR na pasta `mods/` do cliente e do servidor. Não distribua a pasta `.tools/` ou o cache Gradle.
+
+### Áudios: entrada, conversão e novas falas
+
+Os MP3s estão organizados em `assets-entrada/audio/renan/` e `assets-entrada/audio/arthur/`. As cópias soltas da primeira versão foram preservadas. Os arquivos da pasta original `audios/` foram preservados. MP3s originais e ferramentas portáteis são ignorados pelo Git; os OGGs de recursos fazem parte do mod.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/convert_audio.ps1 -Character renan
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/convert_audio.ps1 -Character arthur
+```
+
+O script procura FFmpeg no PATH ou em `.tools/ffmpeg/`. Aceita `-Character`, `-FFmpegPath` e `-InputDirectory`, e evita cópias de áudios com hash idêntico. Converte os arquivos completos para **Ogg Vorbis, mono, 44.100 Hz, qualidade 4**, normaliza nomes, rejeita colisões e mantém os originais.
+
+| Arquivo empacotado | Duração medida | Evento |
+| --- | --- | --- |
+| `sounds/renan/me_respeita.ogg` | Aproximadamente 13,48 s | `guerra_ezuberante:renan.me_respeita` |
+| `sounds/renan/risadinha.ogg` | Aproximadamente 2,38 s | `guerra_ezuberante:renan.risadinha` |
+| `sounds/renan/phonk.ogg` | Aproximadamente 12,59 s | `guerra_ezuberante:renan.phonk` |
+
+Os nove MP3s do Arthur correspondem a sete gravações únicas, entre 7,89 e 16,69 s. Todos foram preservados, e os sete OGGs únicos foram registrados. Consulte [o inventário completo](docs/AUDIOS.md) para nomes, duplicatas e recargas. O autor escolheu a gravação inteira “É vagabundo sim” para a reação de combate, com recarga de 11 s.
+
+Para adicionar outra fala: coloque o MP3 na entrada, converta, registre o evento em `ModSounds.java`, adicione sua definição a `sounds.json`, acrescente legendas em `pt_br.json` e `en_us.json` e inclua a fala na lista `RENAN_VOICES` com uma recarga compatível com a duração. Converter um novo MP3 sozinho não o registra no jogo.
+
+Se um OGG estiver ausente, a interação ignora aquela fala. Se nenhuma estiver instalada, o jogo informa a falta dos arquivos em vez de tentar reproduzi-los.
+
+### Trocar a skin
+
+Use uma skin **PNG 64×64, modelo clássico/Steve**. Copie o novo arquivo para ambos os caminhos:
+
+- `assets-entrada/skins/renan_santos_skin_64x64.png` — fonte de trabalho.
+- `src/main/resources/assets/guerra_ezuberante/textures/entity/renan_santos.png` — textura carregada pelo jogo.
+
+Para Arthur, use `assets-entrada/skins/arthur_do_val_skin_64x64_corrigida.png` e `src/main/resources/assets/guerra_ezuberante/textures/entity/arthur_do_val.png`. O PNG continua 64×64: escala 0,88, hitbox e altura dos olhos pertencem à entidade e ao renderer.
+
+Reconstrua o JAR após a alteração. O renderer usa o modelo humanoide nativo, com braços clássicos, sem GeckoLib. A lógica da entidade não precisa mudar para substituir somente a textura.
+
+### Verificações de recursos
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/validate_assets.ps1
+```
+
+O validador verifica JSONs, paridade das traduções, legendas, referências de OGG, tamanho da skin e igualdade entre a textura fonte e a empacotada. Os resultados de compilação e execução estão registrados em [docs/VALIDACAO.md](docs/VALIDACAO.md).
+
+O idioma do painel acompanha o idioma escolhido no Minecraft. Para usar os textos em português, selecione **Português (Brasil)** nas opções de idioma do jogo. Os testes em `src/gameTest/` são executados separadamente e não entram no JAR distribuído.
 
 ## Navegação
 
@@ -131,7 +246,7 @@ flowchart TD
 
 ## Catálogo de personagens e habilidades
 
-Todos os itens deste catálogo estão planejados. Dano, vida, alcance, duração, recarga, probabilidade de uso e limites de tropas ainda não receberam valores.
+Os poderes de combate deste catálogo estão planejados e ainda não têm valores de balanceamento. O protótipo do Renan já possui vida, movimento e recarga das falas definidos na seção inicial; isso não implementa os ataques especiais abaixo.
 
 ### Renan Santos
 
@@ -145,7 +260,7 @@ Facção: Direita Missão. Papel: boss, invocador e DPS (dano).
 | Cavalaria da Missão | Invoca nerds com lanças medievais montados em onças |
 | Ultimate — Moggador Supremo | Combina rotação, disparos e cavalaria em uma sequência especial |
 
-Renan é o personagem piloto sugerido no documento original. O autor ainda pretende definir e criar conosco o personagem inicial de teste e seus recursos visuais.
+Renan é o personagem piloto confirmado. O protótipo utiliza a skin clássica 64×64 fornecida pelo autor; os poderes deste catálogo continuam planejados.
 
 ### Arthur do Val
 
@@ -242,20 +357,20 @@ Batalhas de chefes, arenas eleitorais, guerras entre facções e campanhas com m
 
 ## Tecnologias: o que usaremos e por quê
 
-As tecnologias abaixo compõem a base proposta. Escolheremos as versões em conjunto, verificando a compatibilidade com a versão alvo do Minecraft. Os badges identificam ferramentas e formatos; não significam que já estejam instalados ou configurados.
+A base implementada é Minecraft 1.20.1, Forge 47.4.28, Java 17, ForgeGradle 6.0.54 e Gradle Wrapper 8.8. As ferramentas de arte e os sistemas de dados avançados continuam opcionais ou planejados conforme a tabela.
 
 ### Base do mod
 
 | Tecnologia | Para que serve | Por que usar neste projeto | Situação |
 | --- | --- | --- | --- |
-| ![Minecraft](https://img.shields.io/badge/Minecraft-Java_Edition-62B447?style=for-the-badge) | Plataforma em que existirão as entidades, os itens e as batalhas | Integrar os personagens ao mundo, ao inventário criativo e ao multiplayer | Versão pendente |
-| ![Java](https://img.shields.io/badge/Java-Linguagem-E76F00?style=for-the-badge) | Programar entidades, IA, poderes e regras | Organizar comportamentos compartilhados e a lógica do mod na plataforma escolhida | Versão do JDK pendente |
-| ![NeoForge](https://img.shields.io/badge/NeoForge-Modding_API-D97635?style=for-the-badge) | API e infraestrutura para integrar o mod ao Minecraft | Base proposta para registros, entidades, itens e eventos | Proposto; versão pendente |
-| ![Gradle](https://img.shields.io/badge/Gradle-Build-02303A?style=for-the-badge&logo=gradle&logoColor=white) | Organizar compilação, dependências e empacotamento | Reproduzir o build e gerar o JAR a partir do projeto versionado | Configuração futura |
+| ![Minecraft](https://img.shields.io/badge/Minecraft-Java_Edition-62B447?style=for-the-badge) | Plataforma em que existirão as entidades, os itens e as batalhas | Integrar os personagens ao mundo, ao inventário criativo e ao multiplayer | Minecraft 1.20.1 |
+| ![Java](https://img.shields.io/badge/Java-Linguagem-E76F00?style=for-the-badge) | Programar entidades, IA, poderes e regras | Organizar comportamentos compartilhados e a lógica do mod na plataforma escolhida | Java 17 |
+| ![Forge](https://img.shields.io/badge/Forge-Modding_API-D97635?style=for-the-badge) | API e infraestrutura para integrar o mod ao Minecraft | Base proposta para registros, entidades, itens e eventos | Forge 47.4.28 |
+| ![Gradle](https://img.shields.io/badge/Gradle-Build-02303A?style=for-the-badge&logo=gradle&logoColor=white) | Organizar compilação, dependências e empacotamento | Reproduzir o build e gerar o JAR a partir do projeto versionado | Gradle 8.8 + ForgeGradle 6.0.54 |
 
-NeoForge é a API de modding escolhida na proposta original; sua documentação será a referência da integração com o jogo. [Documentação oficial do NeoForge](https://docs.neoforged.net/).
+Forge substitui a sugestão inicial de loader e é a API escolhida para esta implementação 1.20.1. A documentação oficial dessa versão orienta os registros, a entidade e o áudio. [Documentação oficial do Forge](https://docs.minecraftforge.net/en/1.20.1/).
 
-A proposta de build inclui versionar o Gradle Wrapper para o próprio projeto definir a versão da ferramenta. Essa versão será escolhida conforme o conjunto compatível de dependências. [Conceitos do Gradle](https://docs.gradle.org/current/userguide/gradle_basics.html), [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html).
+O Gradle Wrapper oficial do MDK está versionado e utiliza Gradle 8.8. O ForgeGradle foi fixado em 6.0.54 para tornar a configuração explícita. [Conceitos do Gradle](https://docs.gradle.org/current/userguide/gradle_basics.html), [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html).
 
 ### Conteúdo, arte e animação
 
@@ -280,14 +395,14 @@ Os dados personalizados em JSON precisarão de leitores e validação implementa
 
 Os diagramas usam blocos Mermaid, formato renderizado pelo GitHub em arquivos Markdown. [Diagramas no GitHub](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams).
 
-O editor ficará a critério do autor. IntelliJ foi sugerido no documento inicial; a construção do mod não depende dessa escolha. Um quadro de tarefas poderá ser criado depois para acompanhar as entregas.
+O ambiente principal solicitado é IntelliJ IDEA no Windows. O Wrapper também permite executar o build pelo terminal. Um quadro de tarefas poderá ser criado depois para acompanhar as entregas.
 
 ### Como as ferramentas se encaixam
 
 ```mermaid
 flowchart LR
     J["Código Java"] --> G["Gradle: compilar e empacotar"]
-    N["NeoForge: integração com Minecraft"] --> G
+    N["Forge: integração com Minecraft"] --> G
     D["Dados e recursos JSON"] --> G
     B["Blockbench: modelos e texturas"] --> R["Recursos exportados"]
     R --> G
@@ -531,13 +646,13 @@ Metas numéricas de desempenho e limites serão definidos quando houver um prot�
 
 ## Arte, sprites, modelos e áudio
 
-O autor quer criar os recursos dos personagens em uma etapa posterior, começando por um personagem inicial de teste.
+O autor forneceu a primeira skin do Renan e duas gravações de áudio. Os recursos visuais dos demais personagens serão desenvolvidos posteriormente.
 
-O formato visual ainda está em aberto: skins/texturas podem ser aproveitadas com um modelo compatível; uma imagem 2D pode exigir adaptação de modelo ou renderização como sprite plano. A escolha entre essas opções será feita quando houver referências e requisitos de animação.
+Para o Renan, o formato escolhido é skin PNG 64×64 no modelo clássico/Steve, aplicada ao PlayerModel nativo. Novos personagens poderão exigir modelos e animações próprios.
 
 As imagens anexadas nesta etapa são diagramas de conceito e uma captura de indicadores, não sprites, texturas ou modelos prontos para o Minecraft.
 
-Nenhuma música, fala, textura ou animação foi produzida ou importada como recurso do mod nesta etapa.
+A skin do Renan e os dois áudios convertidos estão em src/main/resources/assets/guerra_ezuberante/. A movimentação utiliza animação humanoide nativa; não há ataques ou coreografias especiais implementados.
 
 ### Caminho da arte até o jogo
 
@@ -553,7 +668,7 @@ flowchart LR
     H --> B
 ```
 
-O primeiro teste poderá utilizar uma aparência provisória combinada com o autor. Recursos definitivos serão desenvolvidos junto do personagem. A ficha visual reunirá modelo, textura, animações, efeitos e sons; cada recurso será validado quando aparecer corretamente no jogo.
+O primeiro personagem utiliza a skin fornecida pelo autor. Recursos definitivos e novas animações poderão evoluir nos marcos seguintes. A ficha visual reunirá modelo, textura, animações, efeitos e sons; cada recurso será validado quando aparecer corretamente no jogo.
 
 <a id="desenvolvimento"></a>
 
@@ -577,7 +692,7 @@ flowchart TD
 
 ### Etapas práticas
 
-1. **Definir a plataforma:** escolher Minecraft, Java, NeoForge e Gradle compatíveis.
+1. **Definir a plataforma:** escolher Minecraft, Java, Forge e Gradle compatíveis.
 2. **Criar a base mínima:** projeto compila e carrega no ambiente de desenvolvimento.
 3. **Adicionar o piloto:** entidade, atributos, spawn egg e aba Guerra Ezuberante.
 4. **Validar a apresentação:** renderizador e aparência provisória ou modelo preparado com o autor.
@@ -607,17 +722,17 @@ Essas verificações serão aplicadas conforme as funcionalidades existirem. Ain
 
 Cada marco deverá apresentar o comportamento previsto, passar pela validação adequada e ter a documentação atualizada. Compilar faz parte do processo; o funcionamento das entidades e dos poderes também precisará ser observado no jogo.
 
-As instruções executáveis de instalação e build serão acrescentadas quando houver projeto Gradle e versões definidas.
+Os comandos executáveis de build, cliente e servidor estão no início deste README. Os critérios deste capítulo descrevem a estratégia também para versões posteriores.
 
 <a id="roadmap"></a>
 
 ## Roadmap proposto
 
-As versões abaixo são rótulos do planejamento original, ainda sem releases. A numeração poderá ser padronizada antes da configuração do projeto. Não há prazos de calendário: a duração depende de IA, recursos visuais e testes.
+Os rótulos abaixo preservam o roadmap original. A versão técnica do primeiro protótipo é 0.002.0; os marcos futuros ainda não são releases. Não há prazos de calendário: a duração depende de IA, recursos visuais e testes.
 
 | Sprint / versão | Escopo | Critério de aceite previsto |
 | --- | --- | --- |
-| 01 — v0.001 | Base Java/NeoForge/Gradle, entidade piloto Renan, modelo/textura, spawn egg, aba criativa, movimentação, comando e primeiro JAR | Abrir o Minecraft, pegar o ovo na aba do mod, invocar o personagem com aparência correta e vê-lo mover-se sem erros; validar cliente e servidor |
+| 01 — v0.001 | Base Java/Forge/Gradle, entidade piloto Renan, modelo/textura, spawn egg, aba criativa, movimentação, comando e primeiro JAR | Abrir o Minecraft, pegar o ovo na aba do mod, invocar o personagem com aparência correta e vê-lo mover-se sem erros; validar cliente e servidor |
 | 02 — v0.002 | IA e combate básico: detectar, perseguir, atacar, receber dano e morrer | Renan enfrenta um zumbi ou alvo de teste sem travar |
 | 03 — v0.003 | Ataque giratório, projéteis, cooldown, efeitos simples e primeira animação de combate | Habilidade automática respeita a recarga e causa dano no servidor |
 | 04 — v0.004 | Lula, spawn egg, feijões e identificação básica de facções inimigas | Renan e Lula se reconhecem como inimigos e lutam automaticamente |
@@ -629,21 +744,21 @@ As versões abaixo são rótulos do planejamento original, ainda sem releases. A
 | 10 — v0.010 | Integração de poderes, sons, interfaces, limites de invocação e balanceamento | Três facções lutam numa arena multiplayer sem erros críticos |
 | 11 — v0.1.0 | Alpha: polimento, otimização, instalação, documentação e correções | Amigos conseguem reproduzir o mod no cliente e servidor com a mesma versão |
 
-### Checklist futuro da v0.001
+### Checklist implementado da v0.001
 
-- [ ] Criar o projeto Java com NeoForge e Gradle, após definir as versões.
-- [ ] Registrar a entidade piloto, proposta como Renan Santos.
-- [ ] Carregar modelo e textura definidos com o autor.
-- [ ] Criar o spawn egg exclusivo da entidade.
-- [ ] Criar a aba Guerra Ezuberante no inventário criativo.
-- [ ] Implementar movimentação e animação básica.
-- [ ] Permitir invocação por ovo e comando.
-- [ ] Executar testes no cliente e no servidor.
-- [ ] Gerar o primeiro arquivo `.jar`.
+- [x] Criar o projeto Java 17 com Forge 47.4.28 e Gradle 8.8.
+- [x] Registrar a entidade piloto Renan Santos.
+- [x] Carregar modelo humanoide e skin fornecida pelo autor.
+- [x] Criar o spawn egg exclusivo da entidade.
+- [x] Criar a aba Guerra Ezuberante no inventário criativo.
+- [x] Implementar movimentação e animação básica.
+- [x] Permitir invocação por ovo e comando.
+- [x] Executar build, GameTests de servidor e inicialização do cliente; ver limites em VALIDACAO.md.
+- [x] Gerar o primeiro arquivo `.jar`.
 
 O primeiro marco comprova a infraestrutura. Funk, exércitos, meteoritos e poderes especiais ficam nos marcos posteriores.
 
-O documento original pressupõe recursos visuais fornecidos. Como o pedido atual adia sua criação, será preciso combinar uma aparência provisória ou preparar a arte antes de considerar o critério visual desse marco concluído.
+A skin inicial já foi fornecida e integrada. A validação visual do personagem e das telas deve ser registrada separadamente da compilação e dos testes de servidor.
 
 ### Dependência entre os marcos
 
@@ -671,8 +786,21 @@ flowchart TD
 GUERRA/
 ├── README.md                     # Documentação principal no GitHub
 ├── CONTEXTO.md                   # Resumo para retomar o trabalho
+├── build.gradle                  # ForgeGradle 6.0.54
+├── settings.gradle
+├── gradle.properties             # Minecraft, Forge e versão do mod
+├── gradlew / gradlew.bat
+├── gradle/wrapper/               # Gradle 8.8
+├── assets-entrada/               # Skin fonte e MP3s locais
+├── tools/                        # Build, conversão e validação
+├── src/
+│   ├── main/java/                # Mod, registros, entidade e código cliente
+│   ├── main/resources/           # Metadados, skin, OGGs e traduções
+│   └── gameTest/                 # Testes de servidor, fora do JAR final
 └── docs/
     ├── IDEIA_GERAL.md            # Consolidação inicial do design
+    ├── VALIDACAO.md              # Testes e limites observados
+    ├── third-party/              # Licença e créditos do MDK
     └── referencias/
         ├── ideia-original.txt
         ├── faccoes-e-personagens.png
@@ -683,10 +811,10 @@ GUERRA/
 ### Estrutura futura da implementação
 
 
-Adaptação da árvore original ao nome atual. `guerra_ezuberante`, `br.com.guerraezuberante` e os nomes das classes abaixo são propostas; nenhum desses arquivos foi criado nesta etapa. Criar apenas os módulos necessários a cada marco.
+A árvore abaixo é a estrutura-alvo de expansão. O pacote atual é `io.github.omarflk.guerraezuberante` e o mod ID é `guerra_ezuberante`. A entidade implementada chama-se `RenanSantosEntity`; facções, combate avançado e habilidades desta árvore são módulos futuros.
 
 ```text
-src/main/java/br/com/guerraezuberante/
+src/main/java/io/github/omarflk/guerraezuberante/
 ├── GuerraEzuberanteMod.java
 ├── registry/
 │   ├── ModEntities.java
@@ -754,21 +882,21 @@ O README deverá acompanhar as funcionalidades implementadas. Mudanças de desig
 | Decisão | Estado atual | Quando resolver |
 | --- | --- | --- |
 | Nome público | **Guerra Ezuberante**, com z | Definido |
-| Versão do Minecraft | Em aberto | Antes do projeto Java |
-| Java, NeoForge e Gradle | Sem versões fixadas | Junto da plataforma alvo |
-| Personagem piloto | Renan Santos é a proposta original | Antes da primeira entidade |
-| Identificador técnico | `guerra_ezuberante` é uma proposta | Na criação do projeto |
-| Pacote Java | `br.com.guerraezuberante` é uma proposta | Na criação do projeto |
-| Aparência inicial | A combinar com o autor | Antes da validação visual |
+| Versão do Minecraft | 1.20.1 | Definido |
+| Java, Forge e Gradle | Java 17, Forge 47.4.28 e Gradle 8.8 | Definido |
+| Personagem piloto | Renan Santos | Implementado; veja a validação |
+| Identificador técnico | `guerra_ezuberante` | Configurado |
+| Pacote Java | `io.github.omarflk.guerraezuberante` | Configurado |
+| Aparência inicial | Skin clássica 64×64 fornecida | Integrada |
 | GeckoLib | Opcional | Ao definir animações |
-| Atributos e recargas | Sem valores definidos | Nos testes de combate |
+| Atributos e recargas | Vida e recarga de voz definidas; poderes pendentes | Expandir na v0.002 |
 | Fogo amigo e alianças | Aliados da mesma facção por padrão; detalhes pendentes | Ao implementar facções |
 | Troca de facção | Permissão administrativa prevista; regras pendentes | Ao criar seleção e persistência |
 | Progressão | Prevista, sem especificação | Antes de expandir a guerra |
 | Limites de tropas | Configuráveis, sem números fixados | Ao implementar invocações |
-| Distribuição e instalação | Sem release disponível | Após um JAR validado |
+| Distribuição e instalação | JAR local disponível; sem release publicada | Publicação futura |
 
-O próximo passo de implementação será definir a versão do Minecraft e preparar a base para um personagem de teste. Sprites e demais recursos visuais serão construídos em conjunto nas etapas seguintes.
+A v0.002 já contém retaliação básica para os dois personagens. O próximo passo é confirmar visualmente Arthur e o áudio escolhido, testar multiplayer e só depois iniciar v0.003 com o primeiro poder. Sprites dos outros personagens e poderes complexos ficam para etapas posteriores.
 
 <a id="referencias"></a>
 
@@ -781,7 +909,7 @@ O próximo passo de implementação será definir a versão do Minecraft e prepa
 - [Diagrama original de habilidades](docs/referencias/fluxo-de-habilidades.png).
 - [Captura dos indicadores iniciais](docs/referencias/visao-inicial.png).
 
-As fontes históricas usam “Guerra Política”. O nome atual da interface, documentação e conteúdo público é **Guerra Ezuberante**. Propostas de implementação nas fontes são referências de planejamento; a etapa atual é de documentação.
+As fontes históricas usam “Guerra Política”. O nome atual da interface, documentação e conteúdo público é **Guerra Ezuberante**. Propostas antigas nas fontes são referências históricas; as decisões técnicas atuais estão no início deste README e em CONTEXTO.md.
 
 <details>
 <summary>Ver os diagramas originais recebidos</summary>

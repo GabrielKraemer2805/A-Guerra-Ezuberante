@@ -1,0 +1,91 @@
+{
+    "renan.me_respeita":  {
+                              "subtitle":  "subtitles.guerra_ezuberante.renan.me_respeita",
+                              "sounds":  [
+                                             {
+                                                 "name":  "guerra_ezuberante:renan/me_respeita",
+                                                 "stream":  true
+                                             }
+                                         ]
+                          },
+    "renan.risadinha":  {
+                            "subtitle":  "subtitles.guerra_ezuberante.renan.risadinha",
+                            "sounds":  [
+                                           {
+                                               "name":  "guerra_ezuberante:renan/risadinha"
+                                           }
+                                       ]
+                        },
+    "renan.phonk":  {
+                        "subtitle":  "subtitles.guerra_ezuberante.renan.phonk",
+                        "sounds":  [
+                                       {
+                                           "name":  "guerra_ezuberante:renan/phonk",
+                                           "stream":  true
+                                       }
+                                   ]
+                    },
+    "arthur.e_vagabundo_sim":  {
+                                   "subtitle":  "subtitles.guerra_ezuberante.arthur.e_vagabundo_sim",
+                                   "sounds":  [
+                                                  {
+                                                      "name":  "guerra_ezuberante:arthur/e_vagabundo_sim",
+                                                      "stream":  true
+                                                  }
+                                              ]
+                               },
+    "arthur.ficou_ofendidinho":  {
+                                     "subtitle":  "subtitles.guerra_ezuberante.arthur.ficou_ofendidinho",
+                                     "sounds":  [
+                                                    {
+                                                        "name":  "guerra_ezuberante:arthur/ficou_ofendidinho",
+                                                        "stream":  true
+                                                    }
+                                                ]
+                                 },
+    "arthur.limpa_o_cu_com_a_linuga":  {
+                                           "subtitle":  "subtitles.guerra_ezuberante.arthur.limpa_o_cu_com_a_linuga",
+                                           "sounds":  [
+                                                          {
+                                                              "name":  "guerra_ezuberante:arthur/limpa_o_cu_com_a_linuga",
+                                                              "stream":  true
+                                                          }
+                                                      ]
+                                       },
+    "arthur.parar_de_mamat":  {
+                                  "subtitle":  "subtitles.guerra_ezuberante.arthur.parar_de_mamat",
+                                  "sounds":  [
+                                                 {
+                                                     "name":  "guerra_ezuberante:arthur/parar_de_mamat",
+                                                     "stream":  true
+                                                 }
+                                             ]
+                              },
+    "arthur.privatizar_tudo":  {
+                                   "subtitle":  "subtitles.guerra_ezuberante.arthur.privatizar_tudo",
+                                   "sounds":  [
+                                                  {
+                                                      "name":  "guerra_ezuberante:arthur/privatizar_tudo",
+                                                      "stream":  true
+                                                  }
+                                              ]
+                               },
+    "arthur.sao_faceis_pq_sao_pobres":  {
+                                            "subtitle":  "subtitles.guerra_ezuberante.arthur.sao_faceis_pq_sao_pobres",
+                                            "sounds":  [
+                                                           {
+                                                               "name":  "guerra_ezuberante:arthur/sao_faceis_pq_sao_pobres",
+                                                               "stream":  true
+                                                           }
+                                                       ]
+                                        },
+    "arthur.so_deusa":  {
+                            "subtitle":  "subtitles.guerra_ezuberante.arthur.so_deusa",
+                            "sounds":  [
+                                           {
+                                               "name":  "guerra_ezuberante:arthur/so_deusa",
+                                               "stream":  true
+                                           }
+                                       ]
+                        }
+}

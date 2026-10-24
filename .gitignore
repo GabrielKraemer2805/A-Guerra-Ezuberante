@@ -1,0 +1,35 @@
+# Local toolchains, caches and downloaded archives
+.tools/
+.gradle/
+.gradle-user/
+build/
+out/
+bin/
+run/
+run-server/
+run-data/
+run-gametest/
+logs/
+crash-reports/
+*.log
+*.hprof
+
+# IDE and OS files
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.vscode/
+Thumbs.db
+.DS_Store
+
+# Preserve original recordings locally; package only converted game resources
+audios/
+assets-entrada/audio/*
+!assets-entrada/audio/README.md
+
+# Keep the official Gradle wrapper JAR tracked
+!gradle/wrapper/gradle-wrapper.jar

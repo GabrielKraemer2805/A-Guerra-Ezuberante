@@ -1,0 +1,71 @@
+package io.github.omarflk.guerraezuberante.registry;
+
+import io.github.omarflk.guerraezuberante.GuerraEzuberanteMod;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+public final class ModSounds {
+    public static final DeferredRegister<SoundEvent> REGISTER =
+            DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, GuerraEzuberanteMod.MOD_ID);
+    public static final RegistryObject<SoundEvent> ME_RESPEITA = register("renan.me_respeita");
+    public static final RegistryObject<SoundEvent> RISADINHA = register("renan.risadinha");
+    public static final RegistryObject<SoundEvent> PHONK = register("renan.phonk");
+    public static final RegistryObject<SoundEvent> E_VAGABUNDO_SIM = register("arthur.e_vagabundo_sim");
+    public static final RegistryObject<SoundEvent> FICOU_OFENDIDINHO = register("arthur.ficou_ofendidinho");
+    public static final RegistryObject<SoundEvent> LIMPA = register("arthur.limpa_o_cu_com_a_linuga");
+    public static final RegistryObject<SoundEvent> PARAR_DE_MAMAT = register("arthur.parar_de_mamat");
+    public static final RegistryObject<SoundEvent> PRIVATIZAR_TUDO = register("arthur.privatizar_tudo");
+    public static final RegistryObject<SoundEvent> SAO_FACEIS = register("arthur.sao_faceis_pq_sao_pobres");
+    public static final RegistryObject<SoundEvent> SO_DEUSA = register("arthur.so_deusa");
+
+    public record VoiceLine(RegistryObject<SoundEvent> event, String directory, String file, int cooldownTicks) {
+        public VoiceLine(RegistryObject<SoundEvent> event, String file, int cooldownTicks) {
+            this(event, "renan", file, cooldownTicks);
+        }
+
+        public String subtitleKey() {
+            return "subtitles.guerra_ezuberante." + directory + "." + file;
+        }
+
+        public boolean isAvailable() {
+            String path = "/assets/" + GuerraEzuberanteMod.MOD_ID + "/sounds/" + directory + "/" + file + ".ogg";
+            try (InputStream stream = ModSounds.class.getResourceAsStream(path)) {
+                return stream != null;
+            } catch (IOException ignored) {
+                return false;
+            }
+        }
+    }
+
+    // Full recordings are preserved. Cooldowns include their duration and a brief gap.
+    public static final List<VoiceLine> RENAN_VOICES = List.of(
+            new VoiceLine(ME_RESPEITA, "me_respeita", 300),
+            new VoiceLine(RISADINHA, "risadinha", 80));
+
+    public static final VoiceLine RENAN_PHONK = new VoiceLine(PHONK, "phonk", 280);
+    public static final List<VoiceLine> ARTHUR_VOICES = List.of(
+            new VoiceLine(E_VAGABUNDO_SIM, "arthur", "e_vagabundo_sim", 220),
+            new VoiceLine(FICOU_OFENDIDINHO, "arthur", "ficou_ofendidinho", 360),
+            new VoiceLine(LIMPA, "arthur", "limpa_o_cu_com_a_linuga", 320),
+            new VoiceLine(PARAR_DE_MAMAT, "arthur", "parar_de_mamat", 300),
+            new VoiceLine(PRIVATIZAR_TUDO, "arthur", "privatizar_tudo", 360),
+            new VoiceLine(SAO_FACEIS, "arthur", "sao_faceis_pq_sao_pobres", 180),
+            new VoiceLine(SO_DEUSA, "arthur", "so_deusa", 220));
+
+    // Author selected the full recording; its 11-second cooldown exceeds the 9.98-second audio.
+    public static final List<VoiceLine> ARTHUR_REACTIONS = List.of(ARTHUR_VOICES.get(0));
+
+    private static RegistryObject<SoundEvent> register(String name) {
+        return REGISTER.register(name, () -> SoundEvent.createVariableRangeEvent(
+                new ResourceLocation(GuerraEzuberanteMod.MOD_ID, name)));
+    }
+
+    private ModSounds() {}
+}

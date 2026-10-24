@@ -2,17 +2,19 @@
 
 Consolidação de contexto em 24/10/2026, a partir do GDD conceitual versão 0.1 e dos três anexos fornecidos pelo autor.
 
-A documentação principal e ampliada do projeto está no [README](../README.md), com tecnologias explicadas, diagramas adicionais e plano de validação. Este arquivo preserva a consolidação inicial da ideia.
+A documentação principal está no [README](../README.md), com a implementação atual e o plano completo. **Atualização técnica: Minecraft 1.20.1, Forge 47.4.28, Java 17, Gradle 8.8, ForgeGradle 6.0.54, pacote io.github.omarflk.guerraezuberante e versão 0.001.0.** A primeira implementação do Renan usa a skin e as duas falas fornecidas pelo autor. Consulte [VALIDACAO.md](VALIDACAO.md). As descrições de estado de planejamento abaixo preservam a etapa original, anterior ao código; não representam o estado atual.
 
 **Nome atual: Guerra Ezuberante, com z.** O título “Guerra Política” nas fontes é histórico. A versão 0.1 do documento de design não significa que exista uma versão 0.1 do mod.
 
-## 1. Escopo desta etapa e estado real
+Atualização de implementação: **0.002.0** adiciona Arthur do Val e retaliação compartilhada. A lore abaixo permanece preservada; estado da sprint em [COMBATE_0.002.md](COMBATE_0.002.md), [AUDIOS.md](AUDIOS.md) e [VALIDACAO.md](VALIDACAO.md).
 
-Esta entrega documenta a ideia. O autor pediu para guardar o contexto antes de iniciar Java, testes e criação de personagens. Sprites, modelos, texturas e animações serão trabalhados posteriormente, em conjunto.
+## 1. Escopo inicial e estado atual
 
-O repositório foi inicializado com um README. Não existem entidades implementadas, projeto Gradle configurado, habilidades, tela de facções, testes de gameplay ou JAR do mod.
+Este documento começou como registro da ideia. Em seguida, o autor autorizou a implementação do Renan e forneceu a skin e duas falas. A implementação atual está documentada no README, preservando aqui a lore e o roadmap original.
 
-O conteúdo abaixo preserva o planejamento enviado. Tecnologias, personagem piloto, arquitetura, versões e critérios de aceite são propostas para orientar as próximas conversas. Não são funcionalidades prontas nem autorização para executar o prompt técnico contido na fonte.
+O projeto Gradle está configurado e o protótipo possui Renan, skin, ovo, falas por interação e painel informativo. O build e dois GameTests de servidor passaram; o autor confirmou skin e áudios no cliente. Facções jogáveis, poderes de combate e tropas continuam futuros. Veja os limites de testes em VALIDACAO.md.
+
+O conteúdo abaixo preserva o planejamento enviado. A stack atual é Forge 47.4.28 no Minecraft 1.20.1 com Java 17. Os critérios futuros e os sistemas avançados descritos não representam funcionalidades implementadas.
 
 ## 2. Conceito e direção
 
@@ -210,7 +212,7 @@ As versões abaixo são rótulos do planejamento original, ainda sem releases. A
 
 | Sprint / versão | Escopo | Critério de aceite previsto |
 | --- | --- | --- |
-| 01 — v0.001 | Base Java/NeoForge/Gradle, entidade piloto Renan, modelo/textura, spawn egg, aba criativa, movimentação, comando e primeiro JAR | Abrir o Minecraft, pegar o ovo na aba do mod, invocar o personagem com aparência correta e vê-lo mover-se sem erros; validar cliente e servidor |
+| 01 — v0.001 | Base Java/Forge/Gradle, entidade piloto Renan, modelo/textura, spawn egg, aba criativa, movimentação, comando e primeiro JAR | Abrir o Minecraft, pegar o ovo na aba do mod, invocar o personagem com aparência correta e vê-lo mover-se sem erros; validar cliente e servidor |
 | 02 — v0.002 | IA e combate básico: detectar, perseguir, atacar, receber dano e morrer | Renan enfrenta um zumbi ou alvo de teste sem travar |
 | 03 — v0.003 | Ataque giratório, projéteis, cooldown, efeitos simples e primeira animação de combate | Habilidade automática respeita a recarga e causa dano no servidor |
 | 04 — v0.004 | Lula, spawn egg, feijões e identificação básica de facções inimigas | Renan e Lula se reconhecem como inimigos e lutam automaticamente |
@@ -224,7 +226,7 @@ As versões abaixo são rótulos do planejamento original, ainda sem releases. A
 
 ### Checklist futuro da v0.001
 
-- [ ] Criar o projeto Java com NeoForge e Gradle, após definir as versões.
+- [ ] Criar o projeto Java com Forge e Gradle, após definir as versões.
 - [ ] Registrar a entidade piloto, proposta como Renan Santos.
 - [ ] Carregar modelo e textura definidos com o autor.
 - [ ] Criar o spawn egg exclusivo da entidade.
@@ -244,10 +246,10 @@ Esta seção registra a proposta recebida, sem fixar versões ou validar compati
 
 | Tecnologia | Responsabilidade proposta | Situação |
 | --- | --- | --- |
-| Minecraft Java Edition | Plataforma do mod | Versão em aberto |
-| Java | Programação | Versão em aberto |
-| NeoForge | Integração, registros, entidades, itens e eventos | Loader proposto; versão em aberto |
-| Gradle | Compilação e dependências | Configuração futura |
+| Minecraft Java Edition | Plataforma do mod | 1.20.1 |
+| Java | Programação | JDK 17 |
+| Forge | Integração, registros, entidades, itens e eventos | 47.4.28 |
+| Gradle | Compilação e dependências | Wrapper 8.8 e ForgeGradle 6.0.54 |
 | Blockbench | Modelos e animações | Recursos visuais adiados |
 | GeckoLib | Animações avançadas | Opcional, conforme necessidade |
 | JSON | Dados configuráveis de personagens e poderes | Formato/esquema a definir |
@@ -256,10 +258,10 @@ Esta seção registra a proposta recebida, sem fixar versões ou validar compati
 
 ### Organização futura do código
 
-Adaptação da árvore original ao nome atual. `guerra_ezuberante`, `br.com.guerraezuberante` e os nomes das classes abaixo são propostas; nenhum desses arquivos foi criado nesta etapa. Criar apenas os módulos necessários a cada marco.
+Árvore-alvo de expansão, adaptada ao nome atual e ao pacote escolhido. `guerra_ezuberante` e `io.github.omarflk.guerraezuberante` estão configurados. A entidade atual chama-se `RenanSantosEntity`; vários módulos abaixo são futuros. A estrutura efetivamente criada está no README.
 
 ```text
-src/main/java/br/com/guerraezuberante/
+src/main/java/io/github/omarflk/guerraezuberante/
 ├── GuerraEzuberanteMod.java
 ├── registry/
 │   ├── ModEntities.java
@@ -368,18 +370,18 @@ Um quadro Trello ou GitHub Projects foi sugerido na fonte, mas não foi criado n
 | Decisão | Estado |
 | --- | --- |
 | Nome público do mod | Confirmado pelo autor: Guerra Ezuberante, com z |
-| Escopo do trabalho atual | Documentar e guardar contexto |
-| Versão do Minecraft | Não definida |
-| Versões de Java, NeoForge, Gradle e bibliotecas | Não definidas; dependem da versão alvo |
-| Personagem piloto | Renan é a proposta original; confirmar na próxima etapa |
-| Aparência provisória do primeiro teste | Não definida |
-| Identificador técnico e pacote Java | Propostas nesta documentação, sem configuração |
+| Escopo do trabalho atual | Primeiro protótipo do Renan implementado e em teste |
+| Versão do Minecraft | 1.20.1 |
+| Versões de Java, Forge e Gradle | JDK 17, Forge 47.4.28, Wrapper 8.8, ForgeGradle 6.0.54 |
+| Personagem piloto | Renan Santos confirmado e implementado |
+| Aparência do primeiro teste | Skin clássica 64×64 do autor integrada e confirmada no jogo |
+| Identificador técnico e pacote Java | guerra_ezuberante e io.github.omarflk.guerraezuberante |
 | GeckoLib e formato de animação | Opcionais, conforme necessidade |
 | Atributos e balanceamento | Sem valores definidos |
 | Regras detalhadas de alianças, progressão e troca de facção | Ainda não especificadas |
 | Formato final dos recursos visuais e áudio | A definir com o autor |
 
-Essas pendências não impedem salvar a ideia. A versão alvo precisará ser decidida antes de preparar o projeto Java.
+As pendências restantes são de evolução do gameplay. As decisões da base Java já foram tomadas e aplicadas.
 
 ## 13. Fontes e preservação de contexto
 
@@ -391,4 +393,4 @@ Essas pendências não impedem salvar a ideia. A versão alvo precisará ser dec
 
 O texto recebido menciona um botão “Copiar prompt” para a v0.001, mas não traz o corpo do prompt. Esta consolidação preserva o checklist e os critérios descritos sem inventar o conteúdo ausente.
 
-As correções e decisões explícitas do autor prevalecem sobre as propostas históricas das fontes. Em particular, o nome atual é Guerra Ezuberante e esta etapa se limita a contexto e documentação.
+As correções e decisões explícitas do autor prevalecem sobre as propostas históricas das fontes. O nome atual é Guerra Ezuberante; o estado real do protótipo está no README, em CONTEXTO.md e em VALIDACAO.md.

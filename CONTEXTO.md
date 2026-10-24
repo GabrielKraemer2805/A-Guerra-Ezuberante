@@ -1,73 +1,76 @@
 # Contexto do projeto — Guerra Ezuberante
 
-Atualizado em 24/10/2026. Documento curto para retomar o trabalho. A documentação principal agora é o [README.md](README.md), com a ideia completa, tecnologias, diagramas e plano de construção. A consolidação inicial permanece em [docs/IDEIA_GERAL.md](docs/IDEIA_GERAL.md).
+Atualizado em 24/10/2026. Leia o [README](README.md) para design, tecnologias, comandos e roadmap, e [docs/VALIDACAO.md](docs/VALIDACAO.md) para os resultados reais dos testes.
 
-## Pedido atual do autor
+## Pedido atual e decisões confirmadas
 
-- O nome é **Guerra Ezuberante**, com **z**. “Guerra Política” é o nome antigo do material recebido.
-- Nesta etapa, apenas receber, organizar e salvar a ideia em Markdown.
-- Em seguida, o autor pediu para reunir toda a documentação no README publicado no GitHub, com badges das tecnologias, explicações de cada escolha e vários diagramas. A publicação da documentação está autorizada; o código Java continua para depois.
-- A implementação Java e os testes no Minecraft ficam para a próxima etapa.
-- Sprites, modelos, texturas e animações de personagens serão criados depois, com o autor.
-- A intenção seguinte é construir a base e um personagem inicial de teste. O documento sugere Renan Santos; a escolha final ainda pode mudar.
-- O material anexado contém propostas e um prompt para implementação futura. Esses trechos são referência de planejamento, não uma ordem para implementar agora.
+- Nome: **Guerra Ezuberante**, com z.
+- Sprint atual: adicionar Arthur, retaliação compartilhada e reações de áudio, preservando a base existente. O autor forneceu a skin 64×64 do Arthur e novos MP3s.
+- Stack definida: **Minecraft Java 1.20.1, Forge 47.4.28, Java 17, Gradle Wrapper 8.8 e ForgeGradle 6.0.54**. A sugestão histórica de NeoForge foi substituída.
+- Mod ID: `guerra_ezuberante`; pacote: `io.github.omarflk.guerraezuberante`; versão: `0.002.0`.
+- Ambiente principal: Windows e IntelliJ IDEA.
+- Renan e Arthur usam skins clássicas 64×64 do autor e PlayerModel nativo, sem GeckoLib. Arthur possui escala visual 0,88, hitbox 0,528 × 1,584 e olhos a 1,4256.
+- Após os testes, o autor autorizou explicitamente o commit e o push das alterações atuais para a main. Publicações futuras continuam dependendo do pedido vigente.
 
-## Ideia em poucas linhas
+## Estado implementado
 
-Mod de Minecraft Java Edition, com foco multiplayer, combate político inteiramente satírico e personagens caricatos inspirados em figuras públicas. Terá habilidades absurdas, invocações, exércitos, alianças, músicas, transformações e batalhas entre facções.
+- Projeto Forge baseado no MDK oficial, com Wrapper, metadados, recursos e .gitignore.
+- Renan: 30 HP, dano 4, velocidade 0,25, hitbox 0,6 × 1,8. Arthur: 32 HP, dano 5, velocidade 0,24, hitbox proporcional à escala 0,88. Ambos perseguem até 20 blocos.
+- Base compartilhada: `RetaliatingCharacterEntity`; socos com IA nativa e linha de visão, sem ataques através de paredes. Não há seleção espontânea de alvos. Dano com agressor válido inicia retaliação; novo agressor substitui o alvo. Sem progresso recente por 200 ticks, a perseguição termina.
+- Persistência e recargas salvas; sem despawn por distância. Ao carregar, referências antigas de agressor são descartadas. Dano ambiental e jogadores Creative/Spectator/invulneráveis não iniciam retaliação; Survival e Adventure são válidos.
+- Ovos `guerra_ezuberante:renan_spawn_egg` e `guerra_ezuberante:arthur_do_val_spawn_egg` na mesma aba criativa; ambos passam pelo caminho de spawn testado no servidor.
+- Skin do autor copiada sem alterações para `assets-entrada/skins/` e `textures/entity/renan_santos.png` nos recursos.
+- Áudios reais: **Me Respeita**, aproximadamente 13,48 s; **risadinha**, aproximadamente 2,38 s. Ambos Vorbis mono, 44.100 Hz.
+- Botão direito por mão principal escolhe uma fala aleatória disponível. O servidor inicia o som, com recarga por entidade de 15 s ou 4 s. A recarga é salva. Sem pacotes de rede personalizados.
+- Phonk separado encontrado: “Me respeita, creu creu - PHONK.mp3”, 12,59 s. Toca na entrada em combate com recarga de 14 s e áudio nativo vinculado à entidade. Não reinicia a cada golpe.
+- Painel configurável na tecla K com cinco páginas: Início, Personagens, Facções, Habilidades e Sobre. As duas últimas seções de gameplay são informativas, sem executar sistemas futuros.
+- Painel preto/cinza/amarelo preservado: seleção de Renan e Arthur com atributos, prévias e estado de combate implementado. Português e inglês acompanham o idioma do jogo.
+- Código cliente isolado em subscribers `Dist.CLIENT`, incluindo renderer, tecla e telas.
 
-Separar três conceitos: **facção**, **classe de combate** e **personagem/entidade**. Um jogador pode ser Invocador da Missão e usar poderes ligados ao Renan; o Renan também pode existir como mob controlado por IA.
+## Recursos e ferramentas
 
-## Conteúdo planejado
+- MP3s originais preservados em `audios/`; cópias padronizadas em `assets-entrada/audio/`. Ambas as pastas de áudio original são ignoradas pelo Git.
+- OGGs distribuíveis: `sounds/renan/` e `sounds/arthur/` em assets/guerra_ezuberante. Entradas separadas por personagem em assets-entrada/audio/; nove MP3s do Arthur equivalem a sete gravações únicas. As duas cópias privatizar_tudo(1)/(2) são idênticas a parar_de_mamat.
+- `tools/convert_audio.ps1`: FFmpeg do PATH ou portátil, conversão sem cortes, normalização de nomes e detecção de colisões.
+- `tools/validate_assets.ps1`: verifica JSON, idiomas, legendas, OGGs e skin PNG 64×64 idêntica à fonte.
+- `tools/gradle.ps1`: seleciona o JDK 17 portátil, quando presente, e usa `.gradle-user/` como cache local.
+- JDK e FFmpeg portáteis em `.tools/` são ferramentas locais ignoradas pelo Git; não são dependências empacotadas do mod.
+- Source set `src/gameTest/` contém 12 testes de integração e template ampliado; permanece fora do JAR distribuído.
 
-| Facção | Núcleo e identidade |
+## Validação realizada
+
+- Build da sprint concluído; JAR atual: `build/libs/guerra_ezuberante-0.002.0.jar`. O JAR 0.001.0 é o protótipo anterior; usar apenas uma versão por instalação.
+- Os 12 GameTests passaram: ovos/criação, atributos, escala/olhos, paz inicial, dano/morte, persistência, Survival/Adventure/Creative, perseguição, socos, paredes, troca de alvo, fim da perseguição e recargas.
+- Cliente Minecraft iniciou, carregou recursos e abriu o painel pela tecla K; página inicial inspecionada em janela 854×480.
+- **O autor confirmou no jogo que a skin deu certo.**
+- **O autor confirmou que os áudios tocaram ao clicar com o botão direito no Renan.**
+- Navegação completa em todas as páginas, várias resoluções, reconexão real e sessão multiplayer com dois clientes permanecem como testes manuais adicionais. Não apresentar esses testes como já executados.
+
+## Ideia geral preservada
+
+Combate político satírico e multiplayer, com personagens, poderes absurdos, tropas, transformações e batalhas entre facções. Separar **facção**, **classe de combate** e **personagem/entidade**.
+
+| Facção planejada | Núcleo |
 | --- | --- |
 | Esquerda Lulista | Lula, Janones, Boulos, burros zumbificados, artistas, feijão e picanha |
-| Direita Bolsonarista | Jair, Flávio, Eduardo, Nikolas, Trump e Netanyahu; dinheiro, dança e bombardeios fictícios |
-| Direita Missão | Renan, Arthur, Glenda, loiras ucranianas e nerds montados em onças |
-| Esquerda Independente | Resistência em grupo, recuperação e controle |
-| Direita Independente | Dano individual, velocidade e precisão |
-| Centro | Alternância entre defesa, mobilidade e suporte |
+| Direita Bolsonarista | Jair, Flávio, Eduardo, Nikolas, Trump e Netanyahu |
+| Direita Missão | Renan, Arthur, Glenda, loiras ucranianas e cavaleiros de onças |
+| Esquerda Independente | Defesa, recuperação e suporte |
+| Direita Independente | Dano individual, mobilidade e precisão |
+| Centro | Defesa, mobilidade e suporte adaptativos |
 
-Classes propostas: Combatente, Tanque, Invocador, Especialista e Suporte.
+Classes futuras: Combatente, Tanque, Invocador, Especialista e Suporte. Modos futuros: laboratório criativo e guerra de facções. A estrutura de conteúdo futura está no README; não implementar todos os sistemas de uma vez.
 
-Modos propostos: laboratório criativo com spawn eggs, prioritário para desenvolvimento; guerra multiplayer com escolha de facção, habilidades e persistência.
+## Próximo marco
 
-## Caminho de desenvolvimento proposto
+A sprint 0.002.0 implementa Arthur e retaliação básica. Falta confirmar visualmente Arthur e testar dois jogadores reais. Depois vem v0.003, primeiro poder com projéteis e recarga, mediante pedido do autor.
 
-1. Base técnica e entidade piloto com ovo de invocação e aparência de teste.
-2. IA e combate básico.
-3. Primeiro poder com projéteis e cooldown.
-4. Lula e primeira batalha automática contra Renan.
-5. Seis facções, interface, persistência e poderes genéricos.
-6. Expandir Missão, exército de Lula e clã Bolsonaro.
-7. Aliados internacionais, integração, balanceamento e alpha.
+Facções jogáveis, poderes especiais, exércitos, diplomacia, progressão e personagens além de Renan/Arthur continuam pendentes. Novas artes serão feitas com o autor.
 
-As versões v0.001 a v0.010 e v0.1.0 são marcos futuros; nenhuma delas foi implementada.
+Repositório: https://github.com/OmarFLK/A-Guerra-Ezuberante — branch `main`. O último estado remoto anterior à implementação é o commit de documentação `a45140f`. Consulte `git status` antes de versionar a implementação.
 
-## Base técnica proposta, ainda sem configuração
+## Reação de áudio do Arthur confirmada
 
-- Java + NeoForge + Gradle; versões ainda indefinidas.
-- Blockbench para modelos; GeckoLib opcional, se necessário.
-- JSON para dados configuráveis de personagens e habilidades.
-- Servidor valida habilidades, dano e invocações; clientes exibem animações, sons, partículas e interfaces.
-- Habilidades reutilizáveis com dano, alcance, duração, recarga e limites de tropas configuráveis.
-- Invocações limitadas em duração e quantidade; explosões sem destruição permanente de blocos por padrão.
-- Distorção temporal afeta entidades e aparência, sem alterar o relógio global do servidor.
-- Evitar buscas de todos os mobs a cada tick; gerenciar sobreposição de áudio.
+O autor escolheu explicitamente “É vagabundo sim”, gravação inteira de 9,98 s, como reação do Arthur na entrada em combate. ARTHUR_REACTIONS utiliza essa gravação com recarga de 220 ticks (11 s). Golpes durante o mesmo combate não reiniciam o som. As sete falas permanecem no botão direito.
 
-## Decisões pendentes para a etapa de implementação
-
-- Versão do Minecraft e versões compatíveis de Java, NeoForge e Gradle.
-- Confirmação do personagem piloto e escolha da aparência provisória para o teste.
-- Identificador técnico do mod e pacote Java; `guerra_ezuberante` e `br.com.guerraezuberante` são apenas propostas no documento completo.
-- Formato dos recursos visuais, necessidade de GeckoLib, valores de balanceamento e regras detalhadas de alianças/progressão.
-
-## Estado salvo
-
-- Repositório: https://github.com/OmarFLK/A-Guerra-Ezuberante
-- Branch inicial: `main`.
-- O primeiro commit enviado ao GitHub foi `088ceda`, com README contendo “oi”.
-- A documentação desta etapa é versionada na `main`, incluindo README detalhado com badges e 13 diagramas Mermaid, contexto, design e referências. Isso não é uma implementação do mod nem uma release jogável.
-- Referência completa: [ideia geral](docs/IDEIA_GERAL.md).
-- Fontes originais e três imagens: [docs/referencias](docs/referencias/).
+Inventário: [docs/AUDIOS.md](docs/AUDIOS.md). Entrega e arquivos: [docs/COMBATE_0.002.md](docs/COMBATE_0.002.md). Uma instância cliente isolada foi iniciada em `.tools/run-combat-client/` e carregou um mundo; isso não constitui confirmação visual do Arthur nem teste de dois clientes em rede.
