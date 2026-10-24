@@ -1,0 +1,513 @@
+PROJETO: GUERRA POLÍTICA — Minecraft Mod
+Game Design Document — Versão 0.1
+Conceito: Um mod de Minecraft multiplayer, de combate político completamente satírico, em que personagens inspirados em figuras públicas possuem poderes absurdos, exércitos próprios, invocações, alianças, músicas, transformações e habilidades especiais.
+
+Irmão, a ideia é transformar o Minecraft num campo de batalha político absolutamente caótico. Só que quero estruturar isso como um projeto que você realmente consiga desenvolver com o Codex, sem começar com 40 personagens e acabar com um mod que nem inicia.
+
+Nossa estratégia vai ser construir primeiro a base técnica, depois adicionar os personagens e, por último, criar as batalhas gigantescas.
+6
+Facções iniciais
+
+11+
+Personagens nomeados
+
+0.001
+Primeira versão
+
+
+
+1. Estrutura das facções e classes
+Vou considerar que a Direita Missão é a facção do Renan Santos, enquanto Esquerda, Direita e Centro são três classes genéricas independentes. Assim teremos seis escolhas na entrada do jogador.
+Tela inicial — escolha sua facção
+
+
+
+
+
+
+
+
+
+Esquerda Lulista
+Invocações, comida e exército de mortos-vivos
+
+
+
+
+
+
+
+
+
+
+Direita Bolsonarista
+Aliados internacionais, bombas e ataques de dinheiro
+
+
+
+
+
+
+
+
+
+
+Direita Missão
+Renan Santos, Arthur do Val e cavalaria de onças
+
+
+
+
+
+
+
+
+
+
+Esquerda Independente
+Defesa, suporte e poderes genéricos
+
+
+
+
+
+
+
+
+
+
+Direita Independente
+Combate direto, precisão e poderes genéricos
+
+
+
+
+
+
+
+
+
+
+Centro
+Versatilidade, negociação e poderes genéricos
+
+
+Referências visuais conceituais. As identidades finais serão feitas com os sprites e as texturas do mod.
+Como funcionará a seleção
+Quando um jogador entrar pela primeira vez no mundo, aparecerá uma interface para escolher a facção.
+- As três facções independentes terão um conjunto básico de habilidades.
+- As três facções especiais terão habilidades próprias, líderes, invocações e tropas exclusivas.
+- Jogadores da mesma facção serão aliados por padrão.
+- Cada facção terá sua identificação visual, itens e efeitos.
+- A escolha ficará salva no mundo, inclusive após sair do servidor.
+- O administrador poderá permitir mudanças de facção.
+Também vamos separar facção, classe de combate e personagem. Por exemplo, um jogador pode escolher a Direita Missão, ser da classe Invocador e utilizar poderes ligados ao Renan. Já o Renan também existirá como uma entidade independente, invocável por spawn egg.
+
+Essa distinção é importante para não misturar o sistema de personagens controlados pela IA com as habilidades dos jogadores.
+2. Fluxograma completo dos personagens
+#chatgpt-mermaid-_r_p4_{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-size:16px;fill:rgb(237, 237, 237);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-_r_p4_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_p4_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_p4_ .error-icon{fill:rgb(48, 48, 48);}#chatgpt-mermaid-_r_p4_ .error-text{fill:rgb(237, 237, 237);stroke:rgb(237, 237, 237);}#chatgpt-mermaid-_r_p4_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-_r_p4_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-_r_p4_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-_r_p4_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-_r_p4_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-_r_p4_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-_r_p4_ .marker{fill:rgb(175, 175, 175);stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_p4_ .marker.cross{stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_p4_ svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-size:16px;}#chatgpt-mermaid-_r_p4_ p{margin:0;}#chatgpt-mermaid-_r_p4_ .label{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";color:rgb(237, 237, 237);}#chatgpt-mermaid-_r_p4_ .cluster-label text{fill:rgb(237, 237, 237);}#chatgpt-mermaid-_r_p4_ .cluster-label span{color:rgb(237, 237, 237);}#chatgpt-mermaid-_r_p4_ .cluster-label span p{background-color:transparent;}#chatgpt-mermaid-_r_p4_ .label text,#chatgpt-mermaid-_r_p4_ span{fill:rgb(237, 237, 237);color:rgb(237, 237, 237);}#chatgpt-mermaid-_r_p4_ .node rect,#chatgpt-mermaid-_r_p4_ .node circle,#chatgpt-mermaid-_r_p4_ .node ellipse,#chatgpt-mermaid-_r_p4_ .node polygon,#chatgpt-mermaid-_r_p4_ .node path{fill:rgb(9, 23, 44);stroke:rgb(31, 78, 148);stroke-width:1px;}#chatgpt-mermaid-_r_p4_ .rough-node .label text,#chatgpt-mermaid-_r_p4_ .node .label text,#chatgpt-mermaid-_r_p4_ .image-shape .label,#chatgpt-mermaid-_r_p4_ .icon-shape .label{text-anchor:middle;}#chatgpt-mermaid-_r_p4_ .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#chatgpt-mermaid-_r_p4_ .rough-node .label,#chatgpt-mermaid-_r_p4_ .node .label,#chatgpt-mermaid-_r_p4_ .image-shape .label,#chatgpt-mermaid-_r_p4_ .icon-shape .label{text-align:center;}#chatgpt-mermaid-_r_p4_ .node.clickable{cursor:pointer;}#chatgpt-mermaid-_r_p4_ .root .anchor path{fill:rgb(175, 175, 175)!important;stroke-width:0;stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_p4_ .arrowheadPath{fill:rgb(175, 175, 175);}#chatgpt-mermaid-_r_p4_ .edgePath .path{stroke:rgb(175, 175, 175);stroke-width:1px;}#chatgpt-mermaid-_r_p4_ .flowchart-link{stroke:rgb(175, 175, 175);fill:none;}#chatgpt-mermaid-_r_p4_ .edgeLabel{background-color:rgb(0, 0, 0);text-align:center;}#chatgpt-mermaid-_r_p4_ .edgeLabel p{background-color:rgb(0, 0, 0);}#chatgpt-mermaid-_r_p4_ .edgeLabel rect{opacity:0.5;background-color:rgb(0, 0, 0);fill:rgb(0, 0, 0);}#chatgpt-mermaid-_r_p4_ .labelBkg{background-color:rgba(0, 0, 0, 0.5);}#chatgpt-mermaid-_r_p4_ .cluster rect{fill:rgb(48, 48, 48);stroke:rgba(255, 255, 255, 0.15);stroke-width:1px;}#chatgpt-mermaid-_r_p4_ .cluster text{fill:rgb(237, 237, 237);}#chatgpt-mermaid-_r_p4_ .cluster span{color:rgb(237, 237, 237);}#chatgpt-mermaid-_r_p4_ div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-size:12px;background:rgb(48, 48, 48);border:1px solid rgba(255, 255, 255, 0.15);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-mermaid-_r_p4_ .flowchartTitleText{text-anchor:middle;font-size:18px;fill:rgb(237, 237, 237);}#chatgpt-mermaid-_r_p4_ rect.text{fill:none;stroke-width:0;}#chatgpt-mermaid-_r_p4_ .icon-shape,#chatgpt-mermaid-_r_p4_ .image-shape{background-color:rgb(0, 0, 0);text-align:center;}#chatgpt-mermaid-_r_p4_ .icon-shape p,#chatgpt-mermaid-_r_p4_ .image-shape p{background-color:rgb(0, 0, 0);padding:2px;}#chatgpt-mermaid-_r_p4_ .icon-shape .label rect,#chatgpt-mermaid-_r_p4_ .image-shape .label rect{opacity:0.5;background-color:rgb(0, 0, 0);fill:rgb(0, 0, 0);}#chatgpt-mermaid-_r_p4_ .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-mermaid-_r_p4_ .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#chatgpt-mermaid-_r_p4_ .node .neo-node{stroke:rgb(31, 78, 148);}#chatgpt-mermaid-_r_p4_ [data-look="neo"].node rect,#chatgpt-mermaid-_r_p4_ [data-look="neo"].cluster rect,#chatgpt-mermaid-_r_p4_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-_r_p4_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_p4_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-_r_p4_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-_r_p4_-gradient);stroke-width:1px;}#chatgpt-mermaid-_r_p4_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_p4_ [data-look="neo"].node .neo-line path{stroke:rgb(31, 78, 148);filter:none;}#chatgpt-mermaid-_r_p4_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-_r_p4_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_p4_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-_r_p4_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-_r_p4_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_p4_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-_r_p4_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_p4_ .node text{font-size:14px;font-weight:600;letter-spacing:normal;fill:rgb(153, 206, 255);}#chatgpt-mermaid-_r_p4_ .edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(153, 206, 255);}#chatgpt-mermaid-_r_p4_ .node tspan[font-weight="normal"],#chatgpt-mermaid-_r_p4_ .edgeLabels tspan[font-weight="normal"]{font-weight:600;}#chatgpt-mermaid-_r_p4_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(0, 14, 26);stroke:rgb(26, 62, 95);stroke-width:1px;}#chatgpt-mermaid-_r_p4_ .node rect,#chatgpt-mermaid-_r_p4_ .node circle,#chatgpt-mermaid-_r_p4_ .node ellipse,#chatgpt-mermaid-_r_p4_ .node polygon,#chatgpt-mermaid-_r_p4_ .node path{fill:rgb(0, 40, 77);stroke:rgba(255, 255, 255, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_p4_ .node rect{rx:16px;ry:16px;}#chatgpt-mermaid-_r_p4_ .node.mermaid-decision .label-container{fill:rgb(0, 14, 26);stroke:rgb(26, 62, 95);stroke-dasharray:2,2;}#chatgpt-mermaid-_r_p4_ .edgePaths .flowchart-link{stroke:rgb(175, 175, 175);stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;}#chatgpt-mermaid-_r_p4_ .marker{fill:rgb(175, 175, 175);stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_p4_ :root{--mermaid-font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";}#chatgpt-mermaid-_r_p4_ .lula rect{fill:rgb(139, 37, 37)!important;color:rgb(255, 255, 255)!important;stroke:rgb(139, 37, 37)!important;}#chatgpt-mermaid-_r_p4_ .lula polygon{fill:rgb(139, 37, 37)!important;color:rgb(255, 255, 255)!important;stroke:rgb(139, 37, 37)!important;}#chatgpt-mermaid-_r_p4_ .lula ellipse{fill:rgb(139, 37, 37)!important;color:rgb(255, 255, 255)!important;stroke:rgb(139, 37, 37)!important;}#chatgpt-mermaid-_r_p4_ .lula circle{fill:rgb(139, 37, 37)!important;color:rgb(255, 255, 255)!important;stroke:rgb(139, 37, 37)!important;}#chatgpt-mermaid-_r_p4_ .lula path{fill:rgb(139, 37, 37)!important;color:rgb(255, 255, 255)!important;stroke:rgb(139, 37, 37)!important;}#chatgpt-mermaid-_r_p4_ .lula tspan{fill:rgb(255, 255, 255)!important;}#chatgpt-mermaid-_r_p4_ .bolsonaro rect{fill:rgb(41, 100, 63)!important;color:rgb(255, 255, 255)!important;stroke:rgb(41, 100, 63)!important;}#chatgpt-mermaid-_r_p4_ .bolsonaro polygon{fill:rgb(41, 100, 63)!important;color:rgb(255, 255, 255)!important;stroke:rgb(41, 100, 63)!important;}#chatgpt-mermaid-_r_p4_ .bolsonaro ellipse{fill:rgb(41, 100, 63)!important;color:rgb(255, 255, 255)!important;stroke:rgb(41, 100, 63)!important;}#chatgpt-mermaid-_r_p4_ .bolsonaro circle{fill:rgb(41, 100, 63)!important;color:rgb(255, 255, 255)!important;stroke:rgb(41, 100, 63)!important;}#chatgpt-mermaid-_r_p4_ .bolsonaro path{fill:rgb(41, 100, 63)!important;color:rgb(255, 255, 255)!important;stroke:rgb(41, 100, 63)!important;}#chatgpt-mermaid-_r_p4_ .bolsonaro tspan{fill:rgb(255, 255, 255)!important;}#chatgpt-mermaid-_r_p4_ .missao rect{fill:rgb(179, 137, 25)!important;color:rgb(255, 255, 255)!important;stroke:rgb(179, 137, 25)!important;}#chatgpt-mermaid-_r_p4_ .missao polygon{fill:rgb(179, 137, 25)!important;color:rgb(255, 255, 255)!important;stroke:rgb(179, 137, 25)!important;}#chatgpt-mermaid-_r_p4_ .missao ellipse{fill:rgb(179, 137, 25)!important;color:rgb(255, 255, 255)!important;stroke:rgb(179, 137, 25)!important;}#chatgpt-mermaid-_r_p4_ .missao circle{fill:rgb(179, 137, 25)!important;color:rgb(255, 255, 255)!important;stroke:rgb(179, 137, 25)!important;}#chatgpt-mermaid-_r_p4_ .missao path{fill:rgb(179, 137, 25)!important;color:rgb(255, 255, 255)!important;stroke:rgb(179, 137, 25)!important;}#chatgpt-mermaid-_r_p4_ .missao tspan{fill:rgb(255, 255, 255)!important;}#chatgpt-mermaid-_r_p4_ .generic rect{fill:rgb(82, 98, 119)!important;color:rgb(255, 255, 255)!important;stroke:rgb(82, 98, 119)!important;}#chatgpt-mermaid-_r_p4_ .generic polygon{fill:rgb(82, 98, 119)!important;color:rgb(255, 255, 255)!important;stroke:rgb(82, 98, 119)!important;}#chatgpt-mermaid-_r_p4_ .generic ellipse{fill:rgb(82, 98, 119)!important;color:rgb(255, 255, 255)!important;stroke:rgb(82, 98, 119)!important;}#chatgpt-mermaid-_r_p4_ .generic circle{fill:rgb(82, 98, 119)!important;color:rgb(255, 255, 255)!important;stroke:rgb(82, 98, 119)!important;}#chatgpt-mermaid-_r_p4_ .generic path{fill:rgb(82, 98, 119)!important;color:rgb(255, 255, 255)!important;stroke:rgb(82, 98, 119)!important;}#chatgpt-mermaid-_r_p4_ .generic tspan{fill:rgb(255, 255, 255)!important;}GUERRA POLÍTICAEsquerda LulistaDireita BolsonaristaDireita MissãoEsquerda IndependenteDireita IndependenteCentroLulaJanonesGuilherme BoulosBurros zumbificadosArtistas mainstreamFeijão e meteoritos de picanhaJair BolsonaroFlávio BolsonaroEduardo BolsonaroNikolas FerreiraDonald TrumpBenjamin NetanyahuAtaques aéreos nuclearesfictíciosRenan SantosArthur do ValNerds cavaleiros de onçasModo Chad / GlendaExército de loiras ucranianasPoderes básicos de esquerdaPoderes básicos de direitaPoderes básicos de centro
+
+
+
+
+
+Esse é o núcleo inicial. Cada personagem pode ganhar novos poderes e interações sem precisarmos alterar o funcionamento de todos os outros.
+3. Catálogo dos personagens e poderes
+Aqui entra a parte mais importante da lore: cada personagem precisa ter personalidade própria, ataques característicos e relações com outros personagens.
+
+
+
+
+
+
+
+
+
+Renan Santos
+Boss / Invocador / DPS
+Facção: Direita Missão
+
+Habilidades:
+- Me Respeita: começa a girar disparando projéteis em todas as direções, acompanhado de funk.
+- Arthur do Val: invoca Arthur, que posteriormente convoca o exército de loiras ucranianas.
+- Modo Chad: ao negar a Glenda, recebe aumento de dano, velocidade e resistência, com efeitos visuais de aura.
+- Cavalaria da Missão: invoca nerds com lanças medievais montados em onças.
+- Ultimate — Moggador Supremo: combina rotação, disparos e cavalaria numa sequência especial.
+
+
+
+
+
+
+
+
+
+
+
+
+Arthur do Val
+Invocador / Suporte ofensivo
+Facção: Direita Missão
+
+Habilidades:
+- Exército Ucraniano: invoca unidades de loiras ucranianas que atacam os inimigos.
+- São Fáceis Porque São Pobres: habilidade acompanhada de fala satírica e bônus temporário de ataque para suas unidades.
+- Reforços: repõe parcialmente as tropas perdidas.
+- Ultimate — Legião Ucraniana: invoca uma formação maior de combatentes.
+As loiras ucranianas serão unidades próprias, com modelo, comportamento e atributos individuais.
+
+
+
+
+
+
+
+
+
+
+
+
+Lula
+Boss / Necromante / Ataque de área
+Facção: Esquerda Lulista
+
+Habilidades:
+- Dedos de Feijão: dispara rajadas de feijões em inimigos.
+- Picanha Meteorítica: faz chover meteoritos de picanha.
+- Exército dos Mortos: invoca burros zumbificados que perseguem os inimigos.
+- Convocação Política: invoca Janones, Boulos e tropas caricatas de artistas mainstream.
+- Ultimate — Chuva de Picanha: bombardeio de área com diversos meteoritos.
+
+
+
+
+
+
+
+
+
+
+
+
+Jair Bolsonaro
+Boss / Comandante / Controle
+Facção: Direita Bolsonarista
+
+Habilidades:
+- Clã Bolsonaro: invoca Flávio e Eduardo Bolsonaro.
+- Reforço Conservador: invoca Nikolas Ferreira.
+- Aliança Internacional: invoca Trump e Netanyahu.
+- Funk Temporal: inicia uma coreografia que distorce visualmente o tempo e reduz a velocidade dos inimigos.
+- Ultimate — Caos Internacional: combina dança, reforços e ataques explosivos dos aliados.
+
+
+
+
+
+
+
+
+
+
+
+
+Flávio Bolsonaro
+DPS / Ataque à distância
+Facção: Direita Bolsonarista
+
+Habilidades:
+- Rachadinha: dispara projéteis de dinheiro que se dividem em duas partes durante o voo.
+- Lula é Pobre: provoca inimigos próximos, gerando efeitos de provocação e aumentando temporariamente o próprio dano.
+- Chuva de Notas: dispara múltiplos projéteis de dinheiro.
+
+
+
+Personagens secundários e unidades especiais
+Personagem ou unidade	Papel na batalha	Mecânica prevista
+Janones	Suporte lulista	Provocação e fortalecimento de aliados
+Guilherme Boulos	Tanque lulista	Defesa e combate corpo a corpo
+Eduardo Bolsonaro	Reforço bolsonarista	Ataques e bônus de equipe
+Nikolas Ferreira	Suporte bolsonarista	Buffs e provocações
+Donald Trump	Boss invocável	Bombardeios aéreos
+Benjamin Netanyahu	Boss invocável	Bombardeios em área
+Nerds montados em onças	Cavalaria da Missão	Investida com lanças
+Loiras ucranianas	Exército de Arthur	Formação e combate em grupo
+Burros zumbificados	Exército de Lula	Ataques em massa
+Artistas mainstream	Tropas lulistas	Habilidades de suporte e efeitos sonoros
+Glenda	NPC de evento	Ativa a transformação Chad do Renan
+
+Todos esses ataques serão caricaturas fictícias de videogame, não representações de fatos reais.
+4. Sistema de classes jogáveis
+Teremos duas camadas: a facção política e o arquétipo de combate.
+Classe de combate	Função	Características
+Combatente	Dano direto	Ataques rápidos e combos
+Tanque	Resistência	Vida alta, escudos e provocação
+Invocador	Controle de tropas	Criação de aliados temporários
+Especialista	Poderes especiais	Projéteis, efeitos e manipulação de área
+Suporte	Fortalecimento	Cura, buffs e proteção
+
+Os arquétipos podem ser utilizados por qualquer facção, mas as habilidades disponíveis serão determinadas pela combinação.
+
+Por exemplo, um Invocador da Missão terá tropas diferentes das de um Invocador Lulista. Já um Combatente da Direita Independente utilizará ataques genéricos, sem os especiais de Bolsonaro.
+Poderes iniciais das facções genéricas
+Esquerda Independente: bônus de resistência em grupo, recuperação gradual de vida e controle de multidões.
+
+Direita Independente: bônus de dano individual, velocidade e precisão.
+
+Centro: habilidade adaptativa para alternar entre defesa, mobilidade e suporte.
+
+
+Essas diferenças são apenas escolhas de balanceamento do jogo, não características reais das ideologias.
+5. Modos de jogo
+Eu criaria inicialmente dois modos.
+
+Laboratório político (criativo)
+
+Todos os spawn eggs ficam disponíveis na aba exclusiva do mod. Vocês podem invocar qualquer político, criar batalhas e testar habilidades. É o modo prioritário do desenvolvimento.
+
+
+
+Guerra de facções (multiplayer)
+
+Os jogadores escolhem uma facção ao entrar, recebem seus poderes e enfrentam outras equipes. Esse modo contará com regras de aliados, inimigos, progressão e habilidades especiais.
+
+
+
+Futuramente, podemos acrescentar batalhas de chefes, arenas eleitorais, guerras entre facções e campanhas com missões.
+
+6. Roadmap de desenvolvimento e sprints
+O princípio é simples: cada versão precisa funcionar antes de desenvolvermos a próxima.
+Sprint 01 — v0.001
+Primeira entrega
+
+Objetivo: colocar o primeiro político dentro do Minecraft.
+Personagem piloto: Renan Santos
+Checklist de implementação
+
+0/9
+
+
+
+[ ] Criar o projeto Java com NeoForge e Gradle
+[ ] Registrar a entidade Renan Santos
+[ ] Carregar o modelo e a textura fornecidos
+[ ] Criar o spawn egg exclusivo do Renan
+[ ] Criar a aba Guerra Política no inventário criativo
+[ ] Implementar movimentação e animação básica
+[ ] Permitir invocação por ovo e comando
+[ ] Executar testes no cliente e no servidor
+[ ] Gerar o primeiro arquivo .jar
+
+Critério de aceite: abrir o Minecraft, entrar na aba do mod, pegar o ovo do Renan, clicar no chão e ver o Renan aparecer com a aparência correta, movimentando-se sem erros.
+
+Nada de funk, exército, meteoritos ou poderes nessa primeira versão. O objetivo é provar que toda a infraestrutura funciona.
+
+Sprint 02 — v0.002
+
+IA e combate básico
+
+Renan anda, detecta inimigos, persegue alvos, causa dano, recebe dano e morre corretamente.
+
+Aceite: Renan enfrenta um zumbi ou alvo de teste sem travar.
+
+Sprint 03 — v0.003
+
+Primeiros poderes
+
+Adicionar o ataque giratório do Renan, projéteis, cooldown, efeitos simples e primeira animação de combate.
+
+Aceite: A habilidade dispara automaticamente, respeita o cooldown e causa dano no servidor.
+
+Sprint 04 — v0.004
+
+Lula e primeira batalha
+
+Adicionar Lula, ovo de invocação, disparos de feijão e identificação básica de facções inimigas.
+
+Aceite: Renan e Lula se reconhecem como inimigos e lutam automaticamente.
+
+Sprint 05 — v0.005
+
+Sistema de facções
+
+Criar tela de seleção, seis facções, poderes genéricos, persistência de escolhas e regras de alianças.
+
+Aceite: O jogador escolhe uma facção e mantém sua escolha ao reconectar.
+
+Sprint 06 — v0.006
+
+Arthur e a Missão
+
+Invocação de Arthur do Val, exército de loiras ucranianas, cavalaria de onças e evento da Glenda.
+
+Aceite: Renan convoca reforços que identificam e atacam corretamente os inimigos.
+
+Sprint 07 — v0.007
+
+Exército do Lula
+
+Adicionar Janones, Boulos, burros zumbificados, artistas mainstream e meteoritos de picanha.
+
+Aceite: Lula consegue enfrentar um grupo de invocações da Missão.
+
+Sprint 08 — v0.008
+
+Clã Bolsonaro
+
+Adicionar Bolsonaro, Flávio, Eduardo, Nikolas, dinheiro dividido e dança de distorção temporal.
+
+Aceite: Os reforços bolsonaristas funcionam e seus efeitos são sincronizados.
+
+Sprint 09 — v0.009
+
+Caos internacional
+
+Adicionar Trump, Netanyahu, bombardeios, explosões visuais e habilidades combinadas.
+
+Aceite: Ataques de área funcionam sem destruir o desempenho do servidor.
+
+Sprint 10 — v0.010
+
+Primeira guerra completa
+
+Integração dos poderes, sons, interfaces, limites de invocações e balanceamento.
+
+Aceite: Três facções lutam numa arena multiplayer sem erros críticos.
+
+Sprint 11 — v0.1.0
+
+Alpha jogável
+
+Polimento, otimização, instalação simplificada, documentação, correções e versão para os amigos.
+
+Aceite: O mod é reproduzível em cliente e servidor com a mesma versão.
+
+
+Essas versões são marcos planejados, não funcionalidades já desenvolvidas. A duração de cada sprint dependerá da complexidade dos modelos, da IA e dos testes.
+
+7. Arquitetura técnica do mod
+Minha recomendação é fazer o projeto para Minecraft Java Edition, utilizando:
+Tecnologia	Responsabilidade
+Java	Programação do mod
+NeoForge	Entidades, itens, eventos, registros e integração com Minecraft
+Gradle	Compilação e dependências
+Blockbench	Modelos e animações
+GeckoLib	Animações avançadas, se necessário
+JSON	Definições configuráveis de personagens e poderes
+IntelliJ + Codex	Desenvolvimento, refatoração e testes
+Git/GitHub	Versionamento e colaboração
+
+O NeoForge oferece os mecanismos de criação de entidades, renderizadores, dados sincronizados e comunicação entre cliente e servidor. A GeckoLib é uma opção para animações mais complexas. 
+
+NeoForged docs
++3
+
+
+
+
+Detalhe importante sobre os sprites: se vocês têm skins ou texturas de personagens do Minecraft, podemos aproveitá-las com um modelo compatível. Se possuem apenas uma imagem 2D, será necessário criar ou adaptar o modelo da entidade, ou renderizá-la como um sprite plano.
+Organização proposta do código
+guerra-politica/
+├── src/main/java/br/com/guerrapolitica/
+│   ├── GuerraPoliticaMod.java
+│   │
+│   ├── registry/
+│   │   ├── ModEntities.java
+│   │   ├── ModItems.java
+│   │   └── ModCreativeTabs.java
+│   │
+│   ├── entity/
+│   │   ├── PoliticalMobEntity.java
+│   │   ├── RenanEntity.java
+│   │   ├── LulaEntity.java
+│   │   ├── BolsonaroEntity.java
+│   │   └── summons/
+│   │
+│   ├── faction/
+│   │   ├── Faction.java
+│   │   ├── FactionManager.java
+│   │   └── PlayerFactionData.java
+│   │
+│   ├── ability/
+│   │   ├── Ability.java
+│   │   ├── AbilityManager.java
+│   │   ├── AbilityContext.java
+│   │   └── implementations/
+│   │
+│   ├── combat/
+│   │   ├── CombatManager.java
+│   │   ├── TargetingService.java
+│   │   └── SummonManager.java
+│   │
+│   ├── client/
+│   │   ├── renderer/
+│   │   ├── model/
+│   │   ├── animation/
+│   │   └── gui/
+│   │
+│   └── network/
+│       └── packets/
+│
+├── src/main/resources/
+│   ├── assets/guerrapolitica/
+│   │   ├── textures/
+│   │   ├── models/
+│   │   ├── animations/
+│   │   ├── sounds/
+│   │   └── lang/
+│   │
+│   └── data/guerrapolitica/
+│       └── characters/
+│
+├── gradle/
+├── build.gradle
+└── README.md
+
+
+Essa é a estrutura-alvo, e não precisa ser criada inteira na v0.001. Também podemos utilizar uma entidade-base compartilhada e reservar subclasses específicas somente para comportamentos realmente diferentes.
+Como os poderes serão programados
+Em vez de deixar cada personagem com uma quantidade enorme de código repetido, construiremos um sistema reutilizável de habilidades.
+#chatgpt-mermaid-_r_pi_{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-size:16px;fill:rgb(237, 237, 237);}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#chatgpt-mermaid-_r_pi_ .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_pi_ .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#chatgpt-mermaid-_r_pi_ .error-icon{fill:rgb(48, 48, 48);}#chatgpt-mermaid-_r_pi_ .error-text{fill:rgb(237, 237, 237);stroke:rgb(237, 237, 237);}#chatgpt-mermaid-_r_pi_ .edge-thickness-normal{stroke-width:1px;}#chatgpt-mermaid-_r_pi_ .edge-thickness-thick{stroke-width:3.5px;}#chatgpt-mermaid-_r_pi_ .edge-pattern-solid{stroke-dasharray:0;}#chatgpt-mermaid-_r_pi_ .edge-thickness-invisible{stroke-width:0;fill:none;}#chatgpt-mermaid-_r_pi_ .edge-pattern-dashed{stroke-dasharray:3;}#chatgpt-mermaid-_r_pi_ .edge-pattern-dotted{stroke-dasharray:2;}#chatgpt-mermaid-_r_pi_ .marker{fill:rgb(175, 175, 175);stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_pi_ .marker.cross{stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_pi_ svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-size:16px;}#chatgpt-mermaid-_r_pi_ p{margin:0;}#chatgpt-mermaid-_r_pi_ .label{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";color:rgb(237, 237, 237);}#chatgpt-mermaid-_r_pi_ .cluster-label text{fill:rgb(237, 237, 237);}#chatgpt-mermaid-_r_pi_ .cluster-label span{color:rgb(237, 237, 237);}#chatgpt-mermaid-_r_pi_ .cluster-label span p{background-color:transparent;}#chatgpt-mermaid-_r_pi_ .label text,#chatgpt-mermaid-_r_pi_ span{fill:rgb(237, 237, 237);color:rgb(237, 237, 237);}#chatgpt-mermaid-_r_pi_ .node rect,#chatgpt-mermaid-_r_pi_ .node circle,#chatgpt-mermaid-_r_pi_ .node ellipse,#chatgpt-mermaid-_r_pi_ .node polygon,#chatgpt-mermaid-_r_pi_ .node path{fill:rgb(9, 23, 44);stroke:rgb(31, 78, 148);stroke-width:1px;}#chatgpt-mermaid-_r_pi_ .rough-node .label text,#chatgpt-mermaid-_r_pi_ .node .label text,#chatgpt-mermaid-_r_pi_ .image-shape .label,#chatgpt-mermaid-_r_pi_ .icon-shape .label{text-anchor:middle;}#chatgpt-mermaid-_r_pi_ .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#chatgpt-mermaid-_r_pi_ .rough-node .label,#chatgpt-mermaid-_r_pi_ .node .label,#chatgpt-mermaid-_r_pi_ .image-shape .label,#chatgpt-mermaid-_r_pi_ .icon-shape .label{text-align:center;}#chatgpt-mermaid-_r_pi_ .node.clickable{cursor:pointer;}#chatgpt-mermaid-_r_pi_ .root .anchor path{fill:rgb(175, 175, 175)!important;stroke-width:0;stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_pi_ .arrowheadPath{fill:rgb(175, 175, 175);}#chatgpt-mermaid-_r_pi_ .edgePath .path{stroke:rgb(175, 175, 175);stroke-width:1px;}#chatgpt-mermaid-_r_pi_ .flowchart-link{stroke:rgb(175, 175, 175);fill:none;}#chatgpt-mermaid-_r_pi_ .edgeLabel{background-color:rgb(0, 0, 0);text-align:center;}#chatgpt-mermaid-_r_pi_ .edgeLabel p{background-color:rgb(0, 0, 0);}#chatgpt-mermaid-_r_pi_ .edgeLabel rect{opacity:0.5;background-color:rgb(0, 0, 0);fill:rgb(0, 0, 0);}#chatgpt-mermaid-_r_pi_ .labelBkg{background-color:rgba(0, 0, 0, 0.5);}#chatgpt-mermaid-_r_pi_ .cluster rect{fill:rgb(48, 48, 48);stroke:rgba(255, 255, 255, 0.15);stroke-width:1px;}#chatgpt-mermaid-_r_pi_ .cluster text{fill:rgb(237, 237, 237);}#chatgpt-mermaid-_r_pi_ .cluster span{color:rgb(237, 237, 237);}#chatgpt-mermaid-_r_pi_ div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-size:12px;background:rgb(48, 48, 48);border:1px solid rgba(255, 255, 255, 0.15);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-mermaid-_r_pi_ .flowchartTitleText{text-anchor:middle;font-size:18px;fill:rgb(237, 237, 237);}#chatgpt-mermaid-_r_pi_ rect.text{fill:none;stroke-width:0;}#chatgpt-mermaid-_r_pi_ .icon-shape,#chatgpt-mermaid-_r_pi_ .image-shape{background-color:rgb(0, 0, 0);text-align:center;}#chatgpt-mermaid-_r_pi_ .icon-shape p,#chatgpt-mermaid-_r_pi_ .image-shape p{background-color:rgb(0, 0, 0);padding:2px;}#chatgpt-mermaid-_r_pi_ .icon-shape .label rect,#chatgpt-mermaid-_r_pi_ .image-shape .label rect{opacity:0.5;background-color:rgb(0, 0, 0);fill:rgb(0, 0, 0);}#chatgpt-mermaid-_r_pi_ .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-mermaid-_r_pi_ .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#chatgpt-mermaid-_r_pi_ .node .neo-node{stroke:rgb(31, 78, 148);}#chatgpt-mermaid-_r_pi_ [data-look="neo"].node rect,#chatgpt-mermaid-_r_pi_ [data-look="neo"].cluster rect,#chatgpt-mermaid-_r_pi_ [data-look="neo"].node polygon{stroke:url(#chatgpt-mermaid-_r_pi_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_pi_ [data-look="neo"].swimlane.cluster rect{filter:none;}#chatgpt-mermaid-_r_pi_ [data-look="neo"].node path{stroke:url(#chatgpt-mermaid-_r_pi_-gradient);stroke-width:1px;}#chatgpt-mermaid-_r_pi_ [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_pi_ [data-look="neo"].node .neo-line path{stroke:rgb(31, 78, 148);filter:none;}#chatgpt-mermaid-_r_pi_ [data-look="neo"].node circle{stroke:url(#chatgpt-mermaid-_r_pi_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_pi_ [data-look="neo"].node circle .state-start{fill:#000000;}#chatgpt-mermaid-_r_pi_ [data-look="neo"].icon-shape .icon{fill:url(#chatgpt-mermaid-_r_pi_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_pi_ [data-look="neo"].icon-shape .icon-neo path{stroke:url(#chatgpt-mermaid-_r_pi_-gradient);filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#chatgpt-mermaid-_r_pi_ .node text{font-size:14px;font-weight:600;letter-spacing:normal;fill:rgb(153, 206, 255);}#chatgpt-mermaid-_r_pi_ .edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(153, 206, 255);}#chatgpt-mermaid-_r_pi_ .node tspan[font-weight="normal"],#chatgpt-mermaid-_r_pi_ .edgeLabels tspan[font-weight="normal"]{font-weight:600;}#chatgpt-mermaid-_r_pi_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(0, 14, 26);stroke:rgb(26, 62, 95);stroke-width:1px;}#chatgpt-mermaid-_r_pi_ .node rect,#chatgpt-mermaid-_r_pi_ .node circle,#chatgpt-mermaid-_r_pi_ .node ellipse,#chatgpt-mermaid-_r_pi_ .node polygon,#chatgpt-mermaid-_r_pi_ .node path{fill:rgb(0, 40, 77);stroke:rgba(255, 255, 255, 0.1);stroke-width:1px;}#chatgpt-mermaid-_r_pi_ .node rect{rx:16px;ry:16px;}#chatgpt-mermaid-_r_pi_ .node.mermaid-decision .label-container{fill:rgb(0, 14, 26);stroke:rgb(26, 62, 95);stroke-dasharray:2,2;}#chatgpt-mermaid-_r_pi_ .edgePaths .flowchart-link{stroke:rgb(175, 175, 175);stroke-width:1px;stroke-linecap:round;stroke-linejoin:round;}#chatgpt-mermaid-_r_pi_ .marker{fill:rgb(175, 175, 175);stroke:rgb(175, 175, 175);}#chatgpt-mermaid-_r_pi_ :root{--mermaid-font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";}Personagem atacaIA seleciona habilidadeCooldown disponível?Ataque básicoAlvo e condições válidos?Executa habilidade no servidorAplica dano, efeitos ouinvocaçãoSincroniza efeitos com clientesInicia cooldownVolta ao combateNãoSimNãoSim
+
+
+
+
+
+As habilidades poderão ter configurações próprias de dano, alcance, recarga, duração e número máximo de invocações. Isso vai facilitar muito quando vocês quiserem acrescentar mais personagens.
+
+Para multiplayer, o servidor será responsável por validar ataques, calcular dano e criar invocações. Os clientes ficam responsáveis principalmente por exibir animações, sons, partículas e interfaces.
+
+Vamos também estabelecer alguns limites técnicos:
+- Invocações terão duração e quantidade máxima configuráveis.
+- Ataques nucleares serão efeitos fictícios de videogame, sem destruição permanente de blocos por padrão.
+- A distorção temporal afetará entidades e efeitos visuais, não o relógio global do servidor.
+- A IA evitará procurar todos os mobs a cada tick desnecessariamente.
+- As músicas e falas terão um gerenciador de áudio; para distribuir o mod, usaremos sons originais ou com permissão.
+Esses limites são fundamentais para não transformar a primeira batalha entre Lula e Renan num teste de resistência da memória RAM do servidor.
+
+8. Planejamento da primeira versão com o Codex
+Esta é a instrução que eu daria para o Codex iniciar o projeto. Ela está limitada à primeira sprint de propósito.
+Prompt — Implementação v0.001
+ Copiar prompt
+O botão copia o prompt técnico completo para você colar no Codex.
+
+9. Organização do projeto entre vocês
+Para não virar bagunça, eu separaria as responsabilidades em quatro áreas: programação do núcleo, programação dos poderes, arte/animação e testes de gameplay. O Codex pode ajudar a programar o núcleo e os poderes, mas vocês ainda vão precisar decidir como devem parecer as animações, testar o combate e produzir ou adaptar os recursos visuais.
+
+Um quadro Trello ou GitHub Projects funcionaria bem para controlar as sprints. Cada personagem pode ter uma ficha individual, com sprite, modelo, facção, habilidades, sons, animações, testes e status de implementação.
+10. O primeiro resultado que precisamos alcançar
+Marco inicial do projeto
+Mod iniciando no Minecraft
+
+Uma entidade Renan Santos registrada
+
+Spawn egg funcionando na aba Guerra Política
+
+Sprite/modelo renderizado corretamente
+
+Arquivo JAR gerado e testado
+
+Esta é a definição de concluído da v0.001, não o estado atual do desenvolvimento.
+A partir daí, começamos a adicionar os ataques, a inteligência de combate e finalmente a guerra completa.
+
+Só preciso confirmar uma coisa antes de preparar a implementação: vocês vão jogar na Java Edition em qual versão do Minecraft? Por exemplo, 1.20.1, 1.21.1 ou outra. Isso define qual versão do NeoForge e das bibliotecas vamos usar, e evita que o Codex monte a base inteira na versão errada.
