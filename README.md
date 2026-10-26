@@ -6,8 +6,9 @@
 
 **Seis facções · Personagens com IA · Exércitos invocáveis · Multiplayer**
 
-![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.004.0-DBA434?style=for-the-badge)
+![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.008.0-DBA434?style=for-the-badge)
 ![GeckoLib](https://img.shields.io/badge/GeckoLib-4.8.4-58A64B?style=for-the-badge)
+![TaCZ](https://img.shields.io/badge/TaCZ-1.1.8--hotfix2-397BA8?style=for-the-badge)
 ![Plataforma](https://img.shields.io/badge/PLATAFORMA-MINECRAFT_JAVA-62B447?style=for-the-badge)
 ![Primeiro marco](https://img.shields.io/badge/PRIMEIRO_MARCO-v0.001-6488EA?style=for-the-badge)
 ![Foco](https://img.shields.io/badge/FOCO-MULTIPLAYER-A875D6?style=for-the-badge)
@@ -20,9 +21,183 @@ Guerra Ezuberante é um projeto de mod de Minecraft Java Edition em que personag
 
 Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pretendida e o caminho de desenvolvimento. Os ataques, nomes de poderes e eventos pertencem a uma sátira fictícia de videogame.
 
-> **Estado atual — sprint 0.004.0.** GeckoLib **4.8.4** é obrigatório no cliente e no servidor. Renan, os dois Arthurs e as combatentes usam um humanoide articulado, gerado por código com as skins originais. A emergência dura 44 ticks, com mãos, cotovelos e joelhos independentes. Alcance corrigido, impacto no tick 5 e knockback moderado. [Entrega técnica e arquivos](docs/GECKOLIB_0.004.md), [resultados reais](docs/VALIDACAO.md).
+> **Estado atual — sprint 0.008.0.** Tela inicial com arte voxel original **GUERRA EZUBERANTE**, mantendo os botões e a navegação vanilla/Forge. PNG 1920×1080, escala proporcional e título preservado em ultrawide. **55 GameTests passaram**, além do cenário gráfico de navegação, entrada/saída de mundo e quatro tamanhos de renderização. Renan armado, playlists, GE-P12 e arsenal anterior preservados. [Entrega do menu](docs/MENU_0.008.md), [validação](docs/VALIDACAO.md), [Renan e playlists](docs/RENAN_0.007.md).
 
 O projeto segue o desafio de desenvolvimento **100% por IA**. Código, UVs, modelos, keyframes, conversões, validações e correções são responsabilidade do agente. O autor fornece ideias, assets e feedback; não precisa configurar Blockbench ou editar Java/JSON.
+
+## Tela inicial ilustrada — 0.008.0
+
+Uma arte criada com **imagegen** reúne Renan em destaque, Lula, Flávio Bolsonaro, Donald Trump, Benjamin Netanyahu e Xi Jinping em cenário voxel de batalha, com o título do mod. Os personagens extras são elementos da ilustração; não foram implementados como mobs nesta sprint.
+
+![Tela inicial do Guerra Ezuberante renderizada no Minecraft](docs/preview/menu-0.008/1920x1080.png)
+
+Singleplayer, Multiplayer, Minecraft Realms, Mods, Options, Quit, Language e Accessibility continuam sendo os controles originais. A classe estende `TitleScreen` e substitui somente a apresentação do panorama; o logo e a frase amarela são ocultados porque o título já está na arte. Nenhum widget foi recriado.
+
+O fundo preenche a tela sem distorcer, com recorte proporcional e escurecimento inferior suave. O PNG está em `src/main/resources/assets/guerra_ezuberante/textures/gui/title/guerra_ezuberante_menu_bg.png`. [Código, prompt utilizado, capturas 4:3/ultrawide, testes e troca futura da imagem](docs/MENU_0.008.md).
+
+## Renan armado e playlists — adicionados na 0.007.0
+
+Renan continua pacífico até ser provocado. Com TaCZ instalado, nasce segurando a AK-47 real, usa o pipeline nativo de projéteis/dano e atira **uma bala por 20 ticks de servidor**, depois da preparação inicial. Mantém distância, exige linha de visão e protege aliados. A munição infinita pertence ao operador do NPC; a arma dos jogadores continua com munição e recarga normais. Sem TaCZ, permanece disponível o combate básico desarmado.
+
+O modelo e a skin foram preservados. Seis clipes GeckoLib acrescentam idle armado, preparação, mira, caminhada, disparo/recuo e reação a dano. As variantes de Arthur, tropas, espada, controles das armas e a GE-P12 permanecem.
+
+**Áudio conforme a orientação atual do autor:** três gravações do Renan e sete gravações únicas do Arthur entram nas respectivas playlists, incluindo falas e músicas. Uma shuffle bag toca todas antes de repetir, evita repetir entre rodadas e escolhe a primeira sem ordem fixa. Cópias idênticas dos arquivos não viram faixas duplicadas. O efeito de invocação continua no evento de conjuração.
+
+| Ativação | Comportamento |
+| --- | --- |
+| Entrada em combate | Inicia a playlist ou mantém a faixa já ativa |
+| Botão direito direto na entidade | Inicia ou avança para a próxima; cooldown de 0,5 s |
+| Fim da gravação | Avança se a sessão continua ativa |
+| Fim de combate/sessão manual | Termina a gravação atual e para |
+| Morte, remoção ou perda da entidade no cliente | Encerra a reprodução associada |
+
+A música acompanha a posição da entidade, com atenuação local, streaming e no máximo uma instância por personagem em cada cliente. Não altera o botão direito usado para ADS. Configuração `character_audio` do mundo permite ajustar volume e duração da sessão. [Durações auditadas, arquitetura, fontes e limites](docs/RENAN_0.007.md).
+
+```mermaid
+flowchart LR
+    A[Provocação válida] --> G[Goal de tiro do Renan]
+    G --> V[Servidor: alvo, linha livre, intervalo de 20 ticks]
+    V --> T[TaCZ: disparo e dano nativos]
+    A --> M[Uma sessão de áudio por entidade]
+    I[Interação direta] --> M
+    M --> B[Shuffle bag de falas e músicas]
+    B --> C[Som espacial nos clientes próximos]
+```
+
+[Próximos personagens — Lula](docs/PROXIMOS_PERSONAGENS.md) registra requisitos a definir pelo autor. Lula não foi implementado e não recebeu habilidades inventadas.
+
+Validação desta entrega: **54 GameTests**, **11 testes sem TaCZ** e duas sessões gráficas prolongadas aprovadas. No teste de dois clientes, o Renan produziu124 tiros/projéteis/acertos e o observador recebeu124 eventos remotos, com mira/recuo e playlist sincronizados. [Relatórios e limites](docs/VALIDACAO.md). As instâncias automatizadas agora sempre iniciam com som zerado, conforme a preferência do autor.
+
+## Pistola própria GE-P12 — adicionada na 0.006.0
+
+Protótipo para avaliar um sistema independente de armas. O item `guerra_ezuberante:ge_p12` usa um modelo tridimensional original de cubos, desenhado por código, e três sons gerados por síntese. Não utiliza classes, gunpacks, modelos, animações ou áudios do TaCZ.
+
+| Característica | Implementação |
+| --- | --- |
+| Disparo | Semiautomático; botão esquerdo, um tiro por pressionamento |
+| Mira | Segurar botão direito; transição ao centro e redução de FOV em 22% |
+| Recarga | **R**, 32 ticks / 1,6 s; trocar de slot cancela sem consumir reserva |
+| Carregador | 12 cartuchos; munição própria `guerra_ezuberante:pistol_ammo` |
+| Cadência | Intervalo mínimo de 6 ticks / 0,3 s, validado no servidor |
+| Dano | 6 HP antes da armadura; hitscan até 48 blocos, bloqueado por paredes |
+| Kit de teste | **`/ge pistola`**, exige OP 2: pistola carregada + 48 cartuchos |
+| Acesso criativo | Pistola e cartuchos na aba Guerra Ezuberante; pistola nova vazia, R carrega |
+| NPCs | Nenhum recebe a pistola automaticamente |
+
+```mermaid
+sequenceDiagram
+    participant J as Jogador
+    participant C as Cliente Guerra Ezuberante
+    participant S as Servidor Guerra Ezuberante
+    participant M as Mundo
+    J->>C: Pressiona tiro / recarga
+    C->>S: Pedido de ação, sem alvo nem dano fornecido
+    S->>S: Valida jogador, arma, cadência e munição
+    S->>M: Raycast para primeiro obstáculo / entidade
+    S->>M: Aplica dano e transmite som / partículas
+    S-->>C: Inventário sincronizado: munição e número do tiro
+    C->>C: Recuo confirmado, HUD e animação da arma
+```
+
+Mira, recuo e animação de recarga deste protótipo são simples; ainda não há mãos articuladas, carregador animado separado, acessórios ou receitas Survival. São recursos para uma possível próxima etapa, não uma substituição completa do TaCZ. O suporte anterior continua disponível quando ele está instalado; cada sistema atua somente em seus próprios itens.
+
+O build gera também **`build/distributions/guerra-ezuberante-0.008.0-sem-tacz/mods/`**, com Guerra Ezuberante e GeckoLib. A GE-P12 não adiciona outro mod na lista. **GeckoLib ainda aparece separadamente**, pois os personagens dependem dele. Para preservar armas já salvas, o perfil normal de desenvolvimento mantém TaCZ; os testes de independência usam um mundo isolado sem ele.
+
+**Validação executada:** 47 GameTests com TaCZ e 10 próprios sem ele. Os dois cenários gráficos passaram: modelo 3D, ADS/FOV, tiro e dano, som único, recoil, recarga/conservação, gatilho segurado sem rajada e rejeição sem munição. A aba criativa real abriu com 6 itens sem TaCZ e 15 com ele. Multiplayer gráfico entre dois clientes da GE-P12 ainda não foi testado.
+
+[Detalhes, capturas e testes](docs/PISTOLA_0.006.md).
+
+## Arsenal opcional TaCZ — integrado na 0.005.0
+
+Quando o TaCZ está instalado, o Guerra Ezuberante adiciona seus **itens reais** à aba criativa usando a API externa. O TaCZ controla o funcionamento dessas cinco armas; a GE-P12 tem uma implementação própria e independente. Nenhum personagem político recebe armas automaticamente.
+
+| Arma | ID no gunpack oficial | Munição | Comando administrativo | Reserva do kit |
+| --- | --- | --- | --- | --- |
+| AKM / AK-47 | `tacz:ak47` | `tacz:762x39` — 7,62×39 | `/ge armamento ak47` | 120 |
+| M4A1 | `tacz:m4a1` | `tacz:556x45` — 5,56×45 | `/ge armamento m4a1` | 120 |
+| Glock 17 | `tacz:glock_17` | `tacz:9mm` — 9 mm | `/ge armamento glock17` | 68 |
+| Desert Eagle | `tacz:deagle` | `tacz:50ae` — .50 AE | `/ge armamento deagle` | 64 |
+| MP5A5 | `tacz:hk_mp5a5` | `tacz:9mm` — 9 mm | `/ge armamento mp5` | 120 |
+
+Os kits entregam uma arma carregada, sem acessórios obrigatórios, e munição compatível separada em pilhas válidas. Reserva = quatro carregadores padrão, com mínimo de 64 cartuchos. O comando exige **permissão de operador nível 2** e um jogador como executor; não concede armas livremente em servidores Survival. Também aceita `akm`, `glock_17`, `hk_mp5a5` e `mp5a5`. Tab completa os nomes principais.
+
+Na aba **Guerra Ezuberante**, os quatro itens existentes foram mantidos e acompanhados por cinco armas e quatro entradas de munição; 9 mm aparece uma vez, compartilhado pela Glock e pela MP5. Os identificadores acima são índices do gunpack, não novos itens registrados pelo Guerra Ezuberante. Por isso a integração usa `GunItemBuilder`/`AmmoItemBuilder`, em vez de tentar um `/give` de um item inexistente com o mesmo nome.
+
+```mermaid
+flowchart LR
+    A[Aba Guerra Ezuberante] --> I[Índices carregados do TaCZ]
+    C[Comando ge armamento: OP 2] --> I
+    I --> V[Confere arma, calibre e índice de munição]
+    V --> B[Builders oficiais: ItemStacks reais]
+    B --> P[Jogador recebe arma e munição]
+    P --> T[TaCZ: ADS, recoil, disparo e recarga]
+    T --> S[Servidor TaCZ valida tiro, acerto e consumo]
+    S --> O[Outros jogadores recebem eventos e efeitos]
+```
+
+### Controles originais
+
+| Ação | Padrão do TaCZ |
+| --- | --- |
+| Disparar | Botão esquerdo |
+| Mirar / ADS | Botão direito; segue o modo de mira configurado no TaCZ |
+| Recarregar | **R** |
+| Alternar modo de tiro | **G**, conforme os modos da arma |
+| Inspecionar | **H** |
+| Acessórios | **Z**, usando a interface original |
+| Painel do Guerra Ezuberante | **K**, preservado |
+
+Os controles podem ser remapeados no Minecraft. A integração não registra teclas concorrentes nem altera os valores de dano/tempo do gunpack. Um teste com óptica nativa confirma que acessórios continuam instaláveis; as cinco armas funcionam sem eles.
+
+### Dependências e instalação
+
+| Componente | Versão validada | Necessidade |
+| --- | --- | --- |
+| Minecraft Java | 1.20.1 | Plataforma |
+| Forge | 47.4.28 | Cliente e servidor |
+| Java | 17 | Jogo e desenvolvimento |
+| Guerra Ezuberante | 0.008.0 | Este mod, inclui menu ilustrado, Renan armado e GE-P12 |
+| GeckoLib | 4.8.4 para Forge 1.20.1 | Personagens e animações existentes |
+| TaCZ | **1.1.8-hotfix2**, arquivo CurseForge **9037989** | Opcional; necessário nos dois lados para usar as cinco armas nativas |
+
+O build prepara os três JARs separados em **`build/distributions/guerra-ezuberante-0.008.0/mods/`** e a alternativa sem TaCZ em **`build/distributions/guerra-ezuberante-0.008.0-sem-tacz/mods/`**. O artefato próprio fica em **`build/libs/guerra_ezuberante-0.008.0.jar`**. Cliente e servidor devem usar o mesmo conjunto. O gunpack padrão já vem no JAR oficial do TaCZ; a GE-P12 não precisa dele.
+
+A dependência foi fixada pelo [arquivo oficial publicado em 02/10/2026](https://www.curseforge.com/minecraft/mc-mods/timeless-and-classics-zero/files/9037989), não pelo exemplo antigo 1.1.6 do README do TaCZ. Gradle usa CurseMaven com `fg.deobf`; o pacote local utiliza o JAR original, sem o remapeamento de desenvolvimento. `mods.toml` exige a versão exata. `validateTacz` verifica SHA-256 e os IDs/calibres no gunpack dessa distribuição.
+
+Créditos: **Serene Wave Studio | Timeless Squad**. O projeto TaCZ declara código GPL 3.0 e assets CC BY-NC-ND 4.0; seus arquivos permanecem na distribuição externa original. Não foram copiados modelos, texturas, animações ou sons para nosso repositório. [Fontes, versões e créditos](docs/DEPENDENCIAS_TERCEROS.md).
+
+### Testes do arsenal
+
+Além dos 37 GameTests, a automação abriu o Minecraft, criou um cenário isolado em Survival e usou a API cliente real do TaCZ. Mediu ADS/FOV, recoil de câmera, um som por tiro, dano real no alvo, carregador, recarga e tentativa sem munição. Depois repetiu as cinco armas em servidor dedicado: o Observer recebeu um tiro e uma recarga de cada arma, e o servidor confirmou conservação de munição e um acerto por disparo. [Evidências, capturas e limites](docs/ARSENAL_0.005.md).
+
+```powershell
+# Desenvolvimento no IntelliJ / terminal, com JDK 17 e dependências resolvidas pelo agente
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gradle.ps1 runClient
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gradle.ps1 runGameTestServer build
+
+# Teste gráfico isolado; encerra apenas a sua própria instância de teste
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/arsenal_visual_test.ps1
+
+# Servidor dedicado e dois clientes em localhost; requer aceite explícito prévio da EULA
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/arsenal_network_test.ps1
+```
+
+Os perfis automatizados ficam em `.tools/`; o mundo habitual em `run/` não é usado nesses cenários. O autor aceitou a EULA para o teste local desta sprint. Ao finalizar uma versão, o agente abre o perfil normal atualizado e deixa o Minecraft aberto para o autor testar. Nenhum push ou merge está autorizado nesta sprint.
+
+![Armas reais do TaCZ e munições na aba Guerra Ezuberante, preservando ovos e espada](docs/preview/arsenal-0.005/aba-criativa.png)
+
+<details>
+<summary>Ver AKM em primeira pessoa, ADS e recarga</summary>
+
+![Modelo 3D nativo da AKM](docs/preview/arsenal-0.005/akm-3d.png)
+
+![Mira ADS original da AKM](docs/preview/arsenal-0.005/akm-ads.png)
+
+![Animação de recarga original da AKM](docs/preview/arsenal-0.005/akm-recarga.png)
+
+</details>
+
+As capturas são do Minecraft real. Os testes funcionais de uma sessão dedicada com dois clientes passaram; tentativas posteriores de login tiveram timeout, portanto a repetibilidade de conexão ainda é pendente. Também há avisos do TaCZ sobre referências de áudio ausentes em alguns keyframes e em um arquivo agregado de recarga. A integração preserva a distribuição original e não inventa assets substitutos.
 
 ## Dois Arthurs, uma implementação
 
@@ -178,7 +353,7 @@ Para testar: invoque Arthur e Renan pelos ovos, confirme a paz inicial e ataque 
 
 As imagens são capturas do cliente de validação em mundo isolado. O relatório distingue os testes de servidor, a inspeção visual e o multiplayer com dois jogadores que ainda não foi executado.
 
-## Sprint 0.004.0: executar e testar
+## Base de personagens e desenvolvimento
 
 ### O que foi implementado
 
@@ -251,7 +426,7 @@ Com comandos habilitados:
 /summon guerra_ezuberante:arthur_do_val_invocador ~4 ~ ~
 ```
 
-O JAR fica em **`build/libs/guerra_ezuberante-0.004.0.jar`**. O build também prepara **`build/distributions/guerra-ezuberante-0.004.0/mods/`** com o mod e o GeckoLib 4.8.4 original. Esse par é necessário no cliente e no servidor Forge 1.20.1. Não distribua `.tools/` ou caches, nem instale múltiplas versões do mod juntas.
+O JAR atual fica em **`build/libs/guerra_ezuberante-0.008.0.jar`**. O build prepara **`build/distributions/guerra-ezuberante-0.008.0/mods/`** com o mod, GeckoLib 4.8.4 e TaCZ 1.1.8-hotfix2 originais, separados, e **`build/distributions/guerra-ezuberante-0.008.0-sem-tacz/mods/`** apenas com o mod e GeckoLib. A GE-P12 funciona nos dois conjuntos. Não distribua `.tools/` ou caches, nem instale múltiplas versões do mod juntas.
 
 ### Áudios: entrada, conversão e novas falas
 

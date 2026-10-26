@@ -8,13 +8,15 @@ import software.bernie.geckolib.core.object.PlayState;
 public final class CharacterAnimationController extends AnimationController<RetaliatingCharacterEntity> {
     private static final java.util.Map<String, RawAnimation> CLIPS = new java.util.HashMap<>();
     static {
-        for (String name : java.util.List.of("idle", "walk", "punch_left", "punch_right", "sword_attack", "cast", "hurt", "ukrainian_emerge")) {
+        for (String name : java.util.List.of("idle", "walk", "punch_left", "punch_right", "sword_attack", "cast", "hurt", "ukrainian_emerge",
+                "rifle_idle", "rifle_prepare", "rifle_aim", "rifle_walk", "rifle_fire", "rifle_hurt")) {
             var animation = RawAnimation.begin();
-            CLIPS.put(name, name.equals("idle") || name.equals("walk")
+            CLIPS.put(name, java.util.Set.of("idle","walk","rifle_idle","rifle_aim","rifle_walk").contains(name)
                     ? animation.thenLoop("animation.guerra." + name) : animation.thenPlay("animation.guerra." + name));
         }
     }
     private long lastAttack = Long.MIN_VALUE;
+    private long lastShot = Long.MIN_VALUE;
     private final RetaliatingCharacterEntity entity;
     private float partialTick;
 
@@ -31,6 +33,14 @@ public final class CharacterAnimationController extends AnimationController<Reta
             animation = "ukrainian_emerge";
         } else if (entity instanceof ArthurDoValEntity arthur && arthur.isActionLocked()) {
             animation = "cast";
+        } else if (entity instanceof RenanSantosEntity renan && renan.isArmed()) {
+            if(renan.rifleShotAge(partialTick)<9) {
+                if(lastShot!=renan.rifleShotToken()) { forceAnimationReset();lastShot=renan.rifleShotToken(); }
+                animation="rifle_fire";
+            } else if(entity.hurtTime>0) animation="rifle_hurt";
+            else if(renan.isRifleAiming() && renan.rifleAimAge(partialTick)<RenanSantosEntity.PREPARE_TICKS) animation="rifle_prepare";
+            else if(state.isMoving()) animation="rifle_walk";
+            else animation=renan.isRifleAiming()?"rifle_aim":"rifle_idle";
         } else if (entity.attackAnimationAge(partialTick) < RetaliatingCharacterEntity.ATTACK_LENGTH) {
             if (lastAttack != entity.attackAnimationToken()) {
                 forceAnimationReset();
@@ -56,6 +66,12 @@ public final class CharacterAnimationController extends AnimationController<Reta
         }
         if (entity instanceof ArthurDoValEntity arthur && arthur.isActionLocked()) {
             return Math.max(0, Math.min(19.999, arthur.castAnimationAge(partialTick)));
+        }
+        if(entity instanceof RenanSantosEntity renan && renan.isArmed()) {
+            if(renan.rifleShotAge(partialTick)<9)return Math.max(0,renan.rifleShotAge(partialTick));
+            if(entity.hurtTime>0)return Math.min(9.999,10-entity.hurtTime+partialTick);
+            if(renan.isRifleAiming() && renan.rifleAimAge(partialTick)<12)return Math.max(0,renan.rifleAimAge(partialTick));
+            return normal;
         }
         if (entity.attackAnimationAge(partialTick) < RetaliatingCharacterEntity.ATTACK_LENGTH) {
             return Math.max(0, entity.attackAnimationAge(partialTick));

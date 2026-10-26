@@ -23,5 +23,11 @@ public final class CharacterGeoModel<T extends RetaliatingCharacterEntity> exten
             head.setRotX(head.getRotX() + (float)Math.toRadians(data.headPitch()));
             head.setRotY(head.getRotY() + (float)Math.toRadians(data.netHeadYaw()));
         }
+        if(entity instanceof io.github.omarflk.guerraezuberante.entity.RenanSantosEntity renan && renan.isArmed() && renan.isRifleAiming()) {
+            float pitch=(float)Math.toRadians(renan.getXRot());
+            for(String name:java.util.List.of("right_arm","left_arm")) {
+                var arm=getAnimationProcessor().getBone(name);if(arm!=null)arm.setRotX(arm.getRotX()-pitch);
+            }
+        }
     }
 }

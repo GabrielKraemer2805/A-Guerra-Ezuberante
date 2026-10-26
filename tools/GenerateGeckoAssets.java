@@ -137,6 +137,32 @@ public final class GenerateGeckoAssets {
             rot(side+"_shin",2.2,new double[][]{key(0,0,0,0),key(.8,0,0,0),key(1.4,95,0,0),key(1.75,65,0,0),key(1.9,15,0,0),key(2.2,0,0,0)});
         }
         finish("ukrainian_emerge",2.2,false);
+        // Rifle posture is owned by the Renan-only clips. Shared model/UV and old clips remain intact.
+        for(String name:List.of("rifle_idle","rifle_prepare","rifle_aim","rifle_walk","rifle_fire","rifle_hurt")) {
+            begin();
+            boolean lowered=name.equals("rifle_idle"), prepare=name.equals("rifle_prepare"), walk=name.equals("rifle_walk");
+            double duration=name.equals("rifle_fire")?.45:prepare?.6:name.equals("rifle_hurt")?.5:walk?.8:2;
+            double start=prepare?0:1;
+            // Elbows bend around the original forearm joints; hands meet grip and fore-end.
+            rot("right_arm",duration,new double[][]{key(0,prepare?-24:lowered?-24:-60,-8,-8),key(duration,lowered?-24:-60,-8,-8)});
+            rot("right_forearm",duration,new double[][]{key(0,prepare?-42:lowered?-42:-30,0,0),key(duration,lowered?-42:-30,0,0)});
+            rot("left_arm",duration,new double[][]{key(0,prepare?-30:lowered?-30:-60,-20,-18),key(duration,lowered?-30:-60,-20,-18)});
+            rot("left_forearm",duration,new double[][]{key(0,prepare?-36:lowered?-36:-30,-10,0),key(duration,lowered?-36:-30,-10,0)});
+            rot("body",duration,new double[][]{key(0,0,prepare?0:7,0),key(duration,0,7,0)});
+            if(walk)for(String side:List.of("right","left")) {
+                int sign=side.equals("right")?1:-1;
+                channel(side+"_leg","rotation",duration,t->vec(22*sign*Math.sin(t/duration*2*Math.PI),0,0));
+                channel(side+"_shin","rotation",duration,t->vec(-14*Math.max(0,-sign*Math.sin(t/duration*2*Math.PI)),0,0));
+                channel("body","position",duration,t->vec(0,.3*Math.sin(t/duration*4*Math.PI),0));
+            }
+            if(name.equals("rifle_fire")) {
+                rot("right_arm",duration,new double[][]{key(0,-60,-8,-8),key(.05,-65,-8,-8),key(.15,-62,-8,-8),key(duration,-60,-8,-8)});
+                rot("left_arm",duration,new double[][]{key(0,-60,-20,-18),key(.05,-65,-20,-18),key(.15,-62,-20,-18),key(duration,-60,-20,-18)});
+                channel("body","position",duration,t->sample(new double[][]{key(0,0,0,0),key(.05,0,0,.5),key(duration,0,0,0)},t));
+            }
+            if(name.equals("rifle_hurt"))rot("body",duration,new double[][]{key(0,0,7,0),key(.1,-8,7,-4),key(duration,0,7,0)});
+            finish(name,duration,lowered || walk || name.equals("rifle_aim"));
+        }
         write("animations/humanoid.animation.json",map("format_version","1.8.0","animations",animations));
     }
     static void write(String relative,Object value)throws Exception{

@@ -1,0 +1,17 @@
+[
+    {
+        "name":  "geckolib-forge-1.20.1-4.8.4.jar",
+        "bytes":  1038208,
+        "sha256":  "33765775385857e7be6dca712d37f1cf05b48d052b86a8453c93631009ea1106"
+    },
+    {
+        "name":  "guerra_ezuberante-0.007.0.jar",
+        "bytes":  1195947,
+        "sha256":  "101b9e61686758b3c0596bbaced3a3f83bca7a40455c805004d430735efb3408"
+    },
+    {
+        "name":  "tacz-1.20.1-1.1.8-hotfix2.jar",
+        "bytes":  57472579,
+        "sha256":  "2cbb89f44333d2eb4e825d86d789ff119b272ff75184390b55bafd4f0e7f10c2"
+    }
+]

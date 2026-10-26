@@ -1,5 +1,11 @@
 # Guerra Ezuberante — documento de ideia e design
 
+**Atualização 0.008.0:** menu inicial com arte original voxel e título do mod, mantendo widgets e navegação vanilla/Forge. Os personagens extras na arte são somente elementos ilustrativos. [Implementação e testes](MENU_0.008.md).
+
+**Atualização 0.007.0:** Renan usa AK-47 nativa do TaCZ mantido, munição ilimitada só no NPC e cadência20ticks. Renan e Arthur compartilham infraestrutura de playlist por personagem com todos os áudios únicos das respectivas pastas. [Entrega](RENAN_0.007.md). [Lula](PROXIMOS_PERSONAGENS.md) permanece somente como requisitos futuros a definir; nenhum código dele foi implementado.
+
+**Atualização 0.006.0:** experiência com a pistola própria GE-P12, modelo/sons/código originais e TaCZ opcional. A prova de funcionamento sem TaCZ usa um perfil isolado; a integração anterior e os personagens permanecem preservados. [Entrega da pistola](PISTOLA_0.006.md).
+
 Consolidação de contexto em 24/10/2026, a partir do GDD conceitual versão 0.1 e dos três anexos fornecidos pelo autor.
 
 A documentação principal está no [README](../README.md), com a implementação atual e o plano completo. **Atualização técnica: Minecraft 1.20.1, Forge 47.4.28, Java 17, Gradle 8.8, ForgeGradle 6.0.54, pacote io.github.omarflk.guerraezuberante e versão 0.001.0.** A primeira implementação do Renan usa a skin e as duas falas fornecidas pelo autor. Consulte [VALIDACAO.md](VALIDACAO.md). As descrições de estado de planejamento abaixo preservam a etapa original, anterior ao código; não representam o estado atual.
@@ -8,7 +14,7 @@ A documentação principal está no [README](../README.md), com a implementaçã
 
 Atualização de implementação: **0.002.0** adiciona Arthur do Val e retaliação compartilhada. A lore abaixo permanece preservada; estado da sprint em [COMBATE_0.002.md](COMBATE_0.002.md), [AUDIOS.md](AUDIOS.md) e [VALIDACAO.md](VALIDACAO.md).
 
-Atualização da sprint **0.004.0**: GeckoLib 4.8.4 obrigatório, humanoide articulado, emergência corporal em 44 ticks, alcance corrigido e dois Arthurs estão implementados. O Exército Ucraniano e a Espada Ucraniana da sprint anterior foram preservados. Estado real e arquivos em [GECKOLIB_0.004.md](GECKOLIB_0.004.md); as seções abaixo preservam o planejamento original.
+Atualização da sprint **0.005.0**: arsenal funcional de cinco armas integrado ao TaCZ 1.1.8-hotfix2, com kits administrativos e munições nativas. A base anterior de personagens, GeckoLib 4.8.4, dois Arthurs e Exército Ucraniano foi preservada. Estado atual em [ARSENAL_0.005.md](ARSENAL_0.005.md); base de animação em [GECKOLIB_0.004.md](GECKOLIB_0.004.md). As seções abaixo preservam o planejamento original; NPCs ainda não usam armas de fogo.
 
 ## 1. Escopo inicial e estado atual
 

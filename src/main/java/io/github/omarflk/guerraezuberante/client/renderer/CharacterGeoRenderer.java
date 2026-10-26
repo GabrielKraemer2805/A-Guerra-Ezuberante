@@ -32,6 +32,10 @@ public class CharacterGeoRenderer<T extends RetaliatingCharacterEntity> extends 
                 pose.pushPose();
                 pose.mulPose(Axis.XP.rotationDegrees(-90));
                 pose.translate(0, 0.05, -0.1);
+                if(entity instanceof io.github.omarflk.guerraezuberante.entity.RenanSantosEntity renan && renan.isArmed()) {
+                    pose.mulPose(Axis.YP.rotationDegrees(8));
+                    pose.translate(0,.02,0);
+                }
                 super.renderStackForBone(pose, bone, stack, entity, buffers, partialTick, light, overlay);
                 pose.popPose();
             }

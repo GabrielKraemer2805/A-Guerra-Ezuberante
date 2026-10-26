@@ -1,0 +1,63 @@
+{
+  "creativeGuns": 5,
+  "errors": [],
+  "passed": true,
+  "weapons": [
+    {
+      "emptyShotRejected": true,
+      "hipFov": 69.99996948242188,
+      "cameraRecoilDegrees": 0.8295171,
+      "clientShotEvents": 1,
+      "clientReloadEvents": 1,
+      "gun": "tacz:ak47",
+      "targetDamage": 9.0,
+      "shotSounds": 1,
+      "adsFov": 55.531131744384766
+    },
+    {
+      "emptyShotRejected": true,
+      "hipFov": 69.99996948242188,
+      "cameraRecoilDegrees": 1.2389297,
+      "clientShotEvents": 1,
+      "clientReloadEvents": 1,
+      "gun": "tacz:m4a1",
+      "targetDamage": 6.5,
+      "shotSounds": 1,
+      "adsFov": 55.531097412109375
+    },
+    {
+      "emptyShotRejected": true,
+      "hipFov": 69.99996948242188,
+      "cameraRecoilDegrees": 1.199234,
+      "clientShotEvents": 1,
+      "clientReloadEvents": 1,
+      "gun": "tacz:glock_17",
+      "targetDamage": 7.0,
+      "shotSounds": 1,
+      "adsFov": 60.527671813964844
+    },
+    {
+      "emptyShotRejected": true,
+      "hipFov": 69.99996185302734,
+      "cameraRecoilDegrees": 2.7308989,
+      "clientShotEvents": 1,
+      "clientReloadEvents": 1,
+      "gun": "tacz:deagle",
+      "targetDamage": 16.0,
+      "shotSounds": 1,
+      "adsFov": 60.527671813964844
+    },
+    {
+      "emptyShotRejected": true,
+      "hipFov": 69.99996185302734,
+      "cameraRecoilDegrees": 1.0718782,
+      "clientShotEvents": 1,
+      "clientReloadEvents": 1,
+      "gun": "tacz:hk_mp5a5",
+      "targetDamage": 6.0,
+      "shotSounds": 1,
+      "adsFov": 60.527671813964844
+    }
+  ],
+  "creativeAmmo": 4
+}

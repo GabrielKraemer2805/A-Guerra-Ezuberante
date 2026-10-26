@@ -1,0 +1,19 @@
+{
+  "taczLoaded": false,
+  "model3d": true,
+  "hipFov": 70.0,
+  "adsFov": 54.599997997283936,
+  "damage": 6,
+  "shotSounds": 1,
+  "recoilObserved": true,
+  "afterReload": {
+    "reserve": 47,
+    "magazine": 12
+  },
+  "emptyShotAndReloadRejected": true,
+  "adsRelease": true,
+  "heldTriggerIsSemiautomatic": true,
+  "creativeEntries": 6,
+  "passed": true,
+  "errors": []
+}

@@ -1,0 +1,99 @@
+{
+  "texture": {
+    "width": 1920,
+    "height": 1080
+  },
+  "vanillaButtons": [
+    "Singleplayer",
+    "Multiplayer",
+    "Minecraft Realms",
+    "Mods",
+    "Language",
+    "Options...",
+    "Quit Game",
+    "Accessibility",
+    "Copyright Mojang AB. Do not distribute!"
+  ],
+  "options": true,
+  "multiplayer": true,
+  "mods": true,
+  "singleplayer": true,
+  "worldLoaded": true,
+  "returnedFromWorld": true,
+  "replacementEvents": 10,
+  "noReplacementLoop": true,
+  "passed": true,
+  "errors": [],
+  "screenshots": [
+    {
+      "height": 720,
+      "name": "1280x720",
+      "screen": "io.github.omarflk.guerraezuberante.client.screen.GuerraEzuberanteTitleScreen",
+      "width": 1280,
+      "renderTarget": "Minecraft framebuffer"
+    },
+    {
+      "height": 1080,
+      "name": "1920x1080",
+      "screen": "io.github.omarflk.guerraezuberante.client.screen.GuerraEzuberanteTitleScreen",
+      "width": 1920,
+      "renderTarget": "Minecraft framebuffer"
+    },
+    {
+      "height": 768,
+      "name": "1024x768",
+      "screen": "io.github.omarflk.guerraezuberante.client.screen.GuerraEzuberanteTitleScreen",
+      "width": 1024,
+      "renderTarget": "Minecraft framebuffer"
+    },
+    {
+      "height": 1080,
+      "name": "2560x1080",
+      "screen": "io.github.omarflk.guerraezuberante.client.screen.GuerraEzuberanteTitleScreen",
+      "width": 2560,
+      "renderTarget": "Minecraft framebuffer"
+    },
+    {
+      "height": 720,
+      "name": "options",
+      "screen": "net.minecraft.client.gui.screens.OptionsScreen",
+      "width": 1280,
+      "renderTarget": "Minecraft framebuffer"
+    },
+    {
+      "height": 720,
+      "name": "multiplayer",
+      "screen": "net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen",
+      "width": 1280,
+      "renderTarget": "Minecraft framebuffer"
+    },
+    {
+      "height": 720,
+      "name": "mods",
+      "screen": "net.minecraftforge.client.gui.ModListScreen",
+      "width": 1280,
+      "renderTarget": "Minecraft framebuffer"
+    },
+    {
+      "height": 720,
+      "name": "singleplayer",
+      "screen": "net.minecraft.client.gui.screens.worldselection.SelectWorldScreen",
+      "width": 1280,
+      "renderTarget": "Minecraft framebuffer"
+    },
+    {
+      "height": 720,
+      "name": "returned-from-world",
+      "screen": "io.github.omarflk.guerraezuberante.client.screen.GuerraEzuberanteTitleScreen",
+      "width": 1280,
+      "renderTarget": "Minecraft framebuffer"
+    },
+    {
+      "height": 720,
+      "name": "final",
+      "screen": "io.github.omarflk.guerraezuberante.client.screen.GuerraEzuberanteTitleScreen",
+      "width": 1280,
+      "renderTarget": "Minecraft framebuffer"
+    }
+  ]
+}

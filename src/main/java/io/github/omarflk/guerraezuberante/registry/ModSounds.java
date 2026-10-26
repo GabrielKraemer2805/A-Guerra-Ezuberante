@@ -15,6 +15,9 @@ public final class ModSounds {
     public static final DeferredRegister<SoundEvent> REGISTER =
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, GuerraEzuberanteMod.MOD_ID);
     public static final RegistryObject<SoundEvent> ME_RESPEITA = register("renan.me_respeita");
+    public static final RegistryObject<SoundEvent> PISTOL_SHOT = register("pistol.shot");
+    public static final RegistryObject<SoundEvent> PISTOL_RELOAD = register("pistol.reload");
+    public static final RegistryObject<SoundEvent> PISTOL_EMPTY = register("pistol.empty");
     public static final RegistryObject<SoundEvent> RISADINHA = register("renan.risadinha");
     public static final RegistryObject<SoundEvent> PHONK = register("renan.phonk");
     public static final RegistryObject<SoundEvent> SUMMON = register("arthur.invocacao");

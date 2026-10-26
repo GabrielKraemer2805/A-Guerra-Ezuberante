@@ -88,6 +88,7 @@ public final class ModPanelScreen extends Screen {
                 paragraph(textWidth, "gui.guerra_ezuberante.prototype");
                 paragraph(textWidth, "gui.guerra_ezuberante.home_description");
                 paragraph(textWidth, "gui.guerra_ezuberante.how_to_test");
+                paragraph(textWidth, "gui.guerra_ezuberante.arsenal");
             }
             case CHARACTERS -> {
                 int gap = 4;
@@ -107,7 +108,7 @@ public final class ModPanelScreen extends Screen {
                         : characterSelected == 2 ? "arthur_do_val_invocador" : "combatente_ucraniana";
                 paragraph(textWidth, "entity.guerra_ezuberante." + entityId);
                 paragraph(textWidth, "gui.guerra_ezuberante." + character + "_details");
-                List<ModSounds.VoiceLine> voices = characterSelected == 0 ? ModSounds.RENAN_VOICES
+                List<ModSounds.VoiceLine> voices = characterSelected == 0 ? java.util.List.of(ModSounds.RENAN_VOICES.get(0), ModSounds.RENAN_PHONK, ModSounds.RENAN_VOICES.get(1))
                         : characterSelected == 1 || characterSelected == 2 ? ModSounds.ARTHUR_VOICES : List.of();
                 for (ModSounds.VoiceLine voice : voices) {
                     paragraph(textWidth, "gui.guerra_ezuberante.voice_entry",

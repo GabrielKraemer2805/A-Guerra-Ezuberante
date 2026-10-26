@@ -1,10 +1,29 @@
 {
+    "pistol.shot":  {
+                        "subtitle":  "subtitles.guerra_ezuberante.pistol.shot",
+                        "sounds":  [
+                                       "guerra_ezuberante:pistol/shot"
+                                   ]
+                    },
+    "pistol.reload":  {
+                          "subtitle":  "subtitles.guerra_ezuberante.pistol.reload",
+                          "sounds":  [
+                                         "guerra_ezuberante:pistol/reload"
+                                     ]
+                      },
+    "pistol.empty":  {
+                         "subtitle":  "subtitles.guerra_ezuberante.pistol.empty",
+                         "sounds":  [
+                                        "guerra_ezuberante:pistol/empty"
+                                    ]
+                     },
     "renan.me_respeita":  {
                               "subtitle":  "subtitles.guerra_ezuberante.renan.me_respeita",
                               "sounds":  [
                                              {
                                                  "name":  "guerra_ezuberante:renan/me_respeita",
-                                                 "stream":  true
+                                                 "stream":  true,
+                                                 "attenuation_distance":  32
                                              }
                                          ]
                           },
@@ -12,7 +31,9 @@
                             "subtitle":  "subtitles.guerra_ezuberante.renan.risadinha",
                             "sounds":  [
                                            {
-                                               "name":  "guerra_ezuberante:renan/risadinha"
+                                               "name":  "guerra_ezuberante:renan/risadinha",
+                                               "stream":  true,
+                                               "attenuation_distance":  32
                                            }
                                        ]
                         },
@@ -21,7 +42,8 @@
                         "sounds":  [
                                        {
                                            "name":  "guerra_ezuberante:renan/phonk",
-                                           "stream":  true
+                                           "stream":  true,
+                                           "attenuation_distance":  32
                                        }
                                    ]
                     },
@@ -30,7 +52,8 @@
                                    "sounds":  [
                                                   {
                                                       "name":  "guerra_ezuberante:arthur/e_vagabundo_sim",
-                                                      "stream":  true
+                                                      "stream":  true,
+                                                      "attenuation_distance":  32
                                                   }
                                               ]
                                },
@@ -39,7 +62,8 @@
                                      "sounds":  [
                                                     {
                                                         "name":  "guerra_ezuberante:arthur/ficou_ofendidinho",
-                                                        "stream":  true
+                                                        "stream":  true,
+                                                        "attenuation_distance":  32
                                                     }
                                                 ]
                                  },
@@ -48,7 +72,8 @@
                                            "sounds":  [
                                                           {
                                                               "name":  "guerra_ezuberante:arthur/limpa_o_cu_com_a_linuga",
-                                                              "stream":  true
+                                                              "stream":  true,
+                                                              "attenuation_distance":  32
                                                           }
                                                       ]
                                        },
@@ -57,7 +82,8 @@
                                   "sounds":  [
                                                  {
                                                      "name":  "guerra_ezuberante:arthur/parar_de_mamat",
-                                                     "stream":  true
+                                                     "stream":  true,
+                                                     "attenuation_distance":  32
                                                  }
                                              ]
                               },
@@ -66,7 +92,8 @@
                                    "sounds":  [
                                                   {
                                                       "name":  "guerra_ezuberante:arthur/privatizar_tudo",
-                                                      "stream":  true
+                                                      "stream":  true,
+                                                      "attenuation_distance":  32
                                                   }
                                               ]
                                },
@@ -75,7 +102,8 @@
                                             "sounds":  [
                                                            {
                                                                "name":  "guerra_ezuberante:arthur/sao_faceis_pq_sao_pobres",
-                                                               "stream":  true
+                                                               "stream":  true,
+                                                               "attenuation_distance":  32
                                                            }
                                                        ]
                                         },
@@ -84,7 +112,8 @@
                             "sounds":  [
                                            {
                                                "name":  "guerra_ezuberante:arthur/so_deusa",
-                                               "stream":  true
+                                               "stream":  true,
+                                               "attenuation_distance":  32
                                            }
                                        ]
                         },

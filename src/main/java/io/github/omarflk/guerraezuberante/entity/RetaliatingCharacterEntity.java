@@ -36,6 +36,11 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
             RetaliatingCharacterEntity.class, EntityDataSerializers.LONG);
     private static final EntityDataAccessor<Boolean> ATTACK_LEFT = SynchedEntityData.defineId(
             RetaliatingCharacterEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> MUSIC_TRACK = SynchedEntityData.defineId(RetaliatingCharacterEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> MUSIC_SERIAL = SynchedEntityData.defineId(RetaliatingCharacterEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Long> MUSIC_START = SynchedEntityData.defineId(RetaliatingCharacterEntity.class, EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<Float> MUSIC_VOLUME = SynchedEntityData.defineId(RetaliatingCharacterEntity.class, EntityDataSerializers.FLOAT);
+    private io.github.omarflk.guerraezuberante.audio.EntityMusicSession musicSession;
     private LivingEntity pendingStrike;
     private int attackSequence;
     private static final int STALLED_PURSUIT_LIMIT = 200;
@@ -52,6 +57,20 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
     }
 
     protected abstract List<ModSounds.VoiceLine> interactionVoices();
+    public List<io.github.omarflk.guerraezuberante.audio.MusicTrack> musicTracks() { return List.of(); }
+    public final io.github.omarflk.guerraezuberante.audio.EntityMusicSession musicSession() {
+        if (musicSession == null) musicSession = new io.github.omarflk.guerraezuberante.audio.EntityMusicSession(this);
+        return musicSession;
+    }
+    public int musicTrackIndex() { return entityData.get(MUSIC_TRACK); }
+    public int musicSerial() { return entityData.get(MUSIC_SERIAL); }
+    public long musicStart() { return entityData.get(MUSIC_START); }
+    public float musicVolume() { return entityData.get(MUSIC_VOLUME); }
+    public void syncMusic(int track, long start, int serial) {
+        entityData.set(MUSIC_TRACK, track); entityData.set(MUSIC_START, start); entityData.set(MUSIC_SERIAL, serial);
+        entityData.set(MUSIC_VOLUME, io.github.omarflk.guerraezuberante.config.ModConfig.CHARACTER_AUDIO_VOLUME.get().floatValue());
+    }
+    protected boolean allowsMeleeCombat() { return true; }
 
     protected List<ModSounds.VoiceLine> combatVoices() {
         return List.of();
@@ -62,6 +81,8 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
         super.defineSynchedData();
         entityData.define(ATTACK_START, -1000L);
         entityData.define(ATTACK_LEFT, false);
+        entityData.define(MUSIC_TRACK, -1); entityData.define(MUSIC_SERIAL, 0);
+        entityData.define(MUSIC_START, 0L); entityData.define(MUSIC_VOLUME, .8F);
     }
 
     public float attackAnimationAge(float partialTick) {
@@ -88,10 +109,10 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
                 return reach * reach;
             }
             @Override
-            public boolean canUse() { return !isActionLocked() && super.canUse(); }
+            public boolean canUse() { return allowsMeleeCombat() && !isActionLocked() && super.canUse(); }
 
             @Override
-            public boolean canContinueToUse() { return !isActionLocked() && super.canContinueToUse(); }
+            public boolean canContinueToUse() { return allowsMeleeCombat() && !isActionLocked() && super.canContinueToUse(); }
 
             @Override
             protected void checkAndPerformAttack(LivingEntity target, double distanceSquared) {
@@ -134,8 +155,9 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
                 stalledPursuitTicks = 0;
             }
             setTarget(attacker);
-            if (enteringCombat && combatAudioCooldown == 0) {
-                playCombatReaction();
+            if (enteringCombat) {
+                if (!musicTracks().isEmpty()) musicSession().activateCombat();
+                else if (combatAudioCooldown == 0) playCombatReaction();
             }
         }
         return accepted;
@@ -181,9 +203,10 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
         if (level().isClientSide) {
             return;
         }
+        if (!musicTracks().isEmpty()) musicSession().tick(isAlive() && getTarget() != null && isValidAggressor(getTarget()));
         if (pendingStrike != null) {
             float age = attackAnimationAge(0);
-            if (isActionLocked() || pendingStrike != getTarget() || !isValidAggressor(pendingStrike)) {
+            if (!allowsMeleeCombat() || isActionLocked() || pendingStrike != getTarget() || !isValidAggressor(pendingStrike)) {
                 cancelStrike();
             } else if (age == ATTACK_IMPACT) {
                 if (isWithinMeleeReach(pendingStrike) && getSensing().hasLineOfSight(pendingStrike)) {
@@ -235,6 +258,10 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
         if (hand != InteractionHand.MAIN_HAND) {
             return InteractionResult.PASS;
         }
+        if (!musicTracks().isEmpty()) {
+            if (!level().isClientSide) musicSession().interact();
+            return InteractionResult.sidedSuccess(level().isClientSide);
+        }
         if (!level().isClientSide) {
             int remaining = Math.max(voiceCooldown, combatAudioCooldown);
             if (remaining > 0) {
@@ -275,6 +302,14 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
     @Override
     public boolean removeWhenFarAway(double distance) {
         return false;
+    }
+    @Override public void die(DamageSource source) {
+        if (!level().isClientSide && musicSession != null) musicSession.stop();
+        super.die(source);
+    }
+    @Override public void remove(RemovalReason reason) {
+        if (!level().isClientSide && musicSession != null) musicSession.stop();
+        super.remove(reason);
     }
 
     /** Distance between real collision boxes. For two 0.6-wide mobs this permits 2.5 blocks between centres. */

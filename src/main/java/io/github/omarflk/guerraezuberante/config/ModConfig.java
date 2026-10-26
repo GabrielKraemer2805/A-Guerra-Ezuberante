@@ -8,6 +8,8 @@ public final class ModConfig {
     public static final ForgeConfigSpec.IntValue SUMMON_COUNT, SUMMON_COOLDOWN, MAX_SUMMONS, EMERGENCE_TICKS;
     public static final ForgeConfigSpec.DoubleValue FIGHTER_HEALTH;
     public static final ForgeConfigSpec.IntValue SUMMON_LIFETIME, ORPHAN_GRACE;
+    public static final ForgeConfigSpec.DoubleValue CHARACTER_AUDIO_VOLUME;
+    public static final ForgeConfigSpec.IntValue CHARACTER_AUDIO_SESSION, CHARACTER_AUDIO_GRACE;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -23,6 +25,13 @@ public final class ModConfig {
                 .defineInRange("ukrainian_fighter_lifetime_ticks", 6000, 200, 72000);
         ORPHAN_GRACE = builder.comment("Grace period for an unloaded/missing owner before despawning.")
                 .defineInRange("ukrainian_fighter_orphan_grace_ticks", 200, 20, 1200);
+        builder.pop();
+        builder.push("character_audio");
+        CHARACTER_AUDIO_VOLUME = builder.defineInRange("volume", .8D, 0D, 2D);
+        CHARACTER_AUDIO_SESSION = builder.comment("Manual session length; finish the current recording at expiry.")
+                .defineInRange("interaction_session_ticks", 1200, 20, 72000);
+        CHARACTER_AUDIO_GRACE = builder.comment("Combat grace; finish the current recording instead of cutting repeatedly.")
+                .defineInRange("combat_grace_ticks", 40, 0, 1200);
         builder.pop();
         SPEC = builder.build();
     }

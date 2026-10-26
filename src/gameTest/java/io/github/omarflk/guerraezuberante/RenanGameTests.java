@@ -54,18 +54,16 @@ public final class RenanGameTests {
         RenanSantosEntity renan = spawn(helper);
         var player = FakePlayerFactory.getMinecraft(helper.getLevel());
         renan.interact(player, InteractionHand.MAIN_HAND);
-        int first = renan.saveWithoutId(new CompoundTag()).getInt("VoiceCooldown");
-        helper.assertTrue(first == 300 || first == 80, "Interaction did not start a valid voice cooldown");
+        int first = renan.musicSerial();
+        helper.assertTrue(renan.musicTrackIndex() >= 0, "Interaction did not start the shared playlist");
         renan.interact(player, InteractionHand.MAIN_HAND);
-        int second = renan.saveWithoutId(new CompoundTag()).getInt("VoiceCooldown");
+        int second = renan.musicSerial();
         helper.assertTrue(first == second, "Repeated click restarted a voice during cooldown");
         RenanSantosEntity restored = ModEntities.RENAN_SANTOS.get().create(helper.getLevel());
         restored.load(renan.saveWithoutId(new CompoundTag()));
-        helper.assertTrue(restored.saveWithoutId(new CompoundTag()).getInt("VoiceCooldown") == first,
-                "Voice cooldown was not preserved");
+        helper.assertTrue(restored.musicTrackIndex() == -1, "Reload resumed an orphaned audio session");
         helper.runAfterDelay(2, () -> {
-            helper.assertTrue(renan.saveWithoutId(new CompoundTag()).getInt("VoiceCooldown") < first,
-                    "Voice cooldown does not tick down");
+            helper.assertTrue(renan.musicSerial() == first, "Playlist restarted without a transition");
             helper.succeed();
         });
     }

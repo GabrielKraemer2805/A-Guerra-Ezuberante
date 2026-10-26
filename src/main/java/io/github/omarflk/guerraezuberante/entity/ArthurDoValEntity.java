@@ -70,6 +70,9 @@ public final class ArthurDoValEntity extends RetaliatingCharacterEntity {
     protected List<ModSounds.VoiceLine> interactionVoices() {
         return ModSounds.ARTHUR_VOICES;
     }
+    @Override public List<io.github.omarflk.guerraezuberante.audio.MusicTrack> musicTracks() {
+        return io.github.omarflk.guerraezuberante.audio.CharacterAudio.ARTHUR;
+    }
 
     @Override
     protected List<ModSounds.VoiceLine> combatVoices() {

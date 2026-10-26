@@ -9,6 +9,10 @@ base { archivesName = mod_id }
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 sourceSets {
+    pistolTest {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
     gameTest {
         compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
         runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
@@ -17,6 +21,7 @@ sourceSets {
 
 minecraft {
     mappings channel: 'official', version: minecraft_version
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     copyIdeResources = true
     runs {
         configureEach {
@@ -36,7 +41,7 @@ minecraft {
                 args '--quickPlaySingleplayer', providers.gradleProperty('quickPlayWorld').get()
             }
             if (providers.gradleProperty('quickPlayServer').isPresent()) {
-                args '--quickPlayMultiplayer', providers.gradleProperty('quickPlayServer').get(), '--username', 'Observer'
+                args '--quickPlayMultiplayer', providers.gradleProperty('quickPlayServer').get(), '--username', providers.gradleProperty('devUsername').getOrElse('Observer')
             }
             if (project.hasProperty('visualTest')) {
                 args '--width', '1280', '--height', '720'
@@ -49,16 +54,47 @@ minecraft {
                 property 'guerra.observerTest', 'true'
                 mods { "${mod_id}" { source sourceSets.gameTest } }
             }
+            if (project.hasProperty('arsenalTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.arsenalTest', 'true'
+                if (project.hasProperty('arsenalObserver')) { property 'guerra.arsenalObserver', 'true' }
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
+            if (project.hasProperty('pistolTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.pistolTest', 'true'
+                if (project.hasProperty('pistolWithTacz')) { property 'guerra.pistolWithTacz', 'true' }
+                mods { "${mod_id}" { source sourceSets.pistolTest } }
+            }
+            if (project.hasProperty('renanTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.renanTest', 'true'
+                if (project.hasProperty('renanNetwork')) { property 'guerra.renanNetwork', 'true' }
+                if (project.hasProperty('renanObserver')) { property 'guerra.renanObserver', 'true' }
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
+            if (project.hasProperty('titleTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.titleTest', 'true'
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
         }
         server {
-            workingDirectory project.file('run-server')
+            workingDirectory project.file(providers.gradleProperty('serverWorkDir').getOrElse('run-server'))
             args '--nogui'
+            if (project.hasProperty('arsenalTest')) {
+                property 'guerra.arsenalServerTest', 'true'
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
         }
         gameTestServer {
             workingDirectory project.file('run-gametest')
             property 'forge.enabledGameTestNamespaces', mod_id
             mods {
-                "${mod_id}" { source sourceSets.gameTest }
+                "${mod_id}" {
+                    if (!project.hasProperty('withoutTacz')) { source sourceSets.gameTest }
+                    source sourceSets.pistolTest
+                }
             }
         }
     }
@@ -67,14 +103,27 @@ minecraft {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}")
+    compileOnly fg.deobf("curse.maven:timeless-and-classics-zero-1028108:${tacz_file_id}")
+    if (!project.hasProperty('withoutTacz')) {
+        runtimeOnly fg.deobf("curse.maven:timeless-and-classics-zero-1028108:${tacz_file_id}")
+    }
 }
 
-configurations { geckoDistribution { transitive = false } }
+configurations {
+    geckoDistribution { transitive = false }
+    taczDistribution { transitive = false }
+}
 dependencies { geckoDistribution "software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}" }
+dependencies { taczDistribution "curse.maven:timeless-and-classics-zero-1028108:${tacz_file_id}" }
 
 // Fetch common libraries from their original repository instead of Forge's mirror.
 repositories {
     mavenCentral()
+    maven {
+        name = 'CurseMaven'
+        url = 'https://www.cursemaven.com'
+        content { includeGroup 'curse.maven' }
+    }
     maven {
         name = 'GeckoLib'
         url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
@@ -94,7 +143,7 @@ repositories {
 
 tasks.named('processResources', ProcessResources).configure {
     def properties = [mod_id: mod_id, mod_name: mod_name, mod_version: mod_version,
-                      mod_authors: mod_authors, forge_version: forge_version]
+                      mod_authors: mod_authors, forge_version: forge_version, tacz_version: tacz_version]
     inputs.properties properties
     filesMatching('META-INF/mods.toml') { expand properties }
 }
@@ -118,15 +167,57 @@ tasks.register('validateAssets', Exec) {
     commandLine 'powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'tools/validate_assets.ps1'
 }
 tasks.named('check') { dependsOn 'validateAssets' }
+tasks.register('validateTitleAssets', Exec) {
+    commandLine 'powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'tools/validate_menu_art.ps1'
+}
+tasks.named('check') { dependsOn 'validateTitleAssets' }
+tasks.register('validateTacz', Exec) {
+    inputs.files configurations.taczDistribution
+    doFirst {
+        commandLine 'powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'tools/validate_tacz.ps1',
+                '-TaczJar', configurations.taczDistribution.singleFile.absolutePath
+    }
+}
+tasks.named('check') { dependsOn 'validateTacz' }
 tasks.register('modBundle', Copy) {
     dependsOn 'reobfJar'
     from tasks.named('jar', Jar).flatMap { it.archiveFile }
     from configurations.geckoDistribution
+    from(configurations.taczDistribution) { rename { "tacz-${minecraft_version}-${tacz_version}.jar" } }
     into layout.buildDirectory.dir("distributions/guerra-ezuberante-${version}/mods")
 }
 tasks.named('build') { dependsOn 'modBundle' }
+tasks.register('bundleNotices', Copy) {
+    from 'docs/DEPENDENCIAS_TERCEROS.md'
+    into layout.buildDirectory.dir("distributions/guerra-ezuberante-${version}")
+}
+tasks.named('build') { dependsOn 'bundleNotices' }
+tasks.register('standaloneBundle', Copy) {
+    dependsOn 'reobfJar'
+    from tasks.named('jar', Jar).flatMap { it.archiveFile }
+    from configurations.geckoDistribution
+    into layout.buildDirectory.dir("distributions/guerra-ezuberante-${version}-sem-tacz/mods")
+}
+tasks.named('build') { dependsOn 'standaloneBundle' }
 
 // Required before launching a fresh checkout: external mod refmaps are SRG -> official in userdev.
 tasks.matching { it.name in ['prepareRunClient', 'prepareRunServer', 'prepareRunGameTestServer'] }.configureEach {
     dependsOn 'createSrgToMcp'
+}
+
+// Author preference: automated Minecraft instances must never interrupt other audio.
+// Apply before EVERY isolated launch, even when preparation tasks are up to date.
+tasks.matching { it.name == 'runClient' }.configureEach {
+    doFirst {
+        def testDirectory = project.file(providers.gradleProperty('clientWorkDir').getOrElse('run')).canonicalFile
+        def toolsDirectory = project.file('.tools').canonicalFile
+        if (testDirectory.toPath().startsWith(toolsDirectory.toPath())) {
+            testDirectory.mkdirs()
+            def optionsFile = new File(testDirectory, 'options.txt')
+            def optionsText = optionsFile.exists() ? optionsFile.getText('UTF-8') : ''
+            optionsText = optionsText.replaceAll('(?m)^soundCategory_master:[^\\r\\n]*\\r?\\n?', '')
+            optionsFile.setText(optionsText.stripTrailing() + '\nsoundCategory_master:0.0\n', 'UTF-8')
+            logger.lifecycle('Isolated Minecraft test: master volume forced to 0 before launch.')
+        }
+    }
 }

@@ -68,7 +68,7 @@ public final class CombatGameTests {
         var aggressor = cow(helper, 7);
         renan.hurt(helper.getLevel().damageSources().mobAttack(aggressor), 1);
         helper.assertTrue(renan.getTarget() == aggressor, "Renan did not identify attacker");
-        helper.assertTrue(data(renan).getInt("CombatAudioCooldown") == 280, "Phonk did not start");
+        helper.assertTrue(renan.musicTrackIndex() >= 0, "Shared playlist did not start");
         helper.succeedWhen(() -> helper.assertTrue(aggressor.getHealth() < aggressor.getMaxHealth(),
                 "Renan never reached and damaged attacker"));
     }
@@ -112,11 +112,11 @@ public final class CombatGameTests {
         var second = cow(helper, 7);
         renan.hurt(helper.getLevel().damageSources().mobAttack(first), 1);
         helper.runAfterDelay(5, () -> {
-            int cooldown = data(renan).getInt("CombatAudioCooldown");
+            int cooldown = renan.musicSerial();
             renan.invulnerableTime = 0;
             renan.hurt(helper.getLevel().damageSources().mobAttack(second), 1);
             helper.assertTrue(renan.getTarget() == second, "New attacker was ignored");
-            helper.assertTrue(data(renan).getInt("CombatAudioCooldown") == cooldown, "Phonk restarted on hit");
+            helper.assertTrue(renan.musicSerial() == cooldown, "Playlist restarted on hit");
             second.setPos(second.position().add(30, 0, 0));
             helper.runAfterDelay(2, () -> {
                 helper.assertTrue(renan.getTarget() == null, "Distant target not abandoned");
@@ -172,10 +172,10 @@ public final class CombatGameTests {
         helper.assertTrue(ModSounds.ARTHUR_VOICES.size() == 7, "Expected seven unique Arthur recordings");
         helper.assertTrue(ModSounds.ARTHUR_VOICES.stream().allMatch(ModSounds.VoiceLine::isAvailable), "Missing Arthur OGG");
         arthur.interact(player(helper, GameType.SURVIVAL), InteractionHand.MAIN_HAND);
-        int cooldown = data(arthur).getInt("VoiceCooldown");
-        helper.assertTrue(cooldown >= 180 && cooldown <= 360, "Arthur voice cooldown invalid");
+        int cooldown = arthur.musicSerial();
+        helper.assertTrue(arthur.musicTrackIndex() >= 0 && arthur.musicTracks().size() == 7, "Arthur shared library invalid");
         arthur.interact(player(helper, GameType.SURVIVAL), InteractionHand.MAIN_HAND);
-        helper.assertTrue(data(arthur).getInt("VoiceCooldown") == cooldown, "Arthur voice spam");
+        helper.assertTrue(arthur.musicSerial() == cooldown, "Arthur voice spam");
         helper.succeed();
     }
 
@@ -185,21 +185,17 @@ public final class CombatGameTests {
         var arthur = spawn(helper, ModEntities.ARTHUR_DO_VAL.get(), 2);
         var attacker = cow(helper, 7);
         arthur.hurt(helper.getLevel().damageSources().mobAttack(attacker), 1);
-        helper.assertTrue(data(arthur).getString("LastReaction").equals("e_vagabundo_sim"),
-                "Arthur did not play the reaction selected by the author");
-        helper.assertTrue(data(arthur).getInt("CombatAudioCooldown") == 220,
-                "Arthur reaction must have an 11-second cooldown");
+        helper.assertTrue(arthur.musicTrackIndex() >= 0, "Arthur did not start shared audio on combat");
+        int initial = arthur.musicSerial();
         helper.runAfterDelay(5, () -> {
-            int remaining = data(arthur).getInt("CombatAudioCooldown");
-            helper.assertTrue(remaining > 0 && remaining < 220, "Reaction cooldown did not decrease");
             arthur.invulnerableTime = 0;
             arthur.hurt(helper.getLevel().damageSources().mobAttack(attacker), 1);
-            helper.assertTrue(data(arthur).getInt("CombatAudioCooldown") == remaining,
+            helper.assertTrue(arthur.musicSerial() == initial,
                     "Another hit restarted Arthur's voice");
             var restored = ModEntities.ARTHUR_DO_VAL.get().create(helper.getLevel());
             restored.load(data(arthur));
-            helper.assertTrue(data(restored).getInt("CombatAudioCooldown") == remaining,
-                    "Arthur reaction cooldown was not preserved on save/load");
+            helper.assertTrue(restored.musicTrackIndex() == -1,
+                    "Arthur audio session survived unload unexpectedly");
             helper.succeed();
         });
     }

@@ -1,4 +1,105 @@
-# Validação — sprint 0.004.0
+# Validação — sprint 0.008.0
+
+## Tela inicial ilustrada
+
+Em **26/10/2026**, com a stack anterior preservada, o cenário gráfico real passou em `.tools/run-title-client`, com volume mestre zero antes do launch. [Relatório](validacao/menu-0.008/cliente.json), [detalhes da entrega](MENU_0.008.md).
+
+| Verificação | Resultado |
+| --- | --- |
+| Arte | Recurso RGB 1920×1080 carregado e renderizado no menu |
+| Widgets | Nove controles originais encontrados; sem recriar botões |
+| Options / Multiplayer / Mods | Telas vanilla/Forge abriram e retornaram corretamente |
+| Singleplayer | Lista abriu, mundo isolado carregou e salvar/sair voltou ao menu ilustrado |
+| Resoluções de renderização | 1280×720, 1920×1080, 1024×768 e 2560×1080 capturados e inspecionados |
+| Loop | Cinco aberturas adicionais; dez substituições ao longo do cenário, sem recursão |
+| Regressão | **55 GameTests obrigatórios passaram** com o AT ativo |
+| Build | build/reobf e validações de assets concluídos; JAR 0.008.0 |
+
+Limite do ambiente: a janela física é limitada pelo desktop a1444×881; tamanhos alternativos foram renderizados no framebuffer real do Minecraft, não apresentados como monitores físicos diferentes. Não foi feito login Realms ou conexão a servidor externo; a navegação multiplayer local foi verificada. A cópia de mundo e o encerramento automático ficam somente no perfil de teste. [Captura 1920×1080](preview/menu-0.008/1920x1080.png).
+
+## Histórico — 0.007.0
+
+## Renan com AK nativa e playlists compartilhadas
+
+Stack mantida: Forge 47.4.28, Minecraft 1.20.1, Java 17, GeckoLib 4.8.4 e TaCZ 1.1.8-hotfix2. Data: 24/10/2026. Os resultados anteriores permanecem abaixo como histórico.
+
+| Verificação | Resultado executado | Evidência |
+| --- | --- | --- |
+| Regressão / build | **54 GameTests passaram**, build/reobf concluído | `.tools/renan-final-tests.log` |
+| API e arma | Renan equipado com AK nativa; consumo/check desativados só no operador do NPC; Survival permanece normal | `RenanArmedGameTests` |
+| Cadência / munição prolongadas | 6500 ticks acelerados, **108 tiros / 108 acertos**, carregador em 30 preservado | Mesmo log, `RENAN_SUSTAINED` |
+| Paredes e aliados | Linha bloqueada impede pedido; aliado não é agressor válido | GameTests |
+| Playlist / shuffle | Combate e interação compartilham estado; clique tem debounce, duração avança e morte encerra; cem rodadas sem repetição | GameTests |
+| Cliente gráfico em tempo real | **124 tiros / 124 projéteis / 124 acertos**, carregador em 30, mais de 2 min de combate | [Relatório](validacao/renan-0.007/singleplayer.json) |
+| Áudios no cliente | Três gravações do Renan,14 inícios, uma instância por entidade e limpeza na morte | Mesmo relatório |
+| Dois clientes reais | **Passou**: host: 124 tiros/projéteis/acertos e Observer: 124 eventos remotos; mira/recuo observados | [Host](validacao/renan-0.007/multiplayer-host.json), [Observer](validacao/renan-0.007/multiplayer-observer.json) |
+| Playlist em rede | Host confirmou combate sem reiniciar interação; os dois receberam 3 gravações e mantiveram uma instância | Mesmos relatórios |
+| Sem TaCZ | **11 GameTests passaram**, incluindo criação do Renan e playlist sem dependência opcional | `.tools/renan-no-tacz-build.log` |
+| Armas dos jogadores na 0.007 | **Cinco aprovadas no cliente real**, incluindo AKM: ADS/recoil/dano, consumo normal, recarga, conservação e vazio | [Cliente](validacao/renan-0.007/arsenal-jogador-cliente.json), [Servidor](validacao/renan-0.007/arsenal-jogador-servidor.json) |
+| Animações / skins | 14 clipes válidos, modelo e UV 64×64 preservados; captura real inspecionada | `validateGeckoAssets`, capturas |
+| Som dos testes | Lançamentos posteriores ao pedido do autor forçam master 0.0 em perfis `.tools/`; perfil normal preservado | `runClient.doFirst`, `options.txt` dos dois clientes |
+
+GameTest acelera o relógio de ticks; os 6500 ticks não foram declarados minutos de relógio. O cenário gráfico prolongado usa servidor integrado normal. Os testes antigos de áudio foram atualizados porque o autor pediu falas e músicas na mesma playlist para cada personagem; o teste do soco desarma Renan para exercitar o fallback preservado.
+
+Uma primeira tentativa com dois clientes conectou, mas foi encerrada sem relatórios completos e não vale como aprovação. A repetição **com os dois perfis silenciosos completou e produziu os dois relatórios aprovados**. Usou servidor integrado normal com TCP limitado a 127.0.0.1:25582; não foi declarada uma sessão gráfica dedicada separada. Os GameTests também executaram em processo de servidor sem cliente. Não se usa o teste multiplayer antigo das cinco armas como prova desta nova IA.
+
+Limites: não há seek de OGG para ouvintes que chegam no meio da gravação; eles respeitam a próxima transição do servidor. TPS baixo pode produzir intervalo entre fim real do arquivo e timer lógico. Os áudios das instâncias posteriores foram silenciados conforme preferência; recursos/eventos e estados continuam auditados. Aprovação humana do som e do acabamento das poses permanece feedback do autor. [Implementação e fontes](RENAN_0.007.md), [próximos personagens — Lula](PROXIMOS_PERSONAGENS.md).
+
+## Histórico — 0.006.0
+
+## Pistola própria GE-P12
+
+Ambiente mantido: Minecraft 1.20.1, Forge 47.4.28, Java 17, GeckoLib 4.8.4, Windows, 24/10/2026. TaCZ agora é opcional. A validação desta pistola é separada dos resultados anteriores das armas TaCZ.
+
+| Verificação | Resultado executado | Evidência |
+| --- | --- | --- |
+| Regressão completa | **47 GameTests passaram**: 37 anteriores + 10 próprios; build/reobf aprovado | `.tools/pistol-final-build.log` |
+| Servidor sem TaCZ | **Dez testes próprios passaram**, incluindo segundo acerto dentro da janela vanilla de dano | `.tools/pistol-final-no-tacz-tests.log` |
+| Cliente sem TaCZ | Modelo 3D, ADS, tiro/dano, um som principal, recuo, conservação, recarga e vazio aprovados | [Relatório](validacao/pistola-0.006/cliente-sem-tacz.json) |
+| Aba criativa sem TaCZ | Seis itens: quatro anteriores, GE-P12 e cartucho; tela real aberta | Mesmo relatório, [captura](preview/pistola-0.006/creative.png) |
+| Convivência com TaCZ | Mesmo cenário aprovado; aba real com 15 itens (os seis próprios + nove nativos) | [Relatório](validacao/pistola-0.006/cliente-com-tacz.json), [captura](preview/pistola-0.006/creative-com-tacz.png) |
+| Gatilho segurado | Continua semiautomático; nenhum segundo tiro automático | Relatório gráfico sem TaCZ |
+| Recursos próprios | Geometria/paleta e três sons sintetizados, sem assets de arma externos | `tools/GeneratePistolAssets.java`, validadores do build |
+| Pacotes | Mod próprio reobfuscado, alternativa com GeckoLib e outra com GeckoLib + TaCZ | `build/distributions/` |
+
+O cenário gráfico usa Survival, input vanilla/remapeável e o canal de rede de produção. Medidas: FOV 70 → 54,6; alvo recebeu 6 HP; carregador/reserva 12+48 → 11+48 → 12+47; vazio recusou tiro/recarga e não gerou outro som de tiro. A ausência de TaCZ é verificada por `ModList`, não presumida pelo nome de um perfil.
+
+Os testes iniciais detectaram um bloqueio do ataque vanilla enquanto usando a mira; o cliente próprio passou a observar a borda da tecla de ataque também durante ADS. Capturas só são feitas após frames reais para não registrar a tela anterior ao teleporte. Os scripts exigem relatório com `passed=true`.
+
+Não foi executada uma sessão gráfica entre dois clientes da **GE-P12**; os resultados de dois clientes abaixo são históricos das armas externas da 0.005. O protótipo tem animação por transformação do conjunto e não mãos/slide/carregador articulados. Feedback humano sobre sensação e áudio permanece pendente. [Implementação, capturas e limites](PISTOLA_0.006.md).
+
+## Histórico — 0.005.0
+
+### Arsenal TaCZ: resultados da sprint anterior
+
+Ambiente: Minecraft 1.20.1, Forge 47.4.28, Java 17, GeckoLib 4.8.4 e **TaCZ 1.1.8-hotfix2**, em Windows, 24/10/2026. Não houve push/merge desta sprint.
+
+| Verificação | Resultado real | Evidência |
+| --- | --- | --- |
+| Build/reobf | **Passou**; JAR 0.005.0 e conjunto de três mods externos separados | `.tools/arsenal-final-build.log` |
+| GameTests | **37 testes obrigatórios passaram**, incluindo os 31 da base anterior | Mesmo log, `All 37 required tests passed` |
+| Dependência | Manifesto hotfix2, SHA-256, cinco IDs e quatro calibres conferidos | Tarefa `validateTacz` |
+| Assets/Gecko | Validadores anteriores passaram; skins, sons e código de entidades preservados | `validateAssets`, `validateGeckoAssets`, diff Git |
+| AKM primeiro | Cenário completo aprovado antes de acrescentar as outras quatro armas | `.tools/akm-initial-validation/` |
+| Cinco armas em Survival | ADS/FOV, recoil, um som/tiro, dano, recarga e rejeição sem munição passaram | [Relatório cliente](validacao/arsenal-0.005/singleplayer-cliente.json) |
+| Servidor dedicado normal | Inicializou após aceite explícito da EULA pelo autor; gameplay real executado | `.tools/arsenal-dedicated.log`, relatórios preservados |
+| Dois clientes reais | Uma execução completa com Shooter e Observer: maxPlayers=2, cinco armas, sem acertos duplicados | [Servidor](validacao/arsenal-0.005/dedicado-servidor.json), [Shooter](validacao/arsenal-0.005/dedicado-shooter.json) |
+| Sincronização remota | Observer recebeu exatamente um disparo e uma recarga de cada arma | [Observer](validacao/arsenal-0.005/dedicado-observer.json) |
+| Calibres e acessórios | Munição incorreta rejeitada; óptica nativa instalada pela API | GameTests |
+| Permissões | Comando recusado sem OP, aceito com nível 2, kit completo | GameTests |
+| Repetição de login | **Não aprovada como consistente**: tentativas adicionais tiveram timeout no handshake | `.tools/arsenal-network-final.log`, `.tools/arsenal-network-sequential.log` |
+
+Os relatórios de sucesso foram copiados da execução completa antes de novas tentativas. O script exige marcadores/resultados e não considera apenas o exit code zero do Gradle. Tiros e recargas usam a API cliente original, com pacotes reais; o servidor observa eventos e contagens efetivas. Não foi usado um mock de projétil para declarar dano em rede.
+
+A tentativa sem munição é feita depois de esvaziar a arma/reserva somente na fixture isolada. Rejeição e conservação foram medidas de verdade. GunFinishReloadEvent não disparou nessa versão; o estado nativo e a munição comprovam a conclusão. Ver [detalhes e medidas](ARSENAL_0.005.md).
+
+Os modelos, animações FPS e a convivência visual com os personagens GeckoLib foram vistos em capturas reais. A instrumentação de som confirma um disparo no sistema de áudio; não substitui audição ou aprovação humana. O TaCZ emite avisos de sons auxiliares ausentes em alguns keyframes, preservados como limitação da distribuição externa.
+
+Pendentes: causa dos timeouts intermitentes de login nas repetições, latência/reconexão em rede externa, sessões maiores, outros gunpacks, shaders e matriz completa de acessórios. Uma execução local completa com dois clientes não prova todos esses casos. Nenhuma arma foi automaticamente equipada nos personagens políticos.
+
+Conferência gráfica final: a aba criativa foi aberta no Minecraft, selecionada e inspecionada, com cinco armas, quatro munições e os itens anteriores. [Imagem](preview/arsenal-0.005/aba-criativa.png), [cliente final](validacao/arsenal-0.005/singleplayer-final-cliente.json), [servidor integrado final](validacao/arsenal-0.005/singleplayer-final-servidor.json); log `.tools/arsenal-final-visual.log`, `BUILD SUCCESSFUL`. Os timeouts também ocorreram na tentativa sequencial; não declarar essa estratégia como uma correção comprovada. Os avisos de áudio incluem uma referência agregada de recarga da MP5; sons principais de tiro foram verificados, mas não se afirmou que cada keyframe tem áudio disponível.
+
+## Histórico — sprint 0.004.0
 
 Executada em Windows 11, JDK 17.0.20.1, Minecraft 1.20.1, Forge 47.4.28 e GeckoLib 4.8.4, em 24/10/2026. Os resultados abaixo são desta sprint; os registros da 0.003.0 foram preservados depois desta seção como histórico.
 

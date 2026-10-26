@@ -1,0 +1,18 @@
+{
+  "errors": [],
+  "reloads": {
+    "tacz:ak47": 1,
+    "tacz:m4a1": 1,
+    "tacz:glock_17": 1,
+    "tacz:deagle": 1,
+    "tacz:hk_mp5a5": 1
+  },
+  "shots": {
+    "tacz:ak47": 1,
+    "tacz:m4a1": 1,
+    "tacz:glock_17": 1,
+    "tacz:deagle": 1,
+    "tacz:hk_mp5a5": 1
+  },
+  "passed": true
+}

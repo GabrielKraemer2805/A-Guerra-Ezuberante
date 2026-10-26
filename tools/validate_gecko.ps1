@@ -51,6 +51,9 @@ foreach ($clip in $anim.animations.PSObject.Properties) {
 foreach ($clip in @('idle','walk','punch_right','punch_left','sword_attack','hurt','cast','ukrainian_emerge')) {
     Require ($null -ne $anim.animations.('animation.guerra.'+$clip)) "Missing animation: $clip"
 }
+foreach ($clip in @('rifle_idle','rifle_prepare','rifle_aim','rifle_walk','rifle_fire','rifle_hurt')) {
+    Require ($null -ne $anim.animations.('animation.guerra.'+$clip)) "Missing rifle animation: $clip"
+}
 Require ($anim.animations.'animation.guerra.ukrainian_emerge'.animation_length -eq 2.2) 'Emergence must last 44 ticks.'
 foreach ($clip in @('punch_right','punch_left','sword_attack')) {
     $side = if ($clip -eq 'punch_left') { 'left_arm' } else { 'right_arm' }
@@ -64,4 +67,4 @@ $gradle = Get-Content -LiteralPath (Join-Path $projectRoot 'build.gradle') -Raw
 $toml = Get-Content -LiteralPath (Join-Path $projectRoot 'src/main/resources/META-INF/mods.toml') -Raw
 Require ($props -match 'minecraft_version=1.20.1' -and $props -match 'geckolib_version=4.8.4') 'Incompatible pinned platform.'
 Require ($gradle.Contains('geckolib-forge-${minecraft_version}:${geckolib_version}') -and $toml.Contains('modId="geckolib"')) 'GeckoLib is not registered as a required dependency.'
-Write-Host "Gecko validated: $($names.Count) bones, 8 clips, 64x64 UV subdivision, impact tick 5, dependency 4.8.4."
+Write-Host "Gecko validated: $($names.Count) bones, 14 clips, 64x64 UV subdivision, impact tick 5, dependency 4.8.4."

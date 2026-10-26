@@ -13,6 +13,72 @@ import java.util.List;
 public class RenanSantosEntity extends RetaliatingCharacterEntity {
     public RenanSantosEntity(EntityType<? extends RenanSantosEntity> type, Level level) {
         super(type, level);
+        if (!level.isClientSide) io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.equipRenan(this);
+        equipmentChecked = isArmed();
+    }
+    private boolean equipmentChecked;
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Long> SHOT_START = net.minecraft.network.syncher.SynchedEntityData.defineId(
+            RenanSantosEntity.class, net.minecraft.network.syncher.EntityDataSerializers.LONG);
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Long> AIM_START = net.minecraft.network.syncher.SynchedEntityData.defineId(
+            RenanSantosEntity.class, net.minecraft.network.syncher.EntityDataSerializers.LONG);
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Boolean> AIMING = net.minecraft.network.syncher.SynchedEntityData.defineId(
+            RenanSantosEntity.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
+    public static final int SHOT_INTERVAL = 20, PREPARE_TICKS = 12;
+    private long lastShot = -1000;
+    @Override protected void defineSynchedData() {
+        super.defineSynchedData();entityData.define(SHOT_START,-1000L);entityData.define(AIM_START,-1000L);entityData.define(AIMING,false);
+    }
+    public boolean isArmed() { return io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.renanArmed(this); }
+    public boolean isRifleAiming() { return entityData.get(AIMING); }
+    public float rifleShotAge(float partialTick) { return level().getGameTime()-entityData.get(SHOT_START)+partialTick; }
+    public float rifleAimAge(float partialTick) { return level().getGameTime()-entityData.get(AIM_START)+partialTick; }
+    public long rifleShotToken() { return entityData.get(SHOT_START); }
+    @Override protected boolean allowsMeleeCombat() { return !isArmed(); }
+    // TaCZ injects IGunOperator into LivingEntity; virtual dispatch uses these only for Renan.
+    // No TaCZ type is exposed here, keeping this class loadable without the optional mod.
+    public boolean needCheckAmmo() { return false; }
+    public boolean consumesAmmoOrNot() { return false; }
+    public boolean validRangedTarget(net.minecraft.world.entity.LivingEntity target) { return target!=null && isValidAggressor(target); }
+    public void cancelStrikeForRanged() { cancelStrike(); }
+    public void maintainFiringPosition() { noteCombatProgress(); }
+    public void setRifleAiming(boolean aim) {
+        if (aim && !isRifleAiming()) entityData.set(AIM_START,level().getGameTime());
+        entityData.set(AIMING,aim);
+        io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.aimRenan(this,aim);
+    }
+    public boolean tryRifleShot() {
+        if (level().isClientSide || !isArmed() || !validRangedTarget(getTarget()) || !hasSafeShot(getTarget())
+                || !isRifleAiming() || rifleAimAge(0)<PREPARE_TICKS || level().getGameTime()-lastShot<SHOT_INTERVAL)return false;
+        if (!io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.fireRenan(this)) return false;
+        lastShot=level().getGameTime();entityData.set(SHOT_START,lastShot);noteCombatProgress();return true;
+    }
+    public boolean hasSafeShot(net.minecraft.world.entity.LivingEntity target) {
+        if(!getSensing().hasLineOfSight(target))return false;
+        var from=getEyePosition();var to=target.getBoundingBox().getCenter();
+        var hit=level().clip(new net.minecraft.world.level.ClipContext(from,to,net.minecraft.world.level.ClipContext.Block.COLLIDER,
+                net.minecraft.world.level.ClipContext.Fluid.NONE,this));
+        if(hit.getType()!=net.minecraft.world.phys.HitResult.Type.MISS)return false;
+        for(var e:level().getEntities(this,new net.minecraft.world.phys.AABB(from,to).inflate(.6),e->e.isAlive() && e!=target)) {
+            if((isAlliedTo(e)||e.isAlliedTo(this)) && e.getBoundingBox().inflate(.25).clip(from,to).isPresent())return false;
+        }
+        return true;
+    }
+    @Override protected void registerGoals() {
+        super.registerGoals();goalSelector.addGoal(1,new io.github.omarflk.guerraezuberante.combat.RenanRangedGoal(this));
+    }
+    @Override public void tick() {
+        if(!level().isClientSide && !equipmentChecked && tickCount%20==0) {
+            io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.equipRenan(this);
+            equipmentChecked=!getMainHandItem().isEmpty();
+        }
+        super.tick();
+        if(!level().isClientSide && (!isAlive() || !validRangedTarget(getTarget())) && isRifleAiming())setRifleAiming(false);
+    }
+    @Override public List<io.github.omarflk.guerraezuberante.audio.MusicTrack> musicTracks() {
+        return io.github.omarflk.guerraezuberante.audio.CharacterAudio.RENAN;
+    }
+    @Override public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.readAdditionalSaveData(tag);equipmentChecked=!getMainHandItem().isEmpty();
     }
 
     public static AttributeSupplier.Builder createAttributes() {

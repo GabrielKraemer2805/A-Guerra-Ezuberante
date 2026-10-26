@@ -25,6 +25,8 @@ public final class GuerraEzuberanteMod {
         ModItems.REGISTER.register(bus);
         ModCreativeTabs.REGISTER.register(bus);
         ModSounds.REGISTER.register(bus);
+        io.github.omarflk.guerraezuberante.pistol.PistolNetwork.register();
+        io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.register();
         bus.addListener(this::registerAttributes);
     }
 

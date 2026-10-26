@@ -8,7 +8,7 @@ version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
 displayURL="https://github.com/OmarFLK/A-Guerra-Ezuberante"
-description='''Guerra Ezuberante: Renan, Arthur, Exército Ucraniano, espada personalizada, animações de combate e painel informativo.'''
+description='''Guerra Ezuberante: menu inicial ilustrado, Renan com AK nativa TaCZ, playlists espaciais, personagens GeckoLib e pistola própria GE-P12. TaCZ permanece opcional.'''
 
 [[dependencies.${mod_id}]]
 modId="forge"
@@ -22,6 +22,13 @@ modId="geckolib"
 mandatory=true
 versionRange="[4.8.4]"
 ordering="BEFORE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="tacz"
+mandatory=false
+versionRange="[${tacz_version}]"
+ordering="AFTER"
 side="BOTH"
 
 [[dependencies.${mod_id}]]

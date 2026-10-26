@@ -208,6 +208,8 @@ public final class SummonGameTests {
     public static void punchImpactIsSynchronizedAndNotDuplicated(GameTestHelper helper) {
         owner(helper).discard();
         var renan = ModEntities.RENAN_SANTOS.get().create(helper.getLevel());
+        // Exercise the preserved unarmed fallback explicitly; Renan now normally spawns armed.
+        renan.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, net.minecraft.world.item.ItemStack.EMPTY);
         renan.setPos(Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(8, 1, 8))));
         helper.getLevel().addFreshEntity(renan);
         Cow target = enemy(helper);
