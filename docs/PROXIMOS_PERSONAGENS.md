@@ -1,5 +1,7 @@
 # Próximos personagens — Lula
 
+> **Atualização 0.009.0:** Lula foi implementado após o autor fornecer skin, gravações e o novo prompt. Consulte [LULA_0.009.md](LULA_0.009.md). O texto abaixo registra o planejamento anterior da 0.007.0 e não descreve o estado atual.
+
 Lula é o próximo personagem solicitado para planejamento técnico. **Não foi implementado nesta sprint**: não existe novo registro, spawn egg, skin, som ou habilidade dele. O autor fornecerá essas decisões.
 
 | Requisito | A definir pelo autor | Ponto existente para implementar |

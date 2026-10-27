@@ -146,7 +146,7 @@ public final class PistolClientChecks {
                     select.setAccessible(true);select.invoke(screen,ModCreativeTabs.MAIN.get());
                     var contents=ModCreativeTabs.MAIN.get().getDisplayItems();
                     require(contents.stream().anyMatch(s->s.is(ModItems.GE_P12.get())) && contents.stream().anyMatch(s->s.is(ModItems.PISTOL_AMMO.get())),"Own creative entries missing");
-                    require(contents.size()==(ModList.get().isLoaded("tacz")?15:6),"Unexpected creative content count: "+contents.size());
+                    require(contents.size()==(ModList.get().isLoaded("tacz")?17:8),"Unexpected creative content count: "+contents.size());
                     results.put("creativeEntries",contents.size());next(9);
                 }
                 case 9 -> {

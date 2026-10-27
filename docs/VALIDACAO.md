@@ -1,4 +1,12 @@
-# Validação — sprint 0.008.0
+# Validação — sprint 0.009.0
+
+## Lula
+
+Build/reobf e **60 GameTests obrigatórios passaram** em `.tools/lula-final-build-tests.log`, incluindo os 55 testes anteriores. Cinco novos casos cobrem ovo/neutralidade/playlist, voo/dano6/cadência40/windup8, parede/TTL, dono/aliados e a sequência completa de morte. Verificadas persistência DYING/EXPLODED, subida2, explosão única com potência7 observada no motor, dano/knockback, flags de blocos, mobGriefing, desativação, cadeia limitada e cancelamento de proteção Forge. [Detalhes e limites](LULA_0.009.md).
+
+Os testes históricos abaixo mantêm o contexto das entregas anteriores.
+
+Cenário gráfico final **aprovado com dois clientes reais** em127.0.0.1:25583: mesmos cinco projéteis, quatro gravações com uma instância por entidade, tint/ossos/subida e um som nativo de explosão em ambos. [Host](validacao/lula-0.009/host.json), [observador](validacao/lula-0.009/observer.json), [capturas e limitações](LULA_0.009.md). Uma tentativa anterior teve timeout de login; não declarar rede pública ou reconexões sob latência testadas. Build final passou em `.tools/lula-final-package.log`; artefato0.009.0.
 
 ## Tela inicial ilustrada
 

@@ -20,6 +20,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public final class ClientModEvents {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(ModEntities.LULA.get(), io.github.omarflk.guerraezuberante.client.renderer.LulaRenderer::new);
+        event.registerEntityRenderer(ModEntities.BEAN.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context,.65F,false));
         event.registerEntityRenderer(ModEntities.RENAN_SANTOS.get(), RenanRenderer::new);
         event.registerEntityRenderer(ModEntities.ARTHUR_DO_VAL.get(), ArthurRenderer::new);
         event.registerEntityRenderer(ModEntities.ARTHUR_COMBATENTE.get(), ArthurRenderer::new);

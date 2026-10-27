@@ -78,6 +78,13 @@ minecraft {
                 property 'guerra.titleTest', 'true'
                 mods { "${mod_id}" { source sourceSets.gameTest } }
             }
+            if (project.hasProperty('lulaTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.lulaTest', 'true'
+                if (project.hasProperty('lulaNetwork')) { property 'guerra.lulaNetwork', 'true' }
+                if (project.hasProperty('lulaObserver')) { property 'guerra.lulaObserver', 'true' }
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
         }
         server {
             workingDirectory project.file(providers.gradleProperty('serverWorkDir').getOrElse('run-server'))
@@ -163,6 +170,11 @@ tasks.register('validateGeckoAssets', Exec) {
     commandLine 'powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'tools/validate_gecko.ps1'
 }
 tasks.named('check') { dependsOn 'validateGeckoAssets' }
+
+tasks.register('validateLulaAssets', Exec) {
+    commandLine 'powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'tools/validate_lula.ps1'
+}
+tasks.named('check') { dependsOn 'validateLulaAssets' }
 tasks.register('validateAssets', Exec) {
     commandLine 'powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'tools/validate_assets.ps1'
 }

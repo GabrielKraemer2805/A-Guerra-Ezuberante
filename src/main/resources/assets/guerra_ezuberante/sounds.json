@@ -125,5 +125,45 @@
                                                 "stream":  true
                                             }
                                         ]
-                         }
+                         },
+    "lula.feijao_puro":  {
+                             "sounds":  [
+                                            {
+                                                "attenuation_distance":  32,
+                                                "name":  "guerra_ezuberante:lula/feijao_puro",
+                                                "stream":  true
+                                            }
+                                        ],
+                             "subtitle":  "subtitles.guerra_ezuberante.lula.feijao_puro"
+                         },
+    "lula.homofobia":  {
+                           "sounds":  [
+                                          {
+                                              "attenuation_distance":  32,
+                                              "name":  "guerra_ezuberante:lula/homofobia",
+                                              "stream":  true
+                                          }
+                                      ],
+                           "subtitle":  "subtitles.guerra_ezuberante.lula.homofobia"
+                       },
+    "lula.machismo":  {
+                          "sounds":  [
+                                         {
+                                             "attenuation_distance":  32,
+                                             "name":  "guerra_ezuberante:lula/machismo",
+                                             "stream":  true
+                                         }
+                                     ],
+                          "subtitle":  "subtitles.guerra_ezuberante.lula.machismo"
+                      },
+    "lula.racismo":  {
+                         "sounds":  [
+                                        {
+                                            "attenuation_distance":  32,
+                                            "name":  "guerra_ezuberante:lula/racismo",
+                                            "stream":  true
+                                        }
+                                    ],
+                         "subtitle":  "subtitles.guerra_ezuberante.lula.racismo"
+                     }
 }

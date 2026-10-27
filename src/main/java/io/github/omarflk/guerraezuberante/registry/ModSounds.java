@@ -15,6 +15,10 @@ public final class ModSounds {
     public static final DeferredRegister<SoundEvent> REGISTER =
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, GuerraEzuberanteMod.MOD_ID);
     public static final RegistryObject<SoundEvent> ME_RESPEITA = register("renan.me_respeita");
+    public static final RegistryObject<SoundEvent> LULA_BEANS = register("lula.feijao_puro");
+    public static final RegistryObject<SoundEvent> LULA_HOMOFOBIA = register("lula.homofobia");
+    public static final RegistryObject<SoundEvent> LULA_MACHISMO = register("lula.machismo");
+    public static final RegistryObject<SoundEvent> LULA_RACISMO = register("lula.racismo");
     public static final RegistryObject<SoundEvent> PISTOL_SHOT = register("pistol.shot");
     public static final RegistryObject<SoundEvent> PISTOL_RELOAD = register("pistol.reload");
     public static final RegistryObject<SoundEvent> PISTOL_EMPTY = register("pistol.empty");
@@ -54,6 +58,9 @@ public final class ModSounds {
             new VoiceLine(RISADINHA, "risadinha", 80));
 
     public static final VoiceLine RENAN_PHONK = new VoiceLine(PHONK, "phonk", 280);
+    public static final List<VoiceLine> LULA_VOICES = List.of(new VoiceLine(LULA_BEANS,"lula","feijao_puro",185),
+            new VoiceLine(LULA_HOMOFOBIA,"lula","homofobia",109),new VoiceLine(LULA_MACHISMO,"lula","machismo",146),
+            new VoiceLine(LULA_RACISMO,"lula","racismo",156));
     public static final VoiceLine ARTHUR_SUMMON = new VoiceLine(SUMMON, "arthur", "invocacao", 120);
     public static final List<VoiceLine> ARTHUR_VOICES = List.of(
             new VoiceLine(E_VAGABUNDO_SIM, "arthur", "e_vagabundo_sim", 220),

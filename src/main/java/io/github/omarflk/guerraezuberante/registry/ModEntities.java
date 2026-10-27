@@ -13,6 +13,13 @@ import net.minecraftforge.registries.RegistryObject;
 public final class ModEntities {
     public static final DeferredRegister<EntityType<?>> REGISTER =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, GuerraEzuberanteMod.MOD_ID);
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.LulaEntity>> LULA = REGISTER.register(
+            "lula", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.LulaEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":lula"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.BeanProjectile>> BEAN = REGISTER.register(
+            "semente_feijao", () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.BeanProjectile>of(
+                    io.github.omarflk.guerraezuberante.entity.BeanProjectile::new, MobCategory.MISC)
+                    .sized(.22F,.22F).clientTrackingRange(8).updateInterval(1).build(GuerraEzuberanteMod.MOD_ID+":semente_feijao"));
 
     public static final RegistryObject<EntityType<RenanSantosEntity>> RENAN_SANTOS = REGISTER.register(
             "renan_santos", () -> EntityType.Builder.of(RenanSantosEntity::new, MobCategory.CREATURE)

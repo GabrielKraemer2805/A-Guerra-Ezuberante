@@ -10,6 +10,9 @@ public final class ModConfig {
     public static final ForgeConfigSpec.IntValue SUMMON_LIFETIME, ORPHAN_GRACE;
     public static final ForgeConfigSpec.DoubleValue CHARACTER_AUDIO_VOLUME;
     public static final ForgeConfigSpec.IntValue CHARACTER_AUDIO_SESSION, CHARACTER_AUDIO_GRACE;
+    public static final ForgeConfigSpec.DoubleValue LULA_HEALTH, LULA_EXPLOSION_POWER, LULA_RISE;
+    public static final ForgeConfigSpec.BooleanValue LULA_EXPLOSION_ENABLED, LULA_BLOCK_DAMAGE;
+    public static final ForgeConfigSpec.IntValue LULA_DEATH_TICKS;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -32,6 +35,16 @@ public final class ModConfig {
                 .defineInRange("interaction_session_ticks", 1200, 20, 72000);
         CHARACTER_AUDIO_GRACE = builder.comment("Combat grace; finish the current recording instead of cutting repeatedly.")
                 .defineInRange("combat_grace_ticks", 40, 0, 1200);
+        builder.pop();
+        builder.push("lula");
+        LULA_HEALTH = builder.defineInRange("max_health", 30D, 1D, 1024D);
+        LULA_EXPLOSION_ENABLED = builder.define("death_explosion_enabled", true);
+        LULA_EXPLOSION_POWER = builder.comment("Vanilla Wither spawn explosion is 7.0 in Minecraft 1.20.1.")
+                .defineInRange("death_explosion_power", 7D, 0D, 16D);
+        LULA_DEATH_TICKS = builder.defineInRange("death_animation_ticks", 60, 20, 200);
+        LULA_RISE = builder.defineInRange("death_rise_blocks", 2D, 0D, 8D);
+        LULA_BLOCK_DAMAGE = builder.comment("Also respects mobGriefing and Forge explosion protection events.")
+                .define("death_explosion_block_damage", true);
         builder.pop();
         SPEC = builder.build();
     }

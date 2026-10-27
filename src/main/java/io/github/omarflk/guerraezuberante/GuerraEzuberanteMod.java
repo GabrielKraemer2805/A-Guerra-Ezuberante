@@ -31,6 +31,7 @@ public final class GuerraEzuberanteMod {
     }
 
     private void registerAttributes(EntityAttributeCreationEvent event) {
+        event.put(ModEntities.LULA.get(), io.github.omarflk.guerraezuberante.entity.LulaEntity.createAttributes().build());
         event.put(ModEntities.RENAN_SANTOS.get(), RenanSantosEntity.createAttributes().build());
         event.put(ModEntities.ARTHUR_DO_VAL.get(), ArthurDoValEntity.createAttributes().build());
         event.put(ModEntities.ARTHUR_COMBATENTE.get(), ArthurDoValEntity.createAttributes().build());

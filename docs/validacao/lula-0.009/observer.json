@@ -1,0 +1,67 @@
+{
+  "passed": true,
+  "errors": [],
+  "remote": true,
+  "recordings": [
+    "guerra_ezuberante:lula.homofobia",
+    "guerra_ezuberante:lula.racismo",
+    "guerra_ezuberante:lula.machismo",
+    "guerra_ezuberante:lula.feijao_puro"
+  ],
+  "maxConcurrentAudio": 1,
+  "beans": [
+    785,
+    771,
+    787,
+    791,
+    783
+  ],
+  "poses": [
+    {
+      "y": 101.0,
+      "age": 0,
+      "green": 204,
+      "bodyX": -0.0705951,
+      "forearmX": 0.0048870537
+    },
+    {
+      "y": 101.0,
+      "age": 10,
+      "green": 163,
+      "bodyX": -0.14099297,
+      "forearmX": 0.43974885
+    },
+    {
+      "y": 101.73378118040738,
+      "age": 20,
+      "green": 122,
+      "bodyX": -0.32877144,
+      "forearmX": 0.90919507
+    },
+    {
+      "y": 102.86142110263275,
+      "age": 30,
+      "green": 82,
+      "bodyX": -0.48773053,
+      "forearmX": 1.3065928
+    },
+    {
+      "y": 103.0,
+      "age": 40,
+      "green": 41,
+      "bodyX": -0.74545884,
+      "forearmX": 1.5382528
+    },
+    {
+      "y": 103.0,
+      "age": 50,
+      "green": 20,
+      "bodyX": -0.9796129,
+      "forearmX": 1.7462578
+    }
+  ],
+  "roseTwoBlocks": true,
+  "curled": true,
+  "redTint": true,
+  "explosionSounds": 1
+}

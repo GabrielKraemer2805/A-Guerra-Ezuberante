@@ -10,6 +10,8 @@ public final class CharacterAudio {
     }
     public static final List<MusicTrack> RENAN = List.of(
             track("renan.me_respeita",270), track("renan.phonk",252), track("renan.risadinha",48));
+    public static final List<MusicTrack> LULA = List.of(track("lula.feijao_puro",185),track("lula.homofobia",109),
+            track("lula.machismo",146),track("lula.racismo",156));
     public static final List<MusicTrack> ARTHUR = List.of(
             track("arthur.e_vagabundo_sim",200), track("arthur.ficou_ofendidinho",332),
             track("arthur.limpa_o_cu_com_a_linuga",281), track("arthur.parar_de_mamat",264),

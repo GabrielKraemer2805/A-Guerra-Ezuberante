@@ -12,6 +12,9 @@ import net.minecraftforge.registries.RegistryObject;
 public final class ModItems {
     public static final DeferredRegister<Item> REGISTER =
             DeferredRegister.create(ForgeRegistries.ITEMS, GuerraEzuberanteMod.MOD_ID);
+    public static final RegistryObject<Item> LULA_SPAWN_EGG = REGISTER.register("lula_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.LULA,0xB71C26,0xD8D9D2,new Item.Properties()));
+    public static final RegistryObject<Item> BEAN = REGISTER.register("semente_feijao", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> GE_P12 = REGISTER.register("ge_p12",
             () -> new io.github.omarflk.guerraezuberante.pistol.PistolItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> PISTOL_AMMO = REGISTER.register("pistol_ammo", () -> new Item(new Item.Properties()));

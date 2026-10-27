@@ -6,7 +6,7 @@
 
 **Seis facções · Personagens com IA · Exércitos invocáveis · Multiplayer**
 
-![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.008.0-DBA434?style=for-the-badge)
+![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.009.0-DBA434?style=for-the-badge)
 ![GeckoLib](https://img.shields.io/badge/GeckoLib-4.8.4-58A64B?style=for-the-badge)
 ![TaCZ](https://img.shields.io/badge/TaCZ-1.1.8--hotfix2-397BA8?style=for-the-badge)
 ![Plataforma](https://img.shields.io/badge/PLATAFORMA-MINECRAFT_JAVA-62B447?style=for-the-badge)
@@ -21,9 +21,95 @@ Guerra Ezuberante é um projeto de mod de Minecraft Java Edition em que personag
 
 Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pretendida e o caminho de desenvolvimento. Os ataques, nomes de poderes e eventos pertencem a uma sátira fictícia de videogame.
 
-> **Estado atual — sprint 0.008.0.** Tela inicial com arte voxel original **GUERRA EZUBERANTE**, mantendo os botões e a navegação vanilla/Forge. PNG 1920×1080, escala proporcional e título preservado em ultrawide. **55 GameTests passaram**, além do cenário gráfico de navegação, entrada/saída de mundo e quatro tamanhos de renderização. Renan armado, playlists, GE-P12 e arsenal anterior preservados. [Entrega do menu](docs/MENU_0.008.md), [validação](docs/VALIDACAO.md), [Renan e playlists](docs/RENAN_0.007.md).
+> **Estado atual — sprint 0.009.0.** Lula implementado com skin original, barriga articulada, quatro gravações, feijões físicos de **6 de dano a cada 40 ticks** e morte cinematográfica de **60 ticks**: fica vermelho, sobe **2 blocos**, se contrai e explode uma vez com potência **7**, equivalente ao surgimento do Wither. **60 GameTests passaram**, incluindo os 55 anteriores. Renan, Arthur, tropas, armas e menu preservados. [Entrega completa do Lula](docs/LULA_0.009.md), [menu](docs/MENU_0.008.md), [validação](docs/VALIDACAO.md).
 
 O projeto segue o desafio de desenvolvimento **100% por IA**. Código, UVs, modelos, keyframes, conversões, validações e correções são responsabilidade do agente. O autor fornece ideias, assets e feedback; não precisa configurar Blockbench ou editar Java/JSON.
+
+## Lula, feijões e morte explosiva — 0.009.0
+
+![Java](https://img.shields.io/badge/Java_17-ENTIDADE_E_IA-ED8B00?style=for-the-badge)
+![Forge](https://img.shields.io/badge/Forge_1.20.1-F%C3%8DSICA_E_REDE-397BA8?style=for-the-badge)
+![GeckoLib](https://img.shields.io/badge/GeckoLib_4-15_OSSOS_E_5_CLIPES-58A64B?style=for-the-badge)
+![FFmpeg](https://img.shields.io/badge/FFmpeg-OGG_MONO-008F5D?style=for-the-badge)
+
+| Tecnologia | Uso no Lula e motivo |
+| --- | --- |
+| Java 17 / Forge | Entidade, atributos, goal de distância e configurações do servidor; reutiliza a base existente |
+| Física vanilla | `ThrowableItemProjectile` cuida de voo e colisão; `Level.explode` aplica dano, exposição e knockback reais |
+| GeckoLib 4.8.4 | Modelo próprio articulado, barriga saliente, respiração, caminhada, arremesso, dano e morte; nenhum plugin novo |
+| `SynchedEntityData` / NBT | Servidor transmite fase/relógio e salva progresso; clientes fazem tint e animação sem decidir dano |
+| FFmpeg / FFprobe | Converte gravações recebidas sem cortes e mede timers exatos; originais preservados |
+| GameTest / cliente real | Testes de lógica e proteção de mundo separados da inspeção gráfica e de rede |
+
+Lula nasce neutro com **30 HP**, velocidade base **0,23** e hitbox **0,6 × 1,8**. O ovo `guerra_ezuberante:lula_spawn_egg` aparece na aba do mod. **K → Personagens → Lula** mostra detalhes, disponibilidade das falas e prévia. A skin 64×64 fornecida foi copiada sem alteração; a barriga tem três volumes extras e acompanha o torso.
+
+```mermaid
+flowchart LR
+    A[Recebe agressão válida] --> B[Servidor prepara arremesso]
+    B --> C[Animação chega ao tick 8]
+    C --> D[Feijão físico sai da mão direita]
+    D --> E{Colisão vanilla}
+    E -->|Inimigo| F[6 de dano base]
+    E -->|Bloco| G[Descarta sem destruir bloco]
+    F --> H[Descarta após um impacto]
+    B --> I[Próximo arremesso após 40 ticks]
+```
+
+O feijão usa sprite marrom original **16×16**, gravidade, autoria e tempo máximo de vida de 100 ticks. Não acerta instantaneamente: o alvo pode se mover e esquivar. Dono e aliados de scoreboard são ignorados. Dano a entidades acontece somente no servidor, sem golpe corpo a corpo concorrente. A soltura também verifica alvo e linha de visão; parede ou morte cancela o projétil pendente.
+
+### A sequência de morte
+
+```mermaid
+stateDiagram-v2
+    [*] --> ALIVE
+    ALIVE --> DYING: dano letal aceito
+    state DYING {
+        [*] --> Vermelho
+        Vermelho --> Subida: 10 ticks
+        Subida --> Contracao: 30 ticks / altura +2
+        Contracao --> Compressao: 50 ticks
+    }
+    DYING --> EXPLODED: 60 ticks
+    EXPLODED --> [*]: explosão opcional e remoção
+```
+
+O servidor interrompe IA, perseguição, ataques e música. O modelo inteiro ganha tint vermelho persistente, sobe com interpolação suave e curva tronco/cabeça, cotovelos e joelhos. Nos últimos dez ticks, compressão, tremor e partículas vermelhas antecipam a explosão. A queda e o desaparecimento vanilla após 20 ticks foram substituídos pelo relógio da sequência.
+
+A potência foi conferida no `WitherBoss` **official 1.20.1** do JAR efetivamente usado: **7.0F, sem fogo, interação MOB** ao terminar o surgimento. Lula chama a explosão nativa no centro do corpo após a subida. `mobGriefing` e eventos Forge continuam aplicáveis. Cada entidade marca EXPLODED antes da chamada, explode no máximo uma vez e é descartada. Lulas atingidos letalmente podem iniciar outras sequências de três segundos, sem explosão recursiva imediata.
+
+Salvar/carregar durante DYING retoma o progresso carregado restante; não reinicia a animação. Um estado EXPLODED carregado é removido sem nova explosão. Dano adicional não reinicia a morte.
+
+### Áudio e configuração
+
+Quatro originais encontrados em **`audios/lula_audio/`**, todos preservados: `feijao puro.MP3` (9,25 s), `lula homofobia.MP3` (5,43 s), `lula machiso.MP3` (7,29 s) e `luluaracismo.MP3` (7,78 s). OGGs mono 44,1 kHz são distribuídos em `sounds/lula/`. Os nomes identificam arquivos recebidos. A mesma playlist atende botão direito e combate, com shuffle bag e uma instância espacial por entidade. Não foi atribuída fala temática de morte/dano sem identificação adequada.
+
+No arquivo SERVER do mundo, `serverconfig/guerra_ezuberante-server.toml`:
+
+```toml
+[lula]
+max_health = 30.0
+death_explosion_enabled = true
+death_explosion_power = 7.0
+death_animation_ticks = 60
+death_rise_blocks = 2.0
+death_explosion_block_damage = true
+```
+
+`death_explosion_block_damage=false` preserva os blocos mantendo dano a entidades e efeitos; `mobGriefing=false` também protege blocos. `death_explosion_enabled=false` mantém a animação e remoção, sem explosão. A configuração é capturada no início da morte. O padrão pode destruir terreno; teste a morte em um mundo descartável.
+
+**Validação:** 60 GameTests passaram, incluindo dano 6 por impacto, cadência exata, windup, parede, vida útil, neutralidade, aliados, subida, retomada NBT, blast único de potência 7, knockback, opções de blocos, `mobGriefing`, cadeia e cancelamento por proteção Forge. Os cenários gráficos usam clientes reais em perfis isolados com **volume mestre zero**, sem modificar o volume do perfil normal. Detalhes, relatórios e limites em [LULA_0.009.md](docs/LULA_0.009.md).
+
+**Dois clientes reais passaram:** host e observador receberam os mesmos cinco feijões, as quatro gravações com uma instância por entidade, o tint progressivo, a pose articulada, a subida de 2 blocos e um som nativo de explosão. [Relatório host](docs/validacao/lula-0.009/host.json) · [Relatório remoto](docs/validacao/lula-0.009/observer.json). Houve timeout de login numa tentativa anterior; o teste local final não equivale a validar internet pública ou alta latência.
+
+![Lula com skin original e barriga articulada](docs/preview/lula-0.009/idle-belly.png)
+![Morte do Lula: vermelho, levitação e contração](docs/preview/lula-0.009/death-50.png)
+
+```mcfunction
+/give @s guerra_ezuberante:lula_spawn_egg
+/summon guerra_ezuberante:lula ~ ~ ~5
+```
+
+O design de facções e dos poderes adicionais mais abaixo continua como planejamento; esta sprint implementa especificamente o comportamento descrito nesta seção.
 
 ## Tela inicial ilustrada — 0.008.0
 
@@ -101,7 +187,7 @@ sequenceDiagram
 
 Mira, recuo e animação de recarga deste protótipo são simples; ainda não há mãos articuladas, carregador animado separado, acessórios ou receitas Survival. São recursos para uma possível próxima etapa, não uma substituição completa do TaCZ. O suporte anterior continua disponível quando ele está instalado; cada sistema atua somente em seus próprios itens.
 
-O build gera também **`build/distributions/guerra-ezuberante-0.008.0-sem-tacz/mods/`**, com Guerra Ezuberante e GeckoLib. A GE-P12 não adiciona outro mod na lista. **GeckoLib ainda aparece separadamente**, pois os personagens dependem dele. Para preservar armas já salvas, o perfil normal de desenvolvimento mantém TaCZ; os testes de independência usam um mundo isolado sem ele.
+O build gera também **`build/distributions/guerra-ezuberante-0.009.0-sem-tacz/mods/`**, com Guerra Ezuberante e GeckoLib. A GE-P12 não adiciona outro mod na lista. **GeckoLib ainda aparece separadamente**, pois os personagens dependem dele. Para preservar armas já salvas, o perfil normal de desenvolvimento mantém TaCZ; os testes de independência usam um mundo isolado sem ele.
 
 **Validação executada:** 47 GameTests com TaCZ e 10 próprios sem ele. Os dois cenários gráficos passaram: modelo 3D, ADS/FOV, tiro e dano, som único, recoil, recarga/conservação, gatilho segurado sem rajada e rejeição sem munição. A aba criativa real abriu com 6 itens sem TaCZ e 15 com ele. Multiplayer gráfico entre dois clientes da GE-P12 ainda não foi testado.
 
@@ -156,11 +242,11 @@ Os controles podem ser remapeados no Minecraft. A integração não registra tec
 | Minecraft Java | 1.20.1 | Plataforma |
 | Forge | 47.4.28 | Cliente e servidor |
 | Java | 17 | Jogo e desenvolvimento |
-| Guerra Ezuberante | 0.008.0 | Este mod, inclui menu ilustrado, Renan armado e GE-P12 |
+| Guerra Ezuberante | 0.009.0 | Este mod, inclui menu ilustrado, Renan armado e GE-P12 |
 | GeckoLib | 4.8.4 para Forge 1.20.1 | Personagens e animações existentes |
 | TaCZ | **1.1.8-hotfix2**, arquivo CurseForge **9037989** | Opcional; necessário nos dois lados para usar as cinco armas nativas |
 
-O build prepara os três JARs separados em **`build/distributions/guerra-ezuberante-0.008.0/mods/`** e a alternativa sem TaCZ em **`build/distributions/guerra-ezuberante-0.008.0-sem-tacz/mods/`**. O artefato próprio fica em **`build/libs/guerra_ezuberante-0.008.0.jar`**. Cliente e servidor devem usar o mesmo conjunto. O gunpack padrão já vem no JAR oficial do TaCZ; a GE-P12 não precisa dele.
+O build prepara os três JARs separados em **`build/distributions/guerra-ezuberante-0.009.0/mods/`** e a alternativa sem TaCZ em **`build/distributions/guerra-ezuberante-0.009.0-sem-tacz/mods/`**. O artefato próprio fica em **`build/libs/guerra_ezuberante-0.009.0.jar`**. Cliente e servidor devem usar o mesmo conjunto. O gunpack padrão já vem no JAR oficial do TaCZ; a GE-P12 não precisa dele.
 
 A dependência foi fixada pelo [arquivo oficial publicado em 02/10/2026](https://www.curseforge.com/minecraft/mc-mods/timeless-and-classics-zero/files/9037989), não pelo exemplo antigo 1.1.6 do README do TaCZ. Gradle usa CurseMaven com `fg.deobf`; o pacote local utiliza o JAR original, sem o remapeamento de desenvolvimento. `mods.toml` exige a versão exata. `validateTacz` verifica SHA-256 e os IDs/calibres no gunpack dessa distribuição.
 
@@ -426,7 +512,7 @@ Com comandos habilitados:
 /summon guerra_ezuberante:arthur_do_val_invocador ~4 ~ ~
 ```
 
-O JAR atual fica em **`build/libs/guerra_ezuberante-0.008.0.jar`**. O build prepara **`build/distributions/guerra-ezuberante-0.008.0/mods/`** com o mod, GeckoLib 4.8.4 e TaCZ 1.1.8-hotfix2 originais, separados, e **`build/distributions/guerra-ezuberante-0.008.0-sem-tacz/mods/`** apenas com o mod e GeckoLib. A GE-P12 funciona nos dois conjuntos. Não distribua `.tools/` ou caches, nem instale múltiplas versões do mod juntas.
+O JAR atual fica em **`build/libs/guerra_ezuberante-0.009.0.jar`**. O build prepara **`build/distributions/guerra-ezuberante-0.009.0/mods/`** com o mod, GeckoLib 4.8.4 e TaCZ 1.1.8-hotfix2 originais, separados, e **`build/distributions/guerra-ezuberante-0.009.0-sem-tacz/mods/`** apenas com o mod e GeckoLib. A GE-P12 funciona nos dois conjuntos. Não distribua `.tools/` ou caches, nem instale múltiplas versões do mod juntas.
 
 ### Áudios: entrada, conversão e novas falas
 
