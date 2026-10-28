@@ -31,6 +31,7 @@ public final class Factions {
         assign(player, faction);
         player.server.getPlayerList().broadcastSystemMessage(
                 Component.translatable("faction.guerra_ezuberante.joined", player.getName(), faction.displayName()), false);
+        FactionKit.giveOnce(player, faction);
         return true;
     }
 
@@ -53,6 +54,7 @@ public final class Factions {
         player.refreshDisplayName();
         player.refreshTabListName();
         FactionNetwork.broadcast(player.getUUID(), faction);
+        FactionPowers.applyPassives(player);
     }
 
     static void applyClient(UUID player, Faction faction) {

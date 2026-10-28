@@ -35,6 +35,7 @@ public final class ClientModEvents {
     @SubscribeEvent
     public static void registerKeys(RegisterKeyMappingsEvent event) {
         event.register(ModKeyBindings.OPEN_PANEL);
+        event.register(ModKeyBindings.USE_POWER);
     }
 
     @SubscribeEvent

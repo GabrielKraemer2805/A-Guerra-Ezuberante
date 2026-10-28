@@ -14,7 +14,7 @@ import java.util.*;
 public final class Rachadinha {
     public static final int MAX_CELLS=32;
     public record Surface(BlockPos block,Vec3 point) {}
-    public static List<Surface> trace(FlavioBolsonaroEntity owner,Vec3 target,double range){
+    public static List<Surface> trace(LivingEntity owner,Vec3 target,double range){
         var level=owner.level();var delta=target.subtract(owner.position()).multiply(1,0,1);double distance=Math.min(range,delta.length());
         // At melee distance there is no long line to draw, but the ground impact must still be usable.
         if(distance<.6){var impact=findSurface(level,target.x,target.z,owner.getY());return impact==null?List.of():List.of(impact);}
@@ -63,6 +63,19 @@ public final class Rachadinha {
         var path=trace(owner,target.position(),ModConfig.FISSURE_RANGE.get());if(path.isEmpty())return null;
         var effect=ModEntities.RACHADINHA.get().create(server);effect.initialize(owner,target,path);
         return server.addFreshEntity(effect)?effect:null;
+    }
+    /** Bolsonarista player power: toward where the player looks, never digs terrain, own damage value. */
+    public static RachadinhaEntity activate(net.minecraft.server.level.ServerPlayer owner,double range,float damage){
+        var look=owner.getLookAngle();
+        var hit=owner.level().clip(new net.minecraft.world.level.ClipContext(owner.getEyePosition(),owner.getEyePosition().add(look.scale(range)),
+                net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,owner));
+        var flat=new Vec3(look.x,0,look.z);
+        var target=hit.getType()==net.minecraft.world.phys.HitResult.Type.BLOCK && hit.getLocation().distanceTo(owner.position())>1.5
+                ?hit.getLocation():owner.position().add(flat.lengthSqr()<1e-4?Vec3.ZERO:flat.normalize().scale(range));
+        var path=trace(owner,target,range);if(path.isEmpty())return null;
+        var effect=ModEntities.RACHADINHA.get().create(owner.serverLevel());
+        effect.initialize(owner,null,path,damage,ModConfig.FISSURE_KNOCKBACK.get().floatValue(),ModConfig.FISSURE_FINAL_RADIUS.get().floatValue(),1F,false);
+        return owner.serverLevel().addFreshEntity(effect)?effect:null;
     }
     private Rachadinha(){}
 }

@@ -27,6 +27,10 @@ public enum Faction {
     public Component displayName() { return Component.translatable("faction.guerra_ezuberante." + id).withStyle(color); }
     public Component tag() { return Component.translatable("faction.guerra_ezuberante." + id + ".tag"); }
     public String descriptionKey() { return "gui.guerra_ezuberante.faction." + id; }
+    public Component powerName() { return Component.translatable("faction.guerra_ezuberante." + id + ".power").withStyle(color); }
+    public Component powerDescription() { return Component.translatable("faction.guerra_ezuberante." + id + ".power.desc"); }
+    public Component passive() { return Component.translatable("faction.guerra_ezuberante." + id + ".passive"); }
+    public Component kit() { return Component.translatable("faction.guerra_ezuberante." + id + ".kit"); }
 
     /** Prefix shown before the player name in chat, nametag and TAB: "[Lulista] ". */
     public Component prefix() {

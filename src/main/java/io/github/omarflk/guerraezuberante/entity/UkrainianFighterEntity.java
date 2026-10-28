@@ -20,6 +20,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -33,7 +34,7 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
     private static final EntityDataAccessor<Integer> EMERGENCE_DURATION = SynchedEntityData.defineId(
             UkrainianFighterEntity.class, EntityDataSerializers.INT);
     private UUID ownerId;
-    private ArthurDoValEntity cachedOwner;
+    private LivingEntity cachedOwner;
     private int lifeTicks;
     private int missingOwnerTicks;
     private boolean wasEmerging;
@@ -62,9 +63,14 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
     }
 
     public void bindTo(ArthurDoValEntity owner, int delayTicks) {
+        bindTo(owner, delayTicks, ModConfig.SUMMON_LIFETIME.get());
+    }
+
+    /** Owner is an Arthur or, for the Missão faction power, a player. */
+    public void bindTo(LivingEntity owner, int delayTicks, int lifetimeTicks) {
         ownerId = owner.getUUID();
         cachedOwner = owner;
-        lifeTicks = ModConfig.SUMMON_LIFETIME.get();
+        lifeTicks = lifetimeTicks;
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(ModConfig.FIGHTER_HEALTH.get());
         setHealth(getMaxHealth());
         entityData.set(EMERGENCE_START, level().getGameTime() + Math.max(0, delayTicks));
@@ -73,7 +79,8 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
     }
 
     public UUID getOwnerId() { return ownerId; }
-    public ArthurDoValEntity getOwnerEntity() { return cachedOwner; }
+    public ArthurDoValEntity getOwnerEntity() { return cachedOwner instanceof ArthurDoValEntity arthur ? arthur : null; }
+    public LivingEntity getOwner() { return cachedOwner; }
 
     public float emergenceProgress(float partialTick) {
         return net.minecraft.util.Mth.clamp((level().getGameTime() - entityData.get(EMERGENCE_START)
@@ -143,7 +150,8 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
         if (tickCount % 10 != 1) { return; }
         if (ownerId == null || SummonLedger.get(server).isClosed(ownerId)) { vanish(server); return; }
         Entity owner = server.getEntity(ownerId);
-        cachedOwner = owner instanceof ArthurDoValEntity arthur && arthur.isAlive() ? arthur : null;
+        cachedOwner = owner instanceof ArthurDoValEntity arthur && arthur.isAlive() ? arthur
+                : owner instanceof Player player && player.isAlive() && !player.isSpectator() ? player : null;
         if (cachedOwner == null) {
             if (owner != null || (missingOwnerTicks += 10) >= ModConfig.ORPHAN_GRACE.get()) {
                 vanish(server);
@@ -152,8 +160,17 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
         }
         missingOwnerTicks = 0;
         SummonLedger.get(server).register(ownerId, getUUID());
-        LivingEntity target = cachedOwner.getTarget();
+        LivingEntity target = cachedOwner instanceof Player player ? playerCombatTarget(player)
+                : ((ArthurDoValEntity) cachedOwner).getTarget();
         if (!isActionLocked() && target != null && isValidAggressor(target)) { setTarget(target); }
+    }
+
+    /** Defend the player from whoever hit them, otherwise join whatever they recently attacked. */
+    private static LivingEntity playerCombatTarget(Player player) {
+        LivingEntity attacker = player.getLastHurtByMob();
+        if (attacker != null && attacker.isAlive()) { return attacker; }
+        LivingEntity attacked = player.getLastHurtMob();
+        return attacked != null && attacked.isAlive() && player.tickCount - player.getLastHurtMobTimestamp() < 100 ? attacked : null;
     }
 
     private void vanish(ServerLevel server) {
@@ -182,7 +199,7 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
         boolean hit = super.doHurtTarget(target);
         if (hit && target instanceof LivingEntity living) {
             getMainHandItem().getItem().hurtEnemy(getMainHandItem(), living, this);
-            if (cachedOwner != null) { cachedOwner.noteTroopAttack(living); }
+            if (cachedOwner instanceof ArthurDoValEntity arthur) { arthur.noteTroopAttack(living); }
         }
         return hit;
     }

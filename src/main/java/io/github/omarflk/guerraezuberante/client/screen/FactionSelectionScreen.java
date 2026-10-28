@@ -1,5 +1,6 @@
 package io.github.omarflk.guerraezuberante.client.screen;
 
+import io.github.omarflk.guerraezuberante.client.input.ModKeyBindings;
 import io.github.omarflk.guerraezuberante.faction.Faction;
 import io.github.omarflk.guerraezuberante.faction.FactionNetwork;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,7 +14,7 @@ import java.util.List;
 
 /** Two steps, pick then confirm, because the choice can only be undone by an operator. Same palette as the K panel. */
 public final class FactionSelectionScreen extends Screen {
-    private static final int LINE_HEIGHT = 11;
+    private static final int LINE_HEIGHT = 10;
     private final Screen parent;
     private final List<FormattedCharSequence> lines = new ArrayList<>();
     private Faction selected;
@@ -51,11 +52,16 @@ public final class FactionSelectionScreen extends Screen {
         lines.clear();
         if (selected == null) {
             lines.addAll(font.split(Component.translatable("gui.guerra_ezuberante.faction_select.hint"), textWidth));
+            lines.add(FormattedCharSequence.EMPTY);
+            lines.addAll(font.split(Component.translatable("gui.guerra_ezuberante.faction_select.warning"), textWidth));
         } else {
+            // What the player gets, most important first: small GUI heights cut from the bottom.
             lines.addAll(font.split(Component.translatable(selected.descriptionKey()).withStyle(selected.color()), textWidth));
+            lines.addAll(font.split(Component.translatable("gui.guerra_ezuberante.faction_power", selected.powerName(),
+                    selected.powerDescription(), ModKeyBindings.USE_POWER.getTranslatedKeyMessage()), textWidth));
+            lines.addAll(font.split(Component.translatable("gui.guerra_ezuberante.faction_passive", selected.passive()), textWidth));
+            lines.addAll(font.split(Component.translatable("gui.guerra_ezuberante.faction_kit", selected.kit()), textWidth));
         }
-        lines.add(FormattedCharSequence.EMPTY);
-        lines.addAll(font.split(Component.translatable("gui.guerra_ezuberante.faction_select.warning"), textWidth));
     }
 
     @Override
@@ -65,9 +71,14 @@ public final class FactionSelectionScreen extends Screen {
         graphics.fill(0, 0, width, 36, 0xFF1D2027);
         graphics.fill(0, 36, width, 38, 0xFFE9B62F);
         graphics.drawCenteredString(font, title, width / 2, 14, 0xFFE9B62F);
+        int bottom = selected == null ? height - 32 : height - 44;
+        if (selected != null) {
+            graphics.drawCenteredString(font, Component.translatable("gui.guerra_ezuberante.faction_select.short_warning"),
+                    width / 2, height - 42, 0xFFE9B62F);
+        }
         int y = textY;
         for (FormattedCharSequence line : lines) {
-            if (y + LINE_HEIGHT > height - 32) { break; }
+            if (y + LINE_HEIGHT > bottom) { break; }
             graphics.drawString(font, line, textX, y, 0xFFE4E4E7);
             y += LINE_HEIGHT;
         }

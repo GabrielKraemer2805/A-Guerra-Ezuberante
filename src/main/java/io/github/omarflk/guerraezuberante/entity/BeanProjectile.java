@@ -16,9 +16,13 @@ public final class BeanProjectile extends ThrowableItemProjectile {
     public static final float DAMAGE=6F;
     public static final int MAX_LIFE=100;
     private int life;
+    private float damage=DAMAGE;
     private boolean impacted;
     public BeanProjectile(EntityType<? extends BeanProjectile> type,Level level){super(type,level);}
     public BeanProjectile(Level level,LivingEntity owner){super(ModEntities.BEAN.get(),owner,level);}
+    /** Lula keeps DAMAGE; the Lulista player volley uses its own configured value. */
+    public BeanProjectile(Level level,LivingEntity owner,float damage){this(level,owner);this.damage=damage;}
+    public float damage(){return damage;}
     @Override protected Item getDefaultItem(){return ModItems.BEAN.get();}
     @Override protected float getGravity(){return .015F;}
     @Override protected boolean canHitEntity(Entity entity) {
@@ -33,13 +37,13 @@ public final class BeanProjectile extends ThrowableItemProjectile {
     }
     @Override protected void onHitEntity(EntityHitResult hit) {
         if(!level().isClientSide && canHitEntity(hit.getEntity()))
-            hit.getEntity().hurt(level().damageSources().thrown(this,getOwner()),DAMAGE);
+            hit.getEntity().hurt(level().damageSources().thrown(this,getOwner()),damage);
     }
     @Override public void tick() {
         super.tick();
         if(!level().isClientSide && ++life>=MAX_LIFE)discard();
     }
     @Override public Packet<ClientGamePacketListener> getAddEntityPacket(){return NetworkHooks.getEntitySpawningPacket(this);}
-    @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putInt("BeanLife",life);}
-    @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);life=Math.max(0,Math.min(MAX_LIFE,tag.getInt("BeanLife")));}
+    @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putInt("BeanLife",life);tag.putFloat("BeanDamage",damage);}
+    @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);life=Math.max(0,Math.min(MAX_LIFE,tag.getInt("BeanLife")));if(tag.contains("BeanDamage"))damage=tag.getFloat("BeanDamage");}
 }

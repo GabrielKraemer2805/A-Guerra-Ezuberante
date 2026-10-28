@@ -25,6 +25,17 @@ public final class ArthurSummoning {
         SummonLedger ledger = SummonLedger.get(level);
         int requested = Math.min(ModConfig.SUMMON_COUNT.get(),
                 ModConfig.MAX_SUMMONS.get() - ledger.count(owner.getUUID()));
+        int created = spawnFighters(level, owner, requested, ModConfig.SUMMON_LIFETIME.get());
+        if (created < requested) {
+            LOGGER.debug("Arthur {}: created {}/{} fighters; safe terrain or capacity limited this cast",
+                    owner.getUUID(), created, requested);
+        }
+        return created;
+    }
+
+    /** Shared by Arthur and the Missão player power. Counted in the owner's SummonLedger slots. */
+    public static int spawnFighters(ServerLevel level, net.minecraft.world.entity.LivingEntity owner, int requested, int lifetimeTicks) {
+        SummonLedger ledger = SummonLedger.get(level);
         int created = 0;
         BlockPos center = owner.blockPosition();
         // Bounded local search, performed once per cast; no world/entity scans per tick.
@@ -42,7 +53,7 @@ public final class ArthurSummoning {
                         unit.moveTo(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D, owner.getYRot(), 0);
                         AABB box = unit.getBoundingBox();
                         if (!level.noCollision(unit, box) || !level.getEntities(unit, box).isEmpty()) { continue; }
-                        unit.bindTo(owner, created * 2);
+                        unit.bindTo(owner, created * 2, lifetimeTicks);
                         if (level.addFreshEntity(unit)) {
                             ledger.register(owner.getUUID(), unit.getUUID());
                             created++;
@@ -51,10 +62,6 @@ public final class ArthurSummoning {
                     }
                     if (created >= requested) { break search; }
             }
-        }
-        if (created < requested) {
-            LOGGER.debug("Arthur {}: created {}/{} fighters; safe terrain or capacity limited this cast",
-                    owner.getUUID(), created, requested);
         }
         return created;
     }

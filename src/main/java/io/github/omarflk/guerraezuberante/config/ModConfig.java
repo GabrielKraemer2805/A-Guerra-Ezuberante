@@ -21,6 +21,12 @@ public final class ModConfig {
     public static final ForgeConfigSpec.BooleanValue FISSURE_BLOCK_DAMAGE;
     public static final ForgeConfigSpec.DoubleValue FISSURE_FINAL_RADIUS;
     public static final ForgeConfigSpec.IntValue BALANCE_REVISION;
+    public static final ForgeConfigSpec.BooleanValue FACTION_KIT_ENABLED;
+    public static final ForgeConfigSpec.IntValue BEAN_VOLLEY_COOLDOWN,BEAN_VOLLEY_COUNT,PLAYER_FISSURE_COOLDOWN,PLAYER_TROOPS_COOLDOWN,
+            PLAYER_TROOPS_COUNT,PLAYER_TROOPS_LIFETIME,GROUP_HEAL_COOLDOWN,GROUP_HEAL_TICKS,ESQUERDA_REGEN_DELAY,
+            ESQUERDA_REGEN_INTERVAL,DASH_COOLDOWN,DASH_BUFF_TICKS,STANCE_COOLDOWN;
+    public static final ForgeConfigSpec.DoubleValue BEAN_VOLLEY_DAMAGE,LULISTA_SATURATION_BONUS,PLAYER_FISSURE_DAMAGE,
+            PLAYER_FISSURE_RANGE,BOLSONARISTA_ARMOR,MISSAO_HEALTH,GROUP_HEAL_RADIUS,DASH_STRENGTH,DIREITA_SPEED;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -81,6 +87,37 @@ public final class ModConfig {
         FISSURE_FINAL_RADIUS=builder.defineInRange("rachadinha_final_radius",2.25D,.65D,5D);
         FISSURE_BLOCK_DAMAGE=builder.comment("Narrow surface break only; respects mobGriefing, block hardness and Forge destroy events.")
                 .define("rachadinha_block_damage",true);
+        builder.pop();
+        builder.comment("Player faction powers (V key), passives and the one-time starting kit.").push("faction_powers");
+        FACTION_KIT_ENABLED=builder.comment("Kit is given once per player per world, only on the player's own first choice.")
+                .define("starting_kit_enabled",true);
+        BEAN_VOLLEY_COOLDOWN=builder.defineInRange("lulista_bean_volley_cooldown_ticks",160,20,72000);
+        BEAN_VOLLEY_COUNT=builder.defineInRange("lulista_bean_volley_count",3,1,9);
+        BEAN_VOLLEY_DAMAGE=builder.defineInRange("lulista_bean_volley_damage",5D,0D,100D);
+        LULISTA_SATURATION_BONUS=builder.comment("Extra saturation as a fraction of what the food already gives.")
+                .defineInRange("lulista_food_saturation_bonus",.5D,0D,4D);
+        PLAYER_FISSURE_COOLDOWN=builder.defineInRange("bolsonarista_rachadinha_cooldown_ticks",300,40,72000);
+        PLAYER_FISSURE_DAMAGE=builder.defineInRange("bolsonarista_rachadinha_damage",8D,0D,100D);
+        PLAYER_FISSURE_RANGE=builder.defineInRange("bolsonarista_rachadinha_range",8D,2D,16D);
+        BOLSONARISTA_ARMOR=builder.defineInRange("bolsonarista_armor_bonus",2D,0D,20D);
+        PLAYER_TROOPS_COOLDOWN=builder.defineInRange("missao_ukrainian_army_cooldown_ticks",900,40,72000);
+        PLAYER_TROOPS_COUNT=builder.comment("Also the maximum active at once per player.")
+                .defineInRange("missao_ukrainian_army_count",2,1,10);
+        PLAYER_TROOPS_LIFETIME=builder.defineInRange("missao_ukrainian_army_lifetime_ticks",600,200,72000);
+        MISSAO_HEALTH=builder.defineInRange("missao_max_health_bonus",2D,0D,40D);
+        GROUP_HEAL_COOLDOWN=builder.defineInRange("esquerda_group_heal_cooldown_ticks",600,40,72000);
+        GROUP_HEAL_RADIUS=builder.defineInRange("esquerda_group_heal_radius",6D,1D,32D);
+        GROUP_HEAL_TICKS=builder.defineInRange("esquerda_group_heal_regeneration_ticks",100,20,1200);
+        ESQUERDA_REGEN_DELAY=builder.comment("Ticks without taking damage before the passive regeneration starts.")
+                .defineInRange("esquerda_passive_regen_delay_ticks",200,20,6000);
+        ESQUERDA_REGEN_INTERVAL=builder.defineInRange("esquerda_passive_regen_interval_ticks",80,20,6000);
+        DASH_COOLDOWN=builder.defineInRange("direita_dash_cooldown_ticks",240,40,72000);
+        DASH_STRENGTH=builder.comment("Horizontal launch speed; 1.3 is about 6 blocks on flat ground.")
+                .defineInRange("direita_dash_strength",1.3D,.2D,5D);
+        DASH_BUFF_TICKS=builder.defineInRange("direita_dash_strength_effect_ticks",100,20,1200);
+        DIREITA_SPEED=builder.comment("Fraction of base movement speed; 0.1 = +10%.")
+                .defineInRange("direita_speed_bonus",.1D,0D,1D);
+        STANCE_COOLDOWN=builder.defineInRange("centro_stance_switch_cooldown_ticks",100,20,72000);
         builder.pop();
         SPEC = builder.build();
     }

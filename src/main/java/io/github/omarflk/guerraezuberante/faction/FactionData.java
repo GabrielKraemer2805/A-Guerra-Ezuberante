@@ -2,18 +2,23 @@ package io.github.omarflk.guerraezuberante.faction;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /** World-wide faction membership, stored once in the overworld so every dimension sees the same choice. */
 public final class FactionData extends SavedData {
     private final Map<UUID, Faction> members = new HashMap<>();
+    /** Kept across faction changes and clears: a player gets one kit per world. */
+    private final Set<UUID> kitsGiven = new HashSet<>();
 
     public static FactionData get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(FactionData::load, FactionData::new,
@@ -34,6 +39,17 @@ public final class FactionData extends SavedData {
         return true;
     }
 
+    /** Marks the kit as given; false if this player already received one in this world. */
+    public boolean markKitGiven(UUID player) {
+        if (!kitsGiven.add(player)) { return false; }
+        setDirty();
+        return true;
+    }
+
+    public boolean kitGiven(UUID player) {
+        return kitsGiven.contains(player);
+    }
+
     public Map<UUID, Faction> all() {
         return Map.copyOf(members);
     }
@@ -44,6 +60,9 @@ public final class FactionData extends SavedData {
         for (Tag entry : tag.getList("Members", Tag.TAG_COMPOUND)) {
             CompoundTag member = (CompoundTag) entry;
             Faction.byId(member.getString("Faction")).ifPresent(faction -> data.members.put(member.getUUID("Player"), faction));
+        }
+        for (Tag entry : tag.getList("Kits", Tag.TAG_INT_ARRAY)) {
+            data.kitsGiven.add(NbtUtils.loadUUID(entry));
         }
         return data;
     }
@@ -58,6 +77,9 @@ public final class FactionData extends SavedData {
             list.add(member);
         });
         tag.put("Members", list);
+        ListTag kits = new ListTag();
+        kitsGiven.forEach(player -> kits.add(NbtUtils.createUUID(player)));
+        tag.put("Kits", kits);
         return tag;
     }
 }

@@ -19,6 +19,9 @@ public final class FactionNetwork {
     public record Sync(UUID player, int ordinal) {}
     public record Prompt() {}
     public record Choose(int ordinal) {}
+    public record UsePower() {}
+    /** Ticks until the faction power is ready again, for the K panel. */
+    public record Cooldown(int ticks) {}
 
     public static void register() {
         CHANNEL.messageBuilder(Sync.class, 0, NetworkDirection.PLAY_TO_CLIENT)
@@ -52,18 +55,52 @@ public final class FactionNetwork {
                     }
                     context.get().setPacketHandled(true);
                 }).add();
+        CHANNEL.messageBuilder(UsePower.class, 3, NetworkDirection.PLAY_TO_SERVER)
+                .encoder((packet, buffer) -> {})
+                .decoder(buffer -> new UsePower())
+                .consumerMainThread((packet, context) -> {
+                    ServerPlayer player = context.get().getSender();
+                    if (player != null) { FactionPowers.use(player); }
+                    context.get().setPacketHandled(true);
+                }).add();
+        CHANNEL.messageBuilder(Cooldown.class, 4, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder((packet, buffer) -> buffer.writeVarInt(packet.ticks()))
+                .decoder(buffer -> new Cooldown(buffer.readVarInt()))
+                .consumerMainThread((packet, context) -> {
+                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+                            io.github.omarflk.guerraezuberante.client.FactionClient.cooldown(packet.ticks()));
+                    context.get().setPacketHandled(true);
+                }).add();
+    }
+
+    /** Skips connections that are not open (disconnecting players, GameTest mock players). */
+    private static void send(ServerPlayer target, Object packet) {
+        if (target.connection != null && target.connection.connection.isConnected()) {
+            CHANNEL.send(PacketDistributor.PLAYER.with(() -> target), packet);
+        }
+    }
+
+    public static void sendCooldown(ServerPlayer player, int ticks) {
+        send(player, new Cooldown(Math.max(0, ticks)));
+    }
+
+    public static void usePower() {
+        CHANNEL.sendToServer(new UsePower());
     }
 
     public static void broadcast(UUID player, Faction faction) {
-        CHANNEL.send(PacketDistributor.ALL.noArg(), new Sync(player, faction == null ? -1 : faction.ordinal()));
+        var server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        if (server == null) { return; }
+        var packet = new Sync(player, faction == null ? -1 : faction.ordinal());
+        server.getPlayerList().getPlayers().forEach(target -> send(target, packet));
     }
 
     public static void sendTo(ServerPlayer target, UUID player, Faction faction) {
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> target), new Sync(player, faction.ordinal()));
+        send(target, new Sync(player, faction.ordinal()));
     }
 
     public static void prompt(ServerPlayer player) {
-        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new Prompt());
+        send(player, new Prompt());
     }
 
     public static void choose(Faction faction) {

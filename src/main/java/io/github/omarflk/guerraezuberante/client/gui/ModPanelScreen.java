@@ -1,6 +1,8 @@
 package io.github.omarflk.guerraezuberante.client.gui;
 
 import io.github.omarflk.guerraezuberante.GuerraEzuberanteMod;
+import io.github.omarflk.guerraezuberante.client.FactionClient;
+import io.github.omarflk.guerraezuberante.client.input.ModKeyBindings;
 import io.github.omarflk.guerraezuberante.client.screen.FactionSelectionScreen;
 import io.github.omarflk.guerraezuberante.entity.RetaliatingCharacterEntity;
 import io.github.omarflk.guerraezuberante.faction.Faction;
@@ -134,7 +136,14 @@ public final class ModPanelScreen extends Screen {
             case FACTIONS -> {
                 var current = minecraft.player == null ? java.util.Optional.<Faction>empty() : Factions.of(minecraft.player);
                 if (current.isPresent()) {
-                    paragraph(textWidth, "gui.guerra_ezuberante.faction_current", current.get().displayName());
+                    Faction faction = current.get();
+                    paragraph(textWidth, "gui.guerra_ezuberante.faction_current", faction.displayName());
+                    paragraph(textWidth, "gui.guerra_ezuberante.faction_power", faction.powerName(), faction.powerDescription(),
+                            ModKeyBindings.USE_POWER.getTranslatedKeyMessage());
+                    int remaining = FactionClient.remainingCooldown();
+                    paragraph(textWidth, remaining > 0 ? "gui.guerra_ezuberante.faction_power_cooldown"
+                            : "gui.guerra_ezuberante.faction_power_ready", (remaining + 19) / 20);
+                    paragraph(textWidth, "gui.guerra_ezuberante.faction_passive", faction.passive());
                 } else {
                     paragraph(textWidth, "gui.guerra_ezuberante.faction_none");
                     if (minecraft.player != null) {

@@ -23,9 +23,9 @@ Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pre
 
 📚 **[Guia de prompts](guia-de-prompts/README.md)** — como pedir personagens, poderes, correções e arte, com **[modelos para copiar](guia-de-prompts/MODELOS.md)**, **[requisitos para jogar/desenvolver](guia-de-prompts/REQUISITOS.md)** e **[instruções para modificar o mod](guia-de-prompts/COMO-MODIFICAR.md)**. A pasta tem seu próprio README e pode ser consultada diretamente no GitHub.
 
-> **Estado atual — 0.012.0.** Ao entrar no mundo pela primeira vez, cada jogador **escolhe sua facção** entre as seis. A escolha fica salva no mundo, aparece como prefixo colorido no nome (chat, TAB e acima da cabeça) e só um operador pode trocá-la (`/ge faccao definir`). **Fogo amigo continua ativo.** [Detalhes da escolha de facção](docs/FACCOES_0.012.md).
+> **Estado atual — 0.012.0.** Ao entrar no mundo pela primeira vez, cada jogador **escolhe sua facção** entre as seis. A escolha fica salva no mundo, aparece como prefixo colorido no nome (chat, TAB e acima da cabeça) e só um operador pode trocá-la (`/ge faccao definir`). Cada facção tem **um poder na tecla B**, **um passivo** e **um kit inicial**. **Fogo amigo continua ativo.** [Facções, poderes e kits](docs/FACCOES_0.012.md).
 
-## Escolha de facção — 0.012.0
+## Facções, poderes e kits — 0.012.0
 
 | Quando | O que acontece |
 | --- | --- |
@@ -34,7 +34,16 @@ Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pre
 | Depois da escolha | Prefixo `[Lulista]`, `[Bolsonarista]`, `[Missão]`, `[Esquerda]`, `[Direita]` ou `[Centro]`; escolha salva ao sair, morrer ou trocar de dimensão. |
 | Operador | `/ge faccao definir <jogadores> <faccao>` e `/ge faccao limpar <jogadores>`; qualquer jogador consulta com `/ge faccao`. |
 
-A facção é identidade: não bloqueia dano entre membros nem muda o comportamento dos personagens com IA. Poderes por facção ficam para uma próxima versão.
+| Facção | Poder (B) | Passivo | Kit inicial |
+| --- | --- | --- | --- |
+| Esquerda Lulista | Chuva de Feijão: 3 feijões, 5 de dano cada (8 s) | Picanha: +50% de saturação | 8 bifes e 16 pães |
+| Direita Bolsonarista | Rachadinha: fenda de 8 blocos, 8 de dano, sem escavar (15 s) | Colete: +2 de armadura | GE-P12 carregada e 24 cartuchos |
+| Direita Missão | Exército Ucraniano: 2 Combatentes por 30 s (45 s) | Disciplina: +2 de vida máxima | Espada Ucraniana e escudo |
+| Esquerda Independente | Cura em Grupo: Regeneração II em 6 blocos (30 s) | Recuperação: 1 de vida a cada 4 s fora de combate | Escudo, peitoral de ferro e 2 poções de cura |
+| Direita Independente | Investida: dash de ~6 blocos e Força I (12 s) | Agilidade: +10% de velocidade | Arco com Poder I e 32 flechas |
+| Centro | Adaptação: Defesa ↔ Mobilidade (5 s) | Postura sempre ativa | Espada de ferro, escudo e 8 bifes |
+
+O kit sai uma única vez por jogador por mundo. A facção não bloqueia dano entre membros nem muda o comportamento dos personagens com IA. Valores na seção `[faction_powers]` da configuração do servidor.
 
 > **Versão anterior — 0.011.0.** Lula e Jair têm **300 HP, como o Wither**, com barras de boss **Lula em vermelho** e **Jair Bolsonaro em verde**. Flávio repete a **Rachadinha a cada 6 segundos** durante o combate: **10 de dano**, mais knockback e impacto final com raio de **2,25 blocos**. [Detalhes da atualização](docs/BOSSES_0.011.md), [Jair e Flávio](docs/JAIR_FLAVIO_0.010.md), [validação](docs/VALIDACAO.md).
 
@@ -750,7 +759,7 @@ As três primeiras são facções especiais, com líderes, habilidades próprias
 - **Implementado na 0.012.0:** no primeiro ingresso no mundo, o jogador vê a interface de escolha de facção.
 - **Implementado na 0.012.0:** a escolha fica salva no mundo e continua válida após desconectar e voltar ao servidor.
 - **Implementado na 0.012.0:** o administrador troca ou remove a facção com `/ge faccao definir` e `/ge faccao limpar`.
-- **Implementado na 0.012.0 (só visual):** prefixo colorido da facção no nome. Itens e efeitos próprios continuam planejados.
+- **Implementado na 0.012.0:** prefixo colorido da facção no nome, um poder ativo (tecla B), um passivo e um kit inicial por facção.
 - **Decisão do autor na 0.012.0:** jogadores da mesma facção **não** ficam protegidos entre si; fogo amigo continua ativo.
 
 As regras completas de diplomacia, fogo amigo, troca de facção e progressão ainda precisam de detalhamento.
