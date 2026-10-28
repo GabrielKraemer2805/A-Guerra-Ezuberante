@@ -1,5 +1,19 @@
 # Contexto de trabalho — Guerra Ezuberante
 
+## Escolha de facção — 0.012.0
+
+- Pedido em 28/10/2026 por colaborador (não o autor original OmarFLK), após confirmar que a 0.011.0 estava sem bugs nesta máquina. Primeira versão pedida: escolha no primeiro login, troca só por operador, facção visível no nome/TAB, NPCs inalterados, poderes depois. **Correção explícita do pedido: fogo amigo entre membros da mesma facção continua ativo.** Branch `feat/faccoes-0.012`; sem commit/push autorizado.
+- Máquina nova: clone sem `.tools/` nem `run/` prévios; Java 17 do sistema (Temurin 17.0.20.1) com `gradlew.bat`. Antes da mudança: build, 76 GameTests com TaCZ e 12 sem TaCZ aprovados na 0.011.0. O `.minecraft` do TLauncher do colaborador tem Forge 47.4.20 (<47.4.28 exigido) e mods NeoForge 1.21.1; ele escolheu testar pelo `runClient`, sem tocar o `.minecraft`.
+- Pacote novo `faction/`: `Faction` (6 IDs estáveis lulista/bolsonarista/missao/esquerda/direita/centro, cores RED/GREEN/GOLD/LIGHT_PURPLE/AQUA/WHITE), `FactionData` (SavedData `guerra_ezuberante_factions` no overworld, UUID→ID, ID desconhecido descartado no load), `Factions` (choose só sem facção; assign/clear de operador; cópia cliente), `FactionNetwork` (canal `faction` v1: Sync S2C, Prompt S2C, Choose C2S só com índice), `FactionEvents` (login sincroniza online + pede escolha, NameFormat/TabListNameFormat com prefixo `[tag] `, comandos).
+- Facção é só identidade: não cria time de scoreboard, não altera `isAlliedTo`, não bloqueia dano. PvP do servidor e `/team` continuam valendo. Personagens com IA intocados. Não implementar proteção entre membros sem novo pedido.
+- Comandos: `/ge faccao` (todos), `/ge faccao definir <jogadores> <faccao>` e `/ge faccao limpar <jogadores>` (nível 2; limpar reabre a tela). Registrados em `FactionEvents`, independentes do TaCZ.
+- Cliente: `FactionSelectionScreen` (seleciona→descrição→confirmar; Decidir depois), `FactionClient` adia a tela até `screen==null` e sem overlay, limpa a cópia ao desconectar e atualiza o nome do jogador sincronizado. Painel K → Facções mostra facção atual ou botão Escolher facção. 30 chaves novas pt_br/en_us.
+- GameTests novos em `src/pistolTest/.../FactionGameTests.java` (rodam com e sem TaCZ): 81/81 com TaCZ e 17/17 sem TaCZ. O servidor de GameTest desliga PvP; o teste de fogo amigo compara com par de controle sem facção em vez de esperar `canHarmPlayer==true`. FakePlayer é invulnerável, não usar `hurt` para esse teste.
+- Cliente gráfico isolado `.tools/run-faction-client`, master 0 e `pauseOnLostFocus:false`, cópia de `run-gametest/world` como `FactionQA` via `-PquickPlayWorld`. Cliques/teclas por PostMessage e capturas por PrintWindow, sem roubar foco. Aprovados: tela no primeiro login, seleção/confirmação, anúncio no chat, prefixo `[Lulista] Dev drowned`, painel com/sem facção, Decidir depois + escolha pelo painel, persistência após salvar/sair/relançar sem reabrir a tela. Capturas em `docs/preview/faccoes-0.012/`. O mundo de teste nasce embaixo d'água; o jogador se afoga.
+- Não validado: TAB e nametag com dois jogadores reais (singleplayer com um jogador esconde o TAB), multiplayer com dois clientes. Não alegar.
+- Docs `docs/FACCOES_0.012.md`, README (estado atual + seção Seleção e persistência). Versão 0.012.0.
+- Entrega: cliente normal `run/` sem flags, menu pronto às 13:01:37 de 28/10, som normal (master 1.0). O colaborador testou e aprovou ("testei e ta funcionando"), autorizando commit e push. Push feito na branch `feat/faccoes-0.012`, não na `main`; merge/PR não solicitados.
+
 ## Publicação e guia de prompts — 27/10/2026
 
 - O autor autorizou explicitamente commit e push de **todas as alterações atuais**, incluindo a documentação e uma pasta própria de guia de prompts/requisitos. Esta autorização substitui as restrições de publicação das entregas locais descritas abaixo.

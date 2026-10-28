@@ -23,7 +23,20 @@ Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pre
 
 📚 **[Guia de prompts](guia-de-prompts/README.md)** — como pedir personagens, poderes, correções e arte, com **[modelos para copiar](guia-de-prompts/MODELOS.md)**, **[requisitos para jogar/desenvolver](guia-de-prompts/REQUISITOS.md)** e **[instruções para modificar o mod](guia-de-prompts/COMO-MODIFICAR.md)**. A pasta tem seu próprio README e pode ser consultada diretamente no GitHub.
 
-> **Estado atual — 0.011.0.** Lula e Jair têm **300 HP, como o Wither**, com barras de boss **Lula em vermelho** e **Jair Bolsonaro em verde**. Flávio repete a **Rachadinha a cada 6 segundos** durante o combate: **10 de dano**, mais knockback e impacto final com raio de **2,25 blocos**. [Detalhes da atualização](docs/BOSSES_0.011.md), [Jair e Flávio](docs/JAIR_FLAVIO_0.010.md), [validação](docs/VALIDACAO.md).
+> **Estado atual — 0.012.0.** Ao entrar no mundo pela primeira vez, cada jogador **escolhe sua facção** entre as seis. A escolha fica salva no mundo, aparece como prefixo colorido no nome (chat, TAB e acima da cabeça) e só um operador pode trocá-la (`/ge faccao definir`). **Fogo amigo continua ativo.** [Detalhes da escolha de facção](docs/FACCOES_0.012.md).
+
+## Escolha de facção — 0.012.0
+
+| Quando | O que acontece |
+| --- | --- |
+| Primeiro login | Tela **Escolha sua facção**; clicar mostra a descrição, **Entrar na facção** confirma. |
+| Decidir depois | Painel K → Facções → **Escolher facção**; a tela volta no próximo login. |
+| Depois da escolha | Prefixo `[Lulista]`, `[Bolsonarista]`, `[Missão]`, `[Esquerda]`, `[Direita]` ou `[Centro]`; escolha salva ao sair, morrer ou trocar de dimensão. |
+| Operador | `/ge faccao definir <jogadores> <faccao>` e `/ge faccao limpar <jogadores>`; qualquer jogador consulta com `/ge faccao`. |
+
+A facção é identidade: não bloqueia dano entre membros nem muda o comportamento dos personagens com IA. Poderes por facção ficam para uma próxima versão.
+
+> **Versão anterior — 0.011.0.** Lula e Jair têm **300 HP, como o Wither**, com barras de boss **Lula em vermelho** e **Jair Bolsonaro em verde**. Flávio repete a **Rachadinha a cada 6 segundos** durante o combate: **10 de dano**, mais knockback e impacto final com raio de **2,25 blocos**. [Detalhes da atualização](docs/BOSSES_0.011.md), [Jair e Flávio](docs/JAIR_FLAVIO_0.010.md), [validação](docs/VALIDACAO.md).
 
 ## Vida de boss e Rachadinha recorrente — 0.011.0
 
@@ -732,13 +745,13 @@ Um jogador pode escolher Direita Missão, jogar de Invocador e utilizar poderes 
 
 As três primeiras são facções especiais, com líderes, habilidades próprias e tropas exclusivas. As três restantes são escolhas independentes com conjuntos básicos de habilidades.
 
-### Seleção e persistência planejadas
+### Seleção e persistência
 
-- No primeiro ingresso no mundo, o jogador verá uma interface de escolha de facção.
-- Jogadores da mesma facção serão aliados por padrão.
-- Cada facção terá identificação visual, itens e efeitos próprios.
-- A escolha será salva no mundo e continuará válida após desconectar e voltar ao servidor.
-- O administrador poderá permitir mudanças de facção.
+- **Implementado na 0.012.0:** no primeiro ingresso no mundo, o jogador vê a interface de escolha de facção.
+- **Implementado na 0.012.0:** a escolha fica salva no mundo e continua válida após desconectar e voltar ao servidor.
+- **Implementado na 0.012.0:** o administrador troca ou remove a facção com `/ge faccao definir` e `/ge faccao limpar`.
+- **Implementado na 0.012.0 (só visual):** prefixo colorido da facção no nome. Itens e efeitos próprios continuam planejados.
+- **Decisão do autor na 0.012.0:** jogadores da mesma facção **não** ficam protegidos entre si; fogo amigo continua ativo.
 
 As regras completas de diplomacia, fogo amigo, troca de facção e progressão ainda precisam de detalhamento.
 

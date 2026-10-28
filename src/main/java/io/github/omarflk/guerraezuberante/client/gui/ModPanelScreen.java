@@ -1,7 +1,10 @@
 package io.github.omarflk.guerraezuberante.client.gui;
 
 import io.github.omarflk.guerraezuberante.GuerraEzuberanteMod;
+import io.github.omarflk.guerraezuberante.client.screen.FactionSelectionScreen;
 import io.github.omarflk.guerraezuberante.entity.RetaliatingCharacterEntity;
+import io.github.omarflk.guerraezuberante.faction.Faction;
+import io.github.omarflk.guerraezuberante.faction.Factions;
 import io.github.omarflk.guerraezuberante.registry.ModEntities;
 import io.github.omarflk.guerraezuberante.registry.ModSounds;
 import net.minecraft.SharedConstants;
@@ -129,9 +132,20 @@ public final class ModPanelScreen extends Screen {
                 }
             }
             case FACTIONS -> {
+                var current = minecraft.player == null ? java.util.Optional.<Faction>empty() : Factions.of(minecraft.player);
+                if (current.isPresent()) {
+                    paragraph(textWidth, "gui.guerra_ezuberante.faction_current", current.get().displayName());
+                } else {
+                    paragraph(textWidth, "gui.guerra_ezuberante.faction_none");
+                    if (minecraft.player != null) {
+                        addRenderableWidget(Button.builder(Component.translatable("gui.guerra_ezuberante.faction_choose"),
+                                ignored -> minecraft.setScreen(new FactionSelectionScreen(this)))
+                                .bounds(12, height - 28, 104, 20).build());
+                    }
+                }
                 paragraph(textWidth, "gui.guerra_ezuberante.factions_notice");
-                for (String faction : List.of("lulista", "bolsonarista", "missao", "esquerda", "direita", "centro")) {
-                    paragraph(textWidth, "gui.guerra_ezuberante.faction." + faction);
+                for (Faction faction : Faction.values()) {
+                    paragraph(textWidth, faction.descriptionKey());
                 }
             }
             case ABILITIES -> {
