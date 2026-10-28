@@ -20,6 +20,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public final class ClientModEvents {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(ModEntities.JAIR_BOLSONARO.get(),c->new io.github.omarflk.guerraezuberante.client.renderer.BolsonaroRenderer<>(c,"jair_bolsonaro"));
+        event.registerEntityRenderer(ModEntities.FLAVIO_BOLSONARO.get(),c->new io.github.omarflk.guerraezuberante.client.renderer.BolsonaroRenderer<>(c,"flavio_bolsonaro"));
+        event.registerEntityRenderer(ModEntities.RACHADINHA.get(),io.github.omarflk.guerraezuberante.client.renderer.RachadinhaRenderer::new);
         event.registerEntityRenderer(ModEntities.LULA.get(), io.github.omarflk.guerraezuberante.client.renderer.LulaRenderer::new);
         event.registerEntityRenderer(ModEntities.BEAN.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context,.65F,false));
         event.registerEntityRenderer(ModEntities.RENAN_SANTOS.get(), RenanRenderer::new);

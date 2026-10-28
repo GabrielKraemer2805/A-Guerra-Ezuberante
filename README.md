@@ -6,7 +6,7 @@
 
 **Seis facções · Personagens com IA · Exércitos invocáveis · Multiplayer**
 
-![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.009.0-DBA434?style=for-the-badge)
+![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.011.0-DBA434?style=for-the-badge)
 ![GeckoLib](https://img.shields.io/badge/GeckoLib-4.8.4-58A64B?style=for-the-badge)
 ![TaCZ](https://img.shields.io/badge/TaCZ-1.1.8--hotfix2-397BA8?style=for-the-badge)
 ![Plataforma](https://img.shields.io/badge/PLATAFORMA-MINECRAFT_JAVA-62B447?style=for-the-badge)
@@ -21,9 +21,131 @@ Guerra Ezuberante é um projeto de mod de Minecraft Java Edition em que personag
 
 Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pretendida e o caminho de desenvolvimento. Os ataques, nomes de poderes e eventos pertencem a uma sátira fictícia de videogame.
 
-> **Estado atual — sprint 0.009.0.** Lula implementado com skin original, barriga articulada, quatro gravações, feijões físicos de **6 de dano a cada 40 ticks** e morte cinematográfica de **60 ticks**: fica vermelho, sobe **2 blocos**, se contrai e explode uma vez com potência **7**, equivalente ao surgimento do Wither. **60 GameTests passaram**, incluindo os 55 anteriores. Renan, Arthur, tropas, armas e menu preservados. [Entrega completa do Lula](docs/LULA_0.009.md), [menu](docs/MENU_0.008.md), [validação](docs/VALIDACAO.md).
+📚 **[Guia de prompts](guia-de-prompts/README.md)** — como pedir personagens, poderes, correções e arte, com **[modelos para copiar](guia-de-prompts/MODELOS.md)**, **[requisitos para jogar/desenvolver](guia-de-prompts/REQUISITOS.md)** e **[instruções para modificar o mod](guia-de-prompts/COMO-MODIFICAR.md)**. A pasta tem seu próprio README e pode ser consultada diretamente no GitHub.
+
+> **Estado atual — 0.011.0.** Lula e Jair têm **300 HP, como o Wither**, com barras de boss **Lula em vermelho** e **Jair Bolsonaro em verde**. Flávio repete a **Rachadinha a cada 6 segundos** durante o combate: **10 de dano**, mais knockback e impacto final com raio de **2,25 blocos**. [Detalhes da atualização](docs/BOSSES_0.011.md), [Jair e Flávio](docs/JAIR_FLAVIO_0.010.md), [validação](docs/VALIDACAO.md).
+
+## Vida de boss e Rachadinha recorrente — 0.011.0
+
+| Personagem | Vida padrão | Barra no topo da tela |
+| --- | --- | --- |
+| Lula | 300 HP / 150 corações | **Lula**, vermelha |
+| Jair Bolsonaro | 300 HP / 150 corações | **Jair Bolsonaro**, verde |
+| Flávio Bolsonaro | 30 HP / 15 corações | Sem barra de boss |
+
+As barras usam o sistema nativo do Minecraft: aparecem ao rastrear o personagem, acompanham a vida atual e desaparecem na morte ou ao sair do alcance. Personagens já salvos com o antigo padrão de 30 HP recebem 300 HP mantendo a porcentagem de vida. Configurações personalizadas são preservadas.
+
+O ataque especial do Flávio tem prioridade sobre os socos quando a recarga termina. Ele volta a golpear o chão enquanto houver um alvo válido e visível, inclusive bem perto; continua neutro fora do combate. O impacto final tem partículas e som mais fortes e atinge inimigos numa área maior, mantendo **um dano por alvo por ativação**, sem atingir aliados ou animais alheios à luta.
+
+```mermaid
+flowchart LR
+    A[Alvo válido e visível] --> B{Recarga de 120 ticks terminou?}
+    B -->|Não| C[Combate corpo a corpo]
+    C --> A
+    B -->|Sim| D[Prepara e golpeia o chão]
+    D --> E[Rachadinha: dano 10 uma vez por inimigo]
+    E --> F[Impacto final: raio 2,25 e efeito maior]
+    F --> A
+```
 
 O projeto segue o desafio de desenvolvimento **100% por IA**. Código, UVs, modelos, keyframes, conversões, validações e correções são responsabilidade do agente. O autor fornece ideias, assets e feedback; não precisa configurar Blockbench ou editar Java/JSON.
+
+> **Correção visual0.010.1:** laterais das cabeças de Jair e Flávio retocadas para diminuir a aparência das orelhas e preencher o cabelo do Jair. Rosto, roupas e faixa preservados pixel a pixel. [Procedência e detalhes](docs/arte/correcao-cabecas-0.010.1.md). Mecânicas da0.010.0 mantidas.
+
+## Jair, Flávio e Rachadinha — 0.010.0
+
+![Glock](https://img.shields.io/badge/TaCZ-GLOCK_17_NATIVA-397BA8?style=for-the-badge)
+![GeckoLib](https://img.shields.io/badge/GeckoLib-15_ANIMA%C3%87%C3%95ES_NOVAS-58A64B?style=for-the-badge)
+![Servidor](https://img.shields.io/badge/Forge-DANO_E_TERRENO_NO_SERVIDOR-DBA434?style=for-the-badge)
+
+| Tecnologia existente | Uso nesta sprint | Motivo |
+| --- | --- | --- |
+| **TaCZ 1.1.8-hotfix2** | Glock 17 original, projéteis, modelo3D, som e dano | Mantém o arsenal já integrado; não copia assets nem instala outro mod de armas |
+| **Forge 1.20.1 / Java 17** | IA, cooldowns, invocações, dano e escavação | Servidor decide todas as ações; o cliente não aplica dano |
+| **GeckoLib 4.8.4** | Dois modelos, quinze clipes e arma presa à mão | Preserva as skins64×64 e usa keyframes sincronizados |
+| **SynchedEntityData / NBT / SavedData** | Fase visual, vínculo do dono, cooldowns e limite de aliados | Evita duplicação e mantém contagem mesmo com unidades descarregadas |
+| **Renderização e efeitos vanilla** | Rachadura desenhada no chão, partículas e sons de impacto | Cria uma fissura estreita sem explodir crateras circulares em cada segmento |
+
+### Personagens e como testar
+
+| Entidade | ID | Comportamento padrão |
+| --- | --- | --- |
+| Jair Bolsonaro | `guerra_ezuberante:jair_bolsonaro` | Neutro, 300 HP e barra verde, Glock 17 e Dinastia Bolsonaro; morte verde |
+| Flávio Bolsonaro | `guerra_ezuberante:flavio_bolsonaro` | Neutro independente ou aliado vinculado ao Jair; Rachadinha e corpo a corpo |
+
+Skins originais preservadas por hash, modelos separados e ovos na aba Guerra Ezuberante. **K → Personagens → Jair / Flávio** abre informações e prévia. Os previews grandes enviados pelo autor não são usados como textura.
+
+```mcfunction
+/give @s guerra_ezuberante:jair_bolsonaro_spawn_egg
+/give @s guerra_ezuberante:flavio_bolsonaro_spawn_egg
+```
+
+Provoque em Survival para observar combate. Nenhuma identidade política gera agressão automática a jogadores. Jair e Flávio são aliados entre si; demais relações existentes foram preservadas.
+
+### Glock 17 e Dinastia Bolsonaro
+
+A pistola é **`tacz:glock_17`**,9mm, SEMI. Usa o disparo, bala, som e dano originais. O NPC não gasta munição nem precisa recarregar; a regra pertence ao operador Jair, sem tag de munição infinita no item e sem mudar a pistola dos jogadores. Sem TaCZ, usa fallback desarmado.
+
+Mira por12 ticks e solicita um tiro a cada **20 ticks**, sem rajada nem acúmulo por lag. Mantém distância útil5–18 blocos e interrompe quando parede ou aliado bloqueia o corredor. O tiro não é gerado pela animação.
+
+```mermaid
+flowchart LR
+    A[Jair recebe agressão válida] --> B[Convocação: 20 ticks]
+    B --> C[Cria Flávio no tick 12]
+    C --> D[Salva vínculo UUID e ocupa vaga]
+    D --> E[Flávio segue e defende seu Jair]
+    A --> F[Mira e tiro nativo a cada 20 ticks]
+    C --> G[Próxima convocação após 700 ticks]
+    G --> H{Menos de 3 Flávios vinculados?}
+    H -->|Sim, ainda em combate| B
+```
+
+Padrão: **1 Flávio a cada 35 segundos, limite3 por Jair**. Os números são configuráveis. A contagem inclui unidades descarregadas. Ao morrer/remover Jair, suas invocações são descartadas; unidades independentes criadas por ovo continuam independentes. Dono ausente tem tolerância de200 ticks carregados, seguindo a política existente.
+
+### Rachadinha: o solo se abre em direção ao alvo
+
+Flávio ergue os braços e o joelho por8 ticks, golpeia o chão no **tick10** e recupera a postura até o24. A fissura avança depois, uma célula a cada3 ticks, com pequenos desvios laterais, partículas do terreno, decal de rachadura e impacto final mais forte.
+
+Padrão atual: **alcance 8 blocos, largura aproximada 1, cooldown 6 s, até 10 de dano base por alvo por ativação, knockback 0,65 e raio final 2,25 blocos**. Um conjunto de UUIDs impede que os segmentos repitam o dano. Golpes corpo a corpo são ataques separados. Aliados, dono e animais sem relação com o combate não são vítimas da área. A prioridade da habilidade permite repetir a Rachadinha durante a luta, mesmo depois de iniciar os socos.
+
+```mermaid
+flowchart TD
+    A[Preparação e golpe no chão] --> B[Traça superfícies carregadas até o alvo]
+    B --> C[Revela próximo segmento]
+    C --> D[Efeito de terra, pedra e pequena explosão visual]
+    D --> E{Inimigo ainda não atingido?}
+    E -->|Sim| F[Dano uma vez e knockback]
+    D --> G{Escavação habilitada e autorizada?}
+    G -->|Sim| H[Remove uma camada estreita do terreno]
+    G -->|Não| I[Preserva blocos; mantém efeitos e dano]
+    C --> J[Avança após 3 ticks]
+    J --> C
+    J --> K[Último segmento: impacto maior, fade e descarte]
+```
+
+O percurso acompanha degraus e para diante de parede alta, falta de chão, borda ou chunk ausente. Não força carregamento. A remoção real atinge uma faixa estreita de blocos naturais permitidos, sem TNT e sem explosão circular destrutiva por segmento. Bedrock, containers e materiais fora da lista são preservados.
+
+`mobGriefing`, `canEntityDestroy`, **LivingDestroyBlockEvent** e **BlockEvent.BreakEvent** podem negar a escavação. O evento de bloco usa um FakePlayer próprio em Survival, sem OP, sem emprestar a identidade do autor. A compatibilidade foi verificada com cancelamentos dos hooks Forge; mods de proteção com APIs próprias podem exigir integração específica.
+
+### Morte verde e sistema compartilhado com Lula
+
+`SpecialDeathEntity` reúne os estados **ALIVE → DYING → EXPLODED**, salvamento, subida e explosão única. A compatibilidade dos campos NBT antigos do Lula foi mantida. Jair usa a mesma sequência60 ticks: ganha tint verde, sobe2 blocos, curva corpo/cabeça, dobra braços/joelhos, treme e explode. Partículas verdes/amarelas distinguem a morte do vermelho do Lula.
+
+Potência **7**, sem fogo, conferida no surgimento do Wither official1.20.1. Dano, exposição, knockback e som vêm da explosão nativa, respeitando as opções de blocos e hooks. Jair interrompe tiros/invocações e remove suas unidades vinculadas. Cada entidade explode no máximo uma vez; salvar/carregar não reinicia a sequência.
+
+### Configuração, sons e documentação
+
+No arquivo SERVER do mundo, as seções **`[jair]`** e **`[flavio]`** centralizam atributos, limite/cooldown de convocação, morte verde e Rachadinha. Para preservar terreno, use `jair.death_explosion_block_damage=false` e `flavio.rachadinha_block_damage=false`; `mobGriefing=false` também impede essas destruições. O padrão permite dano real a blocos; use um mundo descartável para testar.
+
+Não foram encontrados áudios próprios dos dois personagens. Nenhuma fala foi inventada; a Glock usa TaCZ e a fissura usa efeitos vanilla de pedra/explosão. Playlists antigas permanecem intactas.
+
+[Documentação completa: configurações,15 animações, arquivos, testes e limitações](docs/JAIR_FLAVIO_0.010.md).
+
+**Validação real:** build/reobf e **71 GameTests aprovados**, mais **12 testes sem TaCZ**. Dois clientes reais confirmaram a Glock, o aliado, a fissura e as mortes coloridas. Foram 21 disparos medidos com intervalo 20/20 e carregador17→17; cada fissura controlada causou6 de dano uma vez, com0 blocos removidos no modoOFF e11 no modoON. [Relatório host](docs/validacao/bolsonaro-0.010/host.json) · [Relatório observador](docs/validacao/bolsonaro-0.010/observer.json). Testes silenciosos e mundos isolados; limites detalhados na documentação.
+
+![Jair e Flávio com skins originais e Glock nativa](docs/preview/bolsonaro-0.010/skins-e-glock.png)
+![Rachadinha contínua com destruição estreita do terreno](docs/preview/bolsonaro-0.010/rachadinha-com-destruicao.png)
+![Morte verde do Jair e vermelha do Lula](docs/preview/bolsonaro-0.010/mortes-verde-vermelha.png)
 
 ## Lula, feijões e morte explosiva — 0.009.0
 
@@ -41,7 +163,7 @@ O projeto segue o desafio de desenvolvimento **100% por IA**. Código, UVs, mode
 | FFmpeg / FFprobe | Converte gravações recebidas sem cortes e mede timers exatos; originais preservados |
 | GameTest / cliente real | Testes de lógica e proteção de mundo separados da inspeção gráfica e de rede |
 
-Lula nasce neutro com **30 HP**, velocidade base **0,23** e hitbox **0,6 × 1,8**. O ovo `guerra_ezuberante:lula_spawn_egg` aparece na aba do mod. **K → Personagens → Lula** mostra detalhes, disponibilidade das falas e prévia. A skin 64×64 fornecida foi copiada sem alteração; a barriga tem três volumes extras e acompanha o torso.
+Lula nasce neutro com **300 HP e barra vermelha de boss**, velocidade base **0,23** e hitbox **0,6 × 1,8**. O ovo `guerra_ezuberante:lula_spawn_egg` aparece na aba do mod. **K → Personagens → Lula** mostra detalhes, disponibilidade das falas e prévia. A skin 64×64 fornecida foi copiada sem alteração; a barriga tem três volumes extras e acompanha o torso.
 
 ```mermaid
 flowchart LR
@@ -87,7 +209,7 @@ No arquivo SERVER do mundo, `serverconfig/guerra_ezuberante-server.toml`:
 
 ```toml
 [lula]
-max_health = 30.0
+max_health = 300.0
 death_explosion_enabled = true
 death_explosion_power = 7.0
 death_animation_ticks = 60
@@ -187,7 +309,7 @@ sequenceDiagram
 
 Mira, recuo e animação de recarga deste protótipo são simples; ainda não há mãos articuladas, carregador animado separado, acessórios ou receitas Survival. São recursos para uma possível próxima etapa, não uma substituição completa do TaCZ. O suporte anterior continua disponível quando ele está instalado; cada sistema atua somente em seus próprios itens.
 
-O build gera também **`build/distributions/guerra-ezuberante-0.009.0-sem-tacz/mods/`**, com Guerra Ezuberante e GeckoLib. A GE-P12 não adiciona outro mod na lista. **GeckoLib ainda aparece separadamente**, pois os personagens dependem dele. Para preservar armas já salvas, o perfil normal de desenvolvimento mantém TaCZ; os testes de independência usam um mundo isolado sem ele.
+O build gera também **`build/distributions/guerra-ezuberante-0.011.0-sem-tacz/mods/`**, com Guerra Ezuberante e GeckoLib. A GE-P12 não adiciona outro mod na lista. **GeckoLib ainda aparece separadamente**, pois os personagens dependem dele. Para preservar armas já salvas, o perfil normal de desenvolvimento mantém TaCZ; os testes de independência usam um mundo isolado sem ele.
 
 **Validação executada:** 47 GameTests com TaCZ e 10 próprios sem ele. Os dois cenários gráficos passaram: modelo 3D, ADS/FOV, tiro e dano, som único, recoil, recarga/conservação, gatilho segurado sem rajada e rejeição sem munição. A aba criativa real abriu com 6 itens sem TaCZ e 15 com ele. Multiplayer gráfico entre dois clientes da GE-P12 ainda não foi testado.
 
@@ -242,11 +364,11 @@ Os controles podem ser remapeados no Minecraft. A integração não registra tec
 | Minecraft Java | 1.20.1 | Plataforma |
 | Forge | 47.4.28 | Cliente e servidor |
 | Java | 17 | Jogo e desenvolvimento |
-| Guerra Ezuberante | 0.009.0 | Este mod, inclui menu ilustrado, Renan armado e GE-P12 |
+| Guerra Ezuberante | 0.011.0 | Este mod, inclui menu ilustrado, Renan armado e GE-P12 |
 | GeckoLib | 4.8.4 para Forge 1.20.1 | Personagens e animações existentes |
 | TaCZ | **1.1.8-hotfix2**, arquivo CurseForge **9037989** | Opcional; necessário nos dois lados para usar as cinco armas nativas |
 
-O build prepara os três JARs separados em **`build/distributions/guerra-ezuberante-0.009.0/mods/`** e a alternativa sem TaCZ em **`build/distributions/guerra-ezuberante-0.009.0-sem-tacz/mods/`**. O artefato próprio fica em **`build/libs/guerra_ezuberante-0.009.0.jar`**. Cliente e servidor devem usar o mesmo conjunto. O gunpack padrão já vem no JAR oficial do TaCZ; a GE-P12 não precisa dele.
+O build prepara os três JARs separados em **`build/distributions/guerra-ezuberante-0.011.0/mods/`** e a alternativa sem TaCZ em **`build/distributions/guerra-ezuberante-0.011.0-sem-tacz/mods/`**. O artefato próprio fica em **`build/libs/guerra_ezuberante-0.011.0.jar`**. Cliente e servidor devem usar o mesmo conjunto. O gunpack padrão já vem no JAR oficial do TaCZ; a GE-P12 não precisa dele.
 
 A dependência foi fixada pelo [arquivo oficial publicado em 02/10/2026](https://www.curseforge.com/minecraft/mc-mods/timeless-and-classics-zero/files/9037989), não pelo exemplo antigo 1.1.6 do README do TaCZ. Gradle usa CurseMaven com `fg.deobf`; o pacote local utiliza o JAR original, sem o remapeamento de desenvolvimento. `mods.toml` exige a versão exata. `validateTacz` verifica SHA-256 e os IDs/calibres no gunpack dessa distribuição.
 
@@ -512,7 +634,7 @@ Com comandos habilitados:
 /summon guerra_ezuberante:arthur_do_val_invocador ~4 ~ ~
 ```
 
-O JAR atual fica em **`build/libs/guerra_ezuberante-0.009.0.jar`**. O build prepara **`build/distributions/guerra-ezuberante-0.009.0/mods/`** com o mod, GeckoLib 4.8.4 e TaCZ 1.1.8-hotfix2 originais, separados, e **`build/distributions/guerra-ezuberante-0.009.0-sem-tacz/mods/`** apenas com o mod e GeckoLib. A GE-P12 funciona nos dois conjuntos. Não distribua `.tools/` ou caches, nem instale múltiplas versões do mod juntas.
+O JAR atual fica em **`build/libs/guerra_ezuberante-0.011.0.jar`**. O build prepara **`build/distributions/guerra-ezuberante-0.011.0/mods/`** com o mod, GeckoLib 4.8.4 e TaCZ 1.1.8-hotfix2 originais, separados, e **`build/distributions/guerra-ezuberante-0.011.0-sem-tacz/mods/`** apenas com o mod e GeckoLib. A GE-P12 funciona nos dois conjuntos. Não distribua `.tools/` ou caches, nem instale múltiplas versões do mod juntas.
 
 ### Áudios: entrada, conversão e novas falas
 

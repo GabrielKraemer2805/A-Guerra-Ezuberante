@@ -1,4 +1,23 @@
-# Validação — sprint 0.009.0
+# Validação — 0.011.0
+
+**76 GameTests obrigatórios passaram**, incluindo cinco novos casos de recasts reais da IA, ponto próximo/área final maior, bossbars, migração de vida salva e configurações personalizadas. Intervalos observados entre quatro casts: 121/120/120 ticks. Log `.tools/boss-rift-final-tests.log`. **12 testes sem TaCZ passaram** em `.tools/boss-rift-no-tacz.log`. Build/check/reobf aprovado em `.tools/boss-rift-package.log`; JAR inspecionado sem fixtures ou classes do TaCZ embutidas. [Mudanças e configurações](BOSSES_0.011.md).
+
+**Teste gráfico final aprovado** em perfil isolado e silencioso: duas barras com os nomes/cores pedidos, 300 HP, progressos recebidos de 0,7/0,8, quatro Rachadinhas naturais e retirada das barras na morte/saída de alcance. [Relatório](validacao/boss-0.011/cliente.json); capturas em `docs/preview/boss-0.011/`. Arena mantida carregada e referências resolvidas por UUID corrigiram a fixture inicial. Log final `.tools/boss-rift-visual-loaded.log`. Não houve nova validação de internet pública ou latência.
+
+Os registros abaixo são históricos e preservam o balanceamento e os resultados de cada sprint.
+# Validação — sprint 0.010.0
+
+## Jair, Flávio e Rachadinha
+
+Em 27/10/2026, build/reobf e **71 GameTests obrigatórios passaram**, incluindo os 60 anteriores. Log `.tools/bolsonaro-continuous-release.log`. **12 testes sem TaCZ passaram**, `.tools/bolsonaro-no-tacz-tests.log`. [Entrega, configurações e limites](JAIR_FLAVIO_0.010.md).
+
+Validados: Glock 17 original e munição infinita apenas no NPC, dano/projéteis nativos sem rajadas, linha de tiro/aliados, invocação inicial e cooldown700/limite3, UUID/ledger/remoção dos vinculados, seguimento e defesa reais, ovo independente, fissura com dano6 uma vez, cooldown persistido, windup/parede/declive, terreno estreito e contínuo com profundidade limitada, bedrock, modos ON/OFF, mobGriefing, cancelamento de LivingDestroyBlockEvent e BlockEvent.BreakEvent e morte verde compartilhada com Lula/persistência/explosão única de potência7.
+
+Uma fixture antiga de morte estava sendo inundada por água externa. Auditoria mostrou fonte em waterflow, interação nativa DESTROY_WITH_DECAY e0blocos atingidos, inclusive numa explosão nativa de controle sem entidade. A arena foi movida para altura seca e passou; nenhuma resistência vanilla foi desativada para contornar o teste.
+
+Resultados gráficos, capturas e relatórios da0.010 constam na [documentação da sprint](JAIR_FLAVIO_0.010.md). Os históricos abaixo preservam os resultados anteriores.
+
+**Dois clientes finais aprovados** após a conexão dos cotovelos da fissura:21 tiros medidos com intervalo 20/20;24 eventos cliente no host e24 remotos contando o início da cena; carregador17→17. ModoOFF:12células,6dano,0blocos; modoON:11células,6dano,11blocos. Mesmos IDs de ativação nos clientes, progressão visível, invocação, morte verde e vermelha, subida/ossos e um som de explosão por entidade em ambos. [Host](validacao/bolsonaro-0.010/host.json), [observador](validacao/bolsonaro-0.010/observer.json). Capturas em `docs/preview/bolsonaro-0.010/`.
 
 ## Lula
 

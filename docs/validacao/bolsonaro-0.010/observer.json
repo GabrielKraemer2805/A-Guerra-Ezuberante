@@ -1,0 +1,145 @@
+{
+  "passed": true,
+  "errors": [],
+  "observer": true,
+  "nativeServerShots": [],
+  "nativeServerFires": 0,
+  "nativeHits": 0,
+  "nativeClientShots": 24,
+  "effectIds": [
+    923,
+    860
+  ],
+  "revealedStages": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "ownedAllySeen": true,
+  "greenDeathSeen": true,
+  "redDeathSeen": true,
+  "roseTwoBlocks": true,
+  "curled": true,
+  "deathSounds": 2,
+  "poses": [
+    {
+      "green": 255,
+      "forearmX": 0.34906584,
+      "bodyX": -0.029922815,
+      "age": 0,
+      "y": 101.0,
+      "energy": "green",
+      "red": 204
+    },
+    {
+      "green": 204,
+      "forearmX": 0.0,
+      "bodyX": -0.011170106,
+      "age": 0,
+      "y": 101.0,
+      "energy": "red",
+      "red": 255
+    },
+    {
+      "green": 255,
+      "forearmX": 0.42875776,
+      "bodyX": -0.13841441,
+      "age": 10,
+      "y": 101.0,
+      "energy": "green",
+      "red": 163
+    },
+    {
+      "green": 163,
+      "forearmX": 0.42875776,
+      "bodyX": -0.13841441,
+      "age": 10,
+      "y": 101.0,
+      "energy": "red",
+      "red": 255
+    },
+    {
+      "green": 255,
+      "forearmX": 0.8335266,
+      "bodyX": -0.29850405,
+      "age": 20,
+      "y": 101.73378118040738,
+      "energy": "green",
+      "red": 122
+    },
+    {
+      "green": 122,
+      "forearmX": 0.8335266,
+      "bodyX": -0.29850405,
+      "age": 20,
+      "y": 101.73378118040738,
+      "energy": "red",
+      "red": 255
+    },
+    {
+      "green": 255,
+      "forearmX": 1.3103889,
+      "bodyX": -0.49025115,
+      "age": 30,
+      "y": 102.88697219475276,
+      "energy": "green",
+      "red": 82
+    },
+    {
+      "green": 82,
+      "forearmX": 1.3103889,
+      "bodyX": -0.49025115,
+      "age": 30,
+      "y": 102.88697219475276,
+      "energy": "red",
+      "red": 255
+    },
+    {
+      "green": 255,
+      "forearmX": 1.5460807,
+      "bodyX": -0.754226,
+      "age": 40,
+      "y": 103.0,
+      "energy": "green",
+      "red": 41
+    },
+    {
+      "green": 41,
+      "forearmX": 1.5460807,
+      "bodyX": -0.754226,
+      "age": 40,
+      "y": 103.0,
+      "energy": "red",
+      "red": 255
+    },
+    {
+      "green": 255,
+      "forearmX": 1.746893,
+      "bodyX": -0.98113763,
+      "age": 50,
+      "y": 103.0,
+      "energy": "green",
+      "red": 20
+    },
+    {
+      "green": 20,
+      "forearmX": 1.746893,
+      "bodyX": -0.98113763,
+      "age": 50,
+      "y": 103.0,
+      "energy": "red",
+      "red": 255
+    }
+  ],
+  "server": {}
+}

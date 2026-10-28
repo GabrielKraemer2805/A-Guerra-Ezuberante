@@ -15,15 +15,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
-public final class LulaEntity extends RetaliatingCharacterEntity {
-    public static final int ALIVE=0,DYING=1,EXPLODED=2,THROW_INTERVAL=40,THROW_RELEASE=8,THROW_LENGTH=18;
-    private static final EntityDataAccessor<Integer> DEATH_STATE=SynchedEntityData.defineId(LulaEntity.class,EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Integer> DEATH_ELAPSED=SynchedEntityData.defineId(LulaEntity.class,EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Integer> DEATH_DURATION=SynchedEntityData.defineId(LulaEntity.class,EntityDataSerializers.INT);
+public final class LulaEntity extends SpecialDeathEntity {
+    public static final int THROW_INTERVAL=40,THROW_RELEASE=8,THROW_LENGTH=18;
     private static final EntityDataAccessor<Long> THROW_START=SynchedEntityData.defineId(LulaEntity.class,EntityDataSerializers.LONG);
-    private Vec3 deathOrigin=Vec3.ZERO;
-    private float deathRise=2,deathPower=7;
-    private boolean explosionEnabled=true,blockDamage=true;
     private long nextThrow;
     private LivingEntity pendingBean;
     public LulaEntity(EntityType<? extends LulaEntity> type,Level level){
@@ -34,15 +28,10 @@ public final class LulaEntity extends RetaliatingCharacterEntity {
             .add(Attributes.MAX_HEALTH,ModConfig.LULA_HEALTH.getDefault()).add(Attributes.ATTACK_DAMAGE,4)
             .add(Attributes.MOVEMENT_SPEED,.23).add(Attributes.FOLLOW_RANGE,20);}
     @Override protected float getStandingEyeHeight(Pose pose,EntityDimensions dimensions){return 1.62F;}
-    @Override protected void defineSynchedData(){super.defineSynchedData();entityData.define(DEATH_STATE,ALIVE);entityData.define(DEATH_ELAPSED,0);
-        entityData.define(DEATH_DURATION,60);entityData.define(THROW_START,-1000L);}
-    public int deathState(){return entityData.get(DEATH_STATE);}
-    public int deathElapsed(){return entityData.get(DEATH_ELAPSED);}
-    public int deathDuration(){return entityData.get(DEATH_DURATION);}
-    public float deathAnimationAge(float partialTick){return Mth.clamp((deathElapsed()+partialTick)*60F/deathDuration(),0,60);}
+    @Override protected void defineSynchedData(){super.defineSynchedData();entityData.define(THROW_START,-1000L);}
     public float throwAge(float partialTick){return level().getGameTime()-entityData.get(THROW_START)+partialTick;}
     public long throwToken(){return entityData.get(THROW_START);}
-    @Override public boolean isActionLocked(){return deathState()!=ALIVE;}
+
     @Override protected boolean allowsMeleeCombat(){return false;}
     @Override protected List<ModSounds.VoiceLine> interactionVoices(){return List.of();}
     @Override public List<MusicTrack> musicTracks(){return CharacterAudio.LULA;}
@@ -78,59 +67,16 @@ public final class LulaEntity extends RetaliatingCharacterEntity {
         super.tick();
         if(!level().isClientSide && deathState()==ALIVE && pendingBean!=null && throwAge(0)>=THROW_RELEASE)releaseBean();
     }
-    @Override public boolean hurt(DamageSource source,float amount){return deathState()==ALIVE && super.hurt(source,amount);}
-    @Override public void die(DamageSource source){
-        if(level().isClientSide || deathState()!=ALIVE || dead)return;
-        // Let vanilla/Forge process the lethal damage and LivingDeathEvent exactly once.
-        super.die(source);
-        if(!dead)return; // A Forge death-protection hook cancelled the death.
-        entityData.set(DEATH_STATE,DYING);entityData.set(DEATH_ELAPSED,0);
-        entityData.set(DEATH_DURATION,ModConfig.LULA_DEATH_TICKS.get());
-        deathOrigin=position();deathRise=ModConfig.LULA_RISE.get().floatValue();deathPower=ModConfig.LULA_EXPLOSION_POWER.get().floatValue();
-        explosionEnabled=ModConfig.LULA_EXPLOSION_ENABLED.get();blockDamage=ModConfig.LULA_BLOCK_DAMAGE.get();
-        pendingBean=null;cancelStrike();setTarget(null);getNavigation().stop();setNoAi(true);setNoGravity(true);setDeltaMovement(Vec3.ZERO);
-        musicSession().stop();deathTime=0;
-    }
-    @Override protected void tickDeath(){
-        deathTime=0; // Renderer/controller owns the cinematic pose; no vanilla falling/removal after 20 ticks.
-        if(level().isClientSide)return;
-        if(deathState()==ALIVE){die(level().damageSources().generic());return;}
-        if(deathState()!=DYING)return;
-        int elapsed=deathElapsed()+1;entityData.set(DEATH_ELAPSED,elapsed);
-        double progress=Mth.clamp((elapsed/(double)deathDuration()-.1666667)/.3333333,0,1);
-        progress=progress*progress*(3-2*progress);
-        setPos(deathOrigin.x,deathOrigin.y+deathRise*progress,deathOrigin.z);setDeltaMovement(Vec3.ZERO);
-        if(level() instanceof ServerLevel server && elapsed%3==0) {
-            server.sendParticles(new DustParticleOptions(new org.joml.Vector3f(1,.035F,.025F),1.1F),getX(),getY()+.85,getZ(),
-                    elapsed*6>=deathDuration()*5?12:4,.3,.45,.3,.01);
-        }
-        if(elapsed>=deathDuration())finishDeath();
-    }
-    private void finishDeath(){
-        if(deathState()!=DYING)return;
-        // Mark before calling the engine: re-entrant damage, chain deaths and saving cannot trigger a second blast.
-        entityData.set(DEATH_STATE,EXPLODED);
-        try {
-            if(explosionEnabled)level().explode(this,getX(),getY()+.9,getZ(),deathPower,false,
-                    blockDamage?Level.ExplosionInteraction.MOB:Level.ExplosionInteraction.NONE);
-        }finally{discard();}
-    }
-    @Override public boolean isPushable(){return deathState()==ALIVE && super.isPushable();}
+    @Override protected String deathSavePrefix(){return "Lula";}
+    @Override protected double configuredMaxHealth(){return ModConfig.LULA_HEALTH.get();}
+    @Override protected DeathSettings deathSettings(){return new DeathSettings(ModConfig.LULA_EXPLOSION_ENABLED.get(),
+            ModConfig.LULA_EXPLOSION_POWER.get().floatValue(),ModConfig.LULA_DEATH_TICKS.get(),ModConfig.LULA_RISE.get().floatValue(),ModConfig.LULA_BLOCK_DAMAGE.get());}
+    @Override protected void onSpecialDeathStart(){pendingBean=null;}
     @Override public void addAdditionalSaveData(CompoundTag tag){
-        super.addAdditionalSaveData(tag);tag.putInt("LulaDeathState",deathState());tag.putInt("LulaDeathElapsed",deathElapsed());
-        tag.putInt("LulaDeathDuration",deathDuration());tag.putDouble("LulaOriginX",deathOrigin.x);tag.putDouble("LulaOriginY",deathOrigin.y);tag.putDouble("LulaOriginZ",deathOrigin.z);
-        tag.putFloat("LulaRise",deathRise);tag.putFloat("LulaPower",deathPower);tag.putBoolean("LulaExplosion",explosionEnabled);tag.putBoolean("LulaBlockDamage",blockDamage);
-        tag.putInt("LulaThrowRemaining",(int)Mth.clamp(nextThrow-level().getGameTime(),0,THROW_INTERVAL));
+        super.addAdditionalSaveData(tag);tag.putInt("LulaThrowRemaining",(int)Mth.clamp(nextThrow-level().getGameTime(),0,THROW_INTERVAL));
     }
     @Override public void readAdditionalSaveData(CompoundTag tag){
-        super.readAdditionalSaveData(tag);int state=Mth.clamp(tag.getInt("LulaDeathState"),ALIVE,EXPLODED);entityData.set(DEATH_STATE,state);
-        int duration=Mth.clamp(tag.getInt("LulaDeathDuration"),20,200);entityData.set(DEATH_DURATION,duration);
-        entityData.set(DEATH_ELAPSED,Mth.clamp(tag.getInt("LulaDeathElapsed"),0,duration));
-        deathOrigin=new Vec3(tag.getDouble("LulaOriginX"),tag.getDouble("LulaOriginY"),tag.getDouble("LulaOriginZ"));
-        deathRise=Mth.clamp(tag.getFloat("LulaRise"),0,8);deathPower=Mth.clamp(tag.getFloat("LulaPower"),0,16);
-        explosionEnabled=tag.getBoolean("LulaExplosion");blockDamage=tag.getBoolean("LulaBlockDamage");
-        nextThrow=level().getGameTime()+Mth.clamp(tag.getInt("LulaThrowRemaining"),0,THROW_INTERVAL);pendingBean=null;
-        if(state!=ALIVE){dead=true;setHealth(0);setNoAi(true);setNoGravity(true);deathTime=0;}
+        super.readAdditionalSaveData(tag);nextThrow=level().getGameTime()+Mth.clamp(tag.getInt("LulaThrowRemaining"),0,THROW_INTERVAL);pendingBean=null;
     }
     @Override public void registerControllers(software.bernie.geckolib.core.animation.AnimatableManager.ControllerRegistrar controllers){
         controllers.add(new io.github.omarflk.guerraezuberante.animation.LulaAnimationController(this));

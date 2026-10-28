@@ -1,0 +1,41 @@
+{
+  "health": 300,
+  "labels": [
+    "Jair Bolsonaro: GREEN",
+    "Lula: RED"
+  ],
+  "receivedProgress": [
+    "GREEN\u003d0.7",
+    "RED\u003d0.8"
+  ],
+  "serverHealth": [
+    210.0,
+    240.0
+  ],
+  "progress": [
+    0.7,
+    0.8
+  ],
+  "targetRemainingHp": 928.0,
+  "deathAndUntrackingCleanup": true,
+  "passed": true,
+  "riftIds": [
+    247,
+    390,
+    435,
+    441
+  ],
+  "castTokens": [
+    207540,
+    207661,
+    207781,
+    207901
+  ],
+  "captures": [
+    "full-health",
+    "damaged-health",
+    "final-impact",
+    "repeated-combat",
+    "red-bar-removed"
+  ]
+}

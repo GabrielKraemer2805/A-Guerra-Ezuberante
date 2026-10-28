@@ -14,30 +14,32 @@ import net.minecraftforge.fml.LogicalSide;
 public final class TaczNpcWeapon {
     public static boolean equipped(LivingEntity owner) {
         var gun=IGun.getIGunOrNull(owner.getMainHandItem());
-        return gun!=null && gun.getGunId(owner.getMainHandItem()).equals(Arsenal.AKM.gunId());
+        var expected=owner instanceof io.github.omarflk.guerraezuberante.entity.JairBolsonaroEntity?Arsenal.GLOCK:Arsenal.AKM;
+        return gun!=null && gun.getGunId(owner.getMainHandItem()).equals(expected.gunId());
     }
-    public static void equip(RenanSantosEntity owner) {
+    public static void equip(LivingEntity owner) {
         if(equipped(owner) || !owner.getMainHandItem().isEmpty())return;
-        ItemStack stack=Arsenal.createGun(Arsenal.AKM);
+        ItemStack stack=Arsenal.createGun(owner instanceof io.github.omarflk.guerraezuberante.entity.JairBolsonaroEntity?Arsenal.GLOCK:Arsenal.AKM);
         if(stack.isEmpty())return;
         // Normal native stack. Unlimited ammo is a property of the Renan operator, never the item.
         IGun.getIGunOrNull(stack).setFireMode(stack,FireMode.SEMI);
-        owner.setItemSlot(EquipmentSlot.MAINHAND,stack);owner.setDropChance(EquipmentSlot.MAINHAND,0);
+        owner.setItemSlot(EquipmentSlot.MAINHAND,stack);if(owner instanceof net.minecraft.world.entity.Mob mob)mob.setDropChance(EquipmentSlot.MAINHAND,0);
         IGunOperator.fromLivingEntity(owner).draw(owner::getMainHandItem);
     }
-    public static void prepare(RenanSantosEntity owner,boolean aim) {
+    public static void prepare(LivingEntity owner,boolean aim) {
         if(!equipped(owner))return;
         var operator=IGunOperator.fromLivingEntity(owner);
         if(operator.getDataHolder().currentGunItem==null)operator.draw(owner::getMainHandItem);
         if(operator.getDataHolder().isAiming!=aim)operator.aim(aim);
     }
-    public static boolean fire(RenanSantosEntity owner) {
+    public static boolean fire(LivingEntity owner) {
         if(!equipped(owner))return false;
         var operator=IGunOperator.fromLivingEntity(owner);
         return operator.shoot(owner::getXRot,owner::getYRot)==ShootResult.SUCCESS;
     }
     @SubscribeEvent public static void protectAllies(com.tacz.guns.api.event.common.EntityHurtByGunEvent.Pre event) {
-        if(event.getLogicalSide()==LogicalSide.SERVER && event.getAttacker() instanceof RenanSantosEntity renan
+        var renan=event.getAttacker();
+        if(event.getLogicalSide()==LogicalSide.SERVER && event.getAttacker() instanceof io.github.omarflk.guerraezuberante.combat.NpcGunUser
                 && event.getHurtEntity()!=null && (renan.isAlliedTo(event.getHurtEntity()) || event.getHurtEntity().isAlliedTo(renan)))event.setCanceled(true);
     }
     private TaczNpcWeapon() {}

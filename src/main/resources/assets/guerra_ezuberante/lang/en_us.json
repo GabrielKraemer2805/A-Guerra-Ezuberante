@@ -100,7 +100,19 @@
     "subtitles.guerra_ezuberante.lula.feijao_puro":  "Lula — recording: feijao puro",
     "item.guerra_ezuberante.semente_feijao":  "Bean seed",
     "entity.guerra_ezuberante.semente_feijao":  "Bean seed",
-    "gui.guerra_ezuberante.lula_details":  "Default health: 30 HP. Neutral until provoked. Articulated belly and original skin.",
+    "gui.guerra_ezuberante.lula_details":  "Default health: 300 HP, matching the Wither. Red boss bar: Lula. Neutral until provoked. Articulated belly and original skin.",
     "item.guerra_ezuberante.lula_spawn_egg":  "Lula Spawn Egg",
-    "gui.guerra_ezuberante.lula_combat":  "Physical bean: 6 damage every 2 s. Death: turns red, rises 2 blocks and curls for 3 s before exploding. Power 7; configurable block damage."
+    "gui.guerra_ezuberante.lula_combat":  "Physical bean: 6 damage every 2 s. Death: turns red, rises 2 blocks and curls for 3 s before exploding. Power 7; configurable block damage.",
+    "gui.guerra_ezuberante.character_tab.5":  "Jair",
+    "gui.guerra_ezuberante.jair_details":  "Default health: 300 HP, matching the Wither. Green boss bar: Jair Bolsonaro. Bolsonarista faction. Neutral until provoked. Native TaCZ Glock 17; unarmed fallback without TaCZ.",
+    "item.guerra_ezuberante.jair_bolsonaro_spawn_egg":  "Jair Bolsonaro Spawn Egg",
+    "entity.guerra_ezuberante.flavio_bolsonaro":  "Flávio Bolsonaro",
+    "gui.guerra_ezuberante.bolsonaro_implemented":  "Jair: Glock and Bolsonaro Dynasty. Flávio: terrain-following Rachadinha fissure. Jair and Flávio are allies; no automatic aggression towards players.",
+    "entity.guerra_ezuberante.rachadinha":  "Rachadinha",
+    "entity.guerra_ezuberante.jair_bolsonaro":  "Jair Bolsonaro",
+    "gui.guerra_ezuberante.flavio_details":  "Default health: 30 HP. Bolsonarista faction. Independent from egg; summoned units follow and defend their Jair. Summons vanish when their owner dies.",
+    "gui.guerra_ezuberante.flavio_combat":  "Recurring Rachadinha: 10 damage per activation, 6 s cooldown. Final impact radius: 2.25 blocks, with a larger explosion effect. Punches between abilities; protects allies. Configurable narrow excavation.",
+    "item.guerra_ezuberante.flavio_bolsonaro_spawn_egg":  "Flávio Bolsonaro Spawn Egg",
+    "gui.guerra_ezuberante.character_tab.6":  "Flávio",
+    "gui.guerra_ezuberante.jair_combat":  "One shot per 20 ticks. Bolsonaro Dynasty: summons one Flávio in combat, 35 s cooldown, limit 3. Green death: rises 2 blocks over 3 s and explodes at power 7. Configurable values."
 }

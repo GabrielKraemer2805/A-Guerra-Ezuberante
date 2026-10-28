@@ -13,6 +13,13 @@ import net.minecraftforge.registries.RegistryObject;
 public final class ModEntities {
     public static final DeferredRegister<EntityType<?>> REGISTER =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, GuerraEzuberanteMod.MOD_ID);
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.JairBolsonaroEntity>> JAIR_BOLSONARO=REGISTER.register("jair_bolsonaro",
+            ()->EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.JairBolsonaroEntity::new,MobCategory.CREATURE).sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":jair_bolsonaro"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.FlavioBolsonaroEntity>> FLAVIO_BOLSONARO=REGISTER.register("flavio_bolsonaro",
+            ()->EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.FlavioBolsonaroEntity::new,MobCategory.CREATURE).sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":flavio_bolsonaro"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.RachadinhaEntity>> RACHADINHA=REGISTER.register("rachadinha",
+            ()->EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.RachadinhaEntity>of(io.github.omarflk.guerraezuberante.entity.RachadinhaEntity::new,MobCategory.MISC)
+                    .sized(1,.1F).clientTrackingRange(8).updateInterval(1).noSave().noSummon().build(GuerraEzuberanteMod.MOD_ID+":rachadinha"));
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.LulaEntity>> LULA = REGISTER.register(
             "lula", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.LulaEntity::new, MobCategory.CREATURE)
                     .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":lula"));

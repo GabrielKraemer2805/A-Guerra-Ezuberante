@@ -60,7 +60,7 @@ public final class LulaGameTests {
         var p=arena(h,24);var egg=(net.minecraftforge.common.ForgeSpawnEggItem)ModItems.LULA_SPAWN_EGG.get();
         var e=(LulaEntity)egg.getType(null).spawn(h.getLevel(),new net.minecraft.world.item.ItemStack(egg),null,BlockPos.containing(p),MobSpawnType.SPAWN_EGG,false,false);
         var c=cow(h,p.add(0,0,8));
-        h.assertTrue(e!=null && e.getHealth()==30 && e.musicTracks().size()==4,"Egg, attributes or audio library wrong");
+        h.assertTrue(e!=null && e.getHealth()==300 && e.musicTracks().size()==4,"Egg, attributes or audio library wrong");
         h.assertTrue(e.musicTracks().stream().allMatch(t->t.available()),"Missing Lula OGG");
         h.assertTrue(e.musicSession().interact() && !e.musicSession().interact(),"Playlist/click debounce failed");
         h.runAfterDelay(40,()->{h.assertTrue(e.getTarget()==null && c.getHealth()==1024,"Unprovoked attack");e.discard();c.discard();h.succeed();});
@@ -92,11 +92,12 @@ public final class LulaGameTests {
         var board=h.getLevel().getScoreboard();var team=board.addPlayerTeam("lula_"+e.getId());
         board.addPlayerToTeam(e.getScoreboardName(),team);board.addPlayerToTeam(ally.getScoreboardName(),team);
         var bean=new BeanProjectile(h.getLevel(),e);bean.setPos(p.add(0,.6,0));bean.setNoGravity(true);bean.setDeltaMovement(0,0,1);h.getLevel().addFreshEntity(bean);
-        h.runAfterDelay(20,()->{h.assertTrue(e.getHealth()==30 && ally.getHealth()==1024 && enemy.getHealth()==1018,"Bean hit owner/ally or missed enemy");
+        h.runAfterDelay(20,()->{h.assertTrue(e.getHealth()==300 && ally.getHealth()==1024 && enemy.getHealth()==1018,"Bean hit owner/ally or missed enemy");
             board.removePlayerTeam(team);e.discard();ally.discard();enemy.discard();h.succeed();});
     }
     @GameTest(template="empty",batch="lula_death",timeoutTicks=650) public static void cinematicPersistenceGriefingAndChains(GameTestHelper h){
-        var p=arena(h,100);var e=lula(h,p);e.musicSession().interact();lethal(h,e,true,false);
+        // Sky arena, above water fixtures from unrelated tests in the shared test world.
+        var p=arena(h,220);var e=lula(h,p);e.musicSession().interact();lethal(h,e,true,false);
         h.assertTrue(e.deathState()==LulaEntity.DYING && e.musicTrackIndex()==-1,"Death did not stop attacks/audio");
         h.assertTrue(!e.hurt(h.getLevel().damageSources().genericKill(),1000),"Dying Lula accepted repeated damage");
         h.runAfterDelay(31,()->{
@@ -118,18 +119,28 @@ public final class LulaGameTests {
     private static void griefing(GameTestHelper h,Vec3 p,boolean grief,Runnable next){
         boolean old=h.getLevel().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
         h.getLevel().getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,h.getLevel().getServer());
-        var block=BlockPos.containing(p.add(1,2,0));h.getLevel().setBlockAndUpdate(block,Blocks.DIRT.defaultBlockState());var e=lula(h,p);lethal(h,e,true,true);
+        // Native explosion rays are probabilistic. Check the behavior of a small exposed ring,
+        // rather than require one particular voxel to be selected by a ray on every run.
+        var blocks=new ArrayList<BlockPos>();
+        for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)if(x!=0 || z!=0){
+            var block=BlockPos.containing(p.add(x,2,z));blocks.add(block);h.getLevel().setBlockAndUpdate(block,Blocks.DIRT.defaultBlockState());
+        }
+        var e=lula(h,p);lethal(h,e,true,true);
+        h.runAfterDelay(30,()->h.assertTrue(h.getLevel().getFluidState(BlockPos.containing(p.add(0,2.9,0))).isEmpty(),"Death arena was flooded by another fixture"));
         h.runAfterDelay(64,()->{
             h.getLevel().getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(old,h.getLevel().getServer());
             h.assertTrue(e.isRemoved() && blasts.getOrDefault(e.getUUID(),0)==1,"Missing griefing explosion");
-            h.assertTrue(h.getLevel().getBlockState(block).is(Blocks.DIRT)!=grief,"mobGriefing mismatch: "+grief);next.run();
+            long preserved=blocks.stream().filter(b->h.getLevel().getBlockState(b).is(Blocks.DIRT)).count();
+            h.assertTrue(grief?preserved<blocks.size():preserved==blocks.size(),"mobGriefing mismatch: "+grief+" preserved="+preserved);
+            System.out.println("LULA_GRIEF: enabled="+grief+" preserved="+preserved+"/"+blocks.size());next.run();
         });
     }
     private static void disabledAndChain(GameTestHelper h,Vec3 p){
+        arena(h,220);
         var disabled=lula(h,p);lethal(h,disabled,false,false);
         h.runAfterDelay(64,()->{
             h.assertTrue(disabled.isRemoved() && blasts.getOrDefault(disabled.getUUID(),0)==0,"Disabled explosion still ran");
-            var first=lula(h,p);var second=lula(h,p.add(1,2,0));second.setNoGravity(true);second.setNoAi(true);lethal(h,first,true,false);
+            var first=lula(h,p);var second=lula(h,p.add(1,2,0));second.setHealth(20);second.setNoGravity(true);second.setNoAi(true);lethal(h,first,true,false);
             h.runAfterDelay(64,()->h.assertTrue(first.isRemoved() && !second.isRemoved() && second.deathState()==LulaEntity.DYING,"Chain must start another delayed death"));
             h.runAfterDelay(128,()->{h.assertTrue(second.isRemoved() && blasts.getOrDefault(first.getUUID(),0)==1 && blasts.getOrDefault(second.getUUID(),0)==1,"Chain duplicated/missed explosion");
                 var guarded=lula(h,p);var witness=cow(h,p.add(0,2,3));protectedBlasts.add(guarded.getUUID());lethal(h,guarded,true,true);

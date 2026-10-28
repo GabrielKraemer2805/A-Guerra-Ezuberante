@@ -20,6 +20,8 @@ public final class GuerraEzuberanteMod {
 
     public GuerraEzuberanteMod() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        bus.addListener(io.github.omarflk.guerraezuberante.config.ConfigMigrations::loading);
+        bus.addListener(io.github.omarflk.guerraezuberante.config.ConfigMigrations::reloading);
         ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, ModConfig.SPEC);
         ModEntities.REGISTER.register(bus);
         ModItems.REGISTER.register(bus);
@@ -32,6 +34,8 @@ public final class GuerraEzuberanteMod {
 
     private void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(ModEntities.LULA.get(), io.github.omarflk.guerraezuberante.entity.LulaEntity.createAttributes().build());
+        event.put(ModEntities.JAIR_BOLSONARO.get(),io.github.omarflk.guerraezuberante.entity.JairBolsonaroEntity.createAttributes().build());
+        event.put(ModEntities.FLAVIO_BOLSONARO.get(),io.github.omarflk.guerraezuberante.entity.FlavioBolsonaroEntity.createAttributes().build());
         event.put(ModEntities.RENAN_SANTOS.get(), RenanSantosEntity.createAttributes().build());
         event.put(ModEntities.ARTHUR_DO_VAL.get(), ArthurDoValEntity.createAttributes().build());
         event.put(ModEntities.ARTHUR_COMBATENTE.get(), ArthurDoValEntity.createAttributes().build());

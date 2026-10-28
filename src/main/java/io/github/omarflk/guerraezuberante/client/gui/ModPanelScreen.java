@@ -93,19 +93,19 @@ public final class ModPanelScreen extends Screen {
             case CHARACTERS -> {
                 int gap = 4;
                 int buttonWidth = (width - contentX - 24 - gap) / 2;
-                for (int index = 0; index < 5; index++) {
+                for (int index = 0; index < 7; index++) {
                     int selected = index;
                     addRenderableWidget(Button.builder(Component.translatable("gui.guerra_ezuberante.character_tab." + index),
                             ignored -> minecraft.setScreen(new ModPanelScreen(parent, selected)))
                             .bounds(contentX + (index % 2) * (buttonWidth + gap), 66 + (index / 2) * 24, buttonWidth, 20).build())
                             .active = characterSelected != index;
                 }
-                contentTop = 142;
+                contentTop = 166;
                 String character = characterSelected == 0 ? "renan" : characterSelected == 1 ? "arthur_fighter"
-                        : characterSelected == 2 ? "arthur_summoner" : characterSelected == 3 ? "ucraniana" : "lula";
+                        : characterSelected == 2 ? "arthur_summoner" : characterSelected == 3 ? "ucraniana" : characterSelected == 4 ? "lula" : characterSelected == 5 ? "jair" : "flavio";
                 String entityId = characterSelected == 0 ? "renan_santos"
                         : characterSelected == 1 ? "arthur_do_val_combatente"
-                        : characterSelected == 2 ? "arthur_do_val_invocador" : characterSelected == 3 ? "combatente_ucraniana" : "lula";
+                        : characterSelected == 2 ? "arthur_do_val_invocador" : characterSelected == 3 ? "combatente_ucraniana" : characterSelected == 4 ? "lula" : characterSelected == 5 ? "jair_bolsonaro" : "flavio_bolsonaro";
                 paragraph(textWidth, "entity.guerra_ezuberante." + entityId);
                 paragraph(textWidth, "gui.guerra_ezuberante." + character + "_details");
                 List<ModSounds.VoiceLine> voices = characterSelected == 0 ? java.util.List.of(ModSounds.RENAN_VOICES.get(0), ModSounds.RENAN_PHONK, ModSounds.RENAN_VOICES.get(1))
@@ -123,7 +123,9 @@ public final class ModPanelScreen extends Screen {
                             : characterSelected == 1 ? ModEntities.ARTHUR_COMBATENTE.get().create(minecraft.level)
                             : characterSelected == 2 ? ModEntities.ARTHUR_INVOCADOR.get().create(minecraft.level)
                             : characterSelected == 3 ? ModEntities.UKRAINIAN_FIGHTER.get().create(minecraft.level)
-                            : ModEntities.LULA.get().create(minecraft.level);
+                            : characterSelected == 4 ? ModEntities.LULA.get().create(minecraft.level)
+                            : characterSelected == 5 ? ModEntities.JAIR_BOLSONARO.get().create(minecraft.level)
+                            : ModEntities.FLAVIO_BOLSONARO.get().create(minecraft.level);
                 }
             }
             case FACTIONS -> {
@@ -136,6 +138,7 @@ public final class ModPanelScreen extends Screen {
                 paragraph(textWidth, "gui.guerra_ezuberante.abilities_notice");
                 paragraph(textWidth, "gui.guerra_ezuberante.basic_combat_implemented");
                 paragraph(textWidth, "gui.guerra_ezuberante.ukrainian_army_implemented");
+                paragraph(textWidth, "gui.guerra_ezuberante.bolsonaro_implemented");
                 for (String ability : List.of("me_respeita", "arthur", "chad", "cavalaria", "moggador")) {
                     paragraph(textWidth, "gui.guerra_ezuberante.ability." + ability);
                 }

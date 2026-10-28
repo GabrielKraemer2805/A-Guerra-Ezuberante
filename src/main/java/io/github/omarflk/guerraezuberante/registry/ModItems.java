@@ -12,6 +12,8 @@ import net.minecraftforge.registries.RegistryObject;
 public final class ModItems {
     public static final DeferredRegister<Item> REGISTER =
             DeferredRegister.create(ForgeRegistries.ITEMS, GuerraEzuberanteMod.MOD_ID);
+    public static final RegistryObject<Item> JAIR_SPAWN_EGG=REGISTER.register("jair_bolsonaro_spawn_egg",()->new ForgeSpawnEggItem(ModEntities.JAIR_BOLSONARO,0x153926,0xE9C92F,new Item.Properties()));
+    public static final RegistryObject<Item> FLAVIO_SPAWN_EGG=REGISTER.register("flavio_bolsonaro_spawn_egg",()->new ForgeSpawnEggItem(ModEntities.FLAVIO_BOLSONARO,0x4E8BC1,0x243751,new Item.Properties()));
     public static final RegistryObject<Item> LULA_SPAWN_EGG = REGISTER.register("lula_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.LULA,0xB71C26,0xD8D9D2,new Item.Properties()));
     public static final RegistryObject<Item> BEAN = REGISTER.register("semente_feijao", () -> new Item(new Item.Properties()));

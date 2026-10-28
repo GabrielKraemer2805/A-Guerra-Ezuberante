@@ -29,4 +29,16 @@ public final class TaczIntegration {
         return ModList.get().isLoaded("tacz") && TaczNpcWeapon.fire(owner);
     }
     private TaczIntegration() {}
+    public static boolean jairArmed(net.minecraft.world.entity.LivingEntity owner){
+        return ModList.get().isLoaded("tacz") && TaczNpcWeapon.equipped(owner);
+    }
+    public static void equipJair(io.github.omarflk.guerraezuberante.entity.JairBolsonaroEntity owner){
+        if(ModList.get().isLoaded("tacz"))TaczNpcWeapon.equip(owner);
+    }
+    public static void aimJair(io.github.omarflk.guerraezuberante.entity.JairBolsonaroEntity owner,boolean aim){
+        if(ModList.get().isLoaded("tacz"))TaczNpcWeapon.prepare(owner,aim);
+    }
+    public static boolean fireJair(io.github.omarflk.guerraezuberante.entity.JairBolsonaroEntity owner){
+        return ModList.get().isLoaded("tacz") && TaczNpcWeapon.fire(owner);
+    }
 }

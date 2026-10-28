@@ -100,7 +100,19 @@
     "subtitles.guerra_ezuberante.lula.feijao_puro":  "Lula — gravação: feijao puro",
     "item.guerra_ezuberante.semente_feijao":  "Semente de feijão",
     "entity.guerra_ezuberante.semente_feijao":  "Semente de feijão",
-    "gui.guerra_ezuberante.lula_details":  "Vida padrão: 30 HP. Neutro até ser provocado. Barriga articulada e skin original.",
+    "gui.guerra_ezuberante.lula_details":  "Vida padrão: 300 HP, igual ao Wither. Barra de boss vermelha: Lula. Neutro até ser provocado. Barriga articulada e skin original.",
     "item.guerra_ezuberante.lula_spawn_egg":  "Ovo — Lula",
-    "gui.guerra_ezuberante.lula_combat":  "Feijão físico: 6 de dano a cada 2 s. Morte: fica vermelho, levita 2 blocos e se contrai por 3 s antes de explodir. Potência 7; dano a blocos configurável."
+    "gui.guerra_ezuberante.lula_combat":  "Feijão físico: 6 de dano a cada 2 s. Morte: fica vermelho, levita 2 blocos e se contrai por 3 s antes de explodir. Potência 7; dano a blocos configurável.",
+    "gui.guerra_ezuberante.character_tab.5":  "Jair",
+    "gui.guerra_ezuberante.jair_details":  "Vida padrão: 300 HP, igual ao Wither. Barra de boss verde: Jair Bolsonaro. Facção Bolsonarista. Neutro até ser provocado. Glock 17 nativa do TaCZ; sem TaCZ, luta desarmado.",
+    "item.guerra_ezuberante.jair_bolsonaro_spawn_egg":  "Ovo — Jair Bolsonaro",
+    "entity.guerra_ezuberante.flavio_bolsonaro":  "Flávio Bolsonaro",
+    "gui.guerra_ezuberante.bolsonaro_implemented":  "Jair: Glock e Dinastia Bolsonaro. Flávio: Rachadinha com propagação pelo terreno. Jair e Flávio são aliados; não há agressão automática a jogadores.",
+    "entity.guerra_ezuberante.rachadinha":  "Rachadinha",
+    "entity.guerra_ezuberante.jair_bolsonaro":  "Jair Bolsonaro",
+    "gui.guerra_ezuberante.flavio_details":  "Vida padrão: 30 HP. Facção Bolsonarista. Independente por ovo; se invocado, segue e defende seu Jair. Invocações desaparecem após a morte do dono.",
+    "gui.guerra_ezuberante.flavio_combat":  "Rachadinha recorrente: 10 de dano por ativação, recarga de 6 s. Impacto final com raio de 2,25 blocos e explosão visual maior. Soco entre habilidades; protege aliados. Escavação estreita configurável.",
+    "item.guerra_ezuberante.flavio_bolsonaro_spawn_egg":  "Ovo — Flávio Bolsonaro",
+    "gui.guerra_ezuberante.character_tab.6":  "Flávio",
+    "gui.guerra_ezuberante.jair_combat":  "Um tiro a cada 20 ticks. Dinastia Bolsonaro: invoca um Flávio em combate, intervalo 35 s, limite 3. Morte verde: levita 2 blocos por 3 s e explode com potência 7. Valores configuráveis."
 }

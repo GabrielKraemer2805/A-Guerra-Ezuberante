@@ -33,6 +33,9 @@ public final class GenerateGeckoAssets {
         bones.add(b);
     }
     static void model() throws Exception {
+        model(true);
+    }
+    static void model(boolean writeOutput) throws Exception {
         bone("root",null,vec(0,0,0),List.of());
         bone("body","root",vec(0,12,0),List.of());
         bone("torso","body",vec(0,12,0),List.of(cube(-4,12,-2,8,12,4,16,16,0,12,0),cube(-4,12,-2,8,12,4,16,32,0,12,.25)));
@@ -43,7 +46,7 @@ public final class GenerateGeckoAssets {
         limb("left_leg",0,0,16,48,0,48,"left_shin",12);
         bone("right_hand","right_forearm",vec(-6,12,0),List.of());
         bone("left_hand","left_forearm",vec(6,12,0),List.of());
-        write("geo/humanoid.geo.json",map("format_version","1.12.0","minecraft:geometry",List.of(
+        if(writeOutput)write("geo/humanoid.geo.json",map("format_version","1.12.0","minecraft:geometry",List.of(
                 map("description",map("identifier","geometry.guerra.humanoid","texture_width",64,"texture_height",64,
                         "visible_bounds_width",4,"visible_bounds_height",5,"visible_bounds_offset",vec(0,1,0)),"bones",bones))));
     }

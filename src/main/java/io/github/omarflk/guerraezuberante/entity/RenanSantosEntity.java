@@ -10,7 +10,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-public class RenanSantosEntity extends RetaliatingCharacterEntity {
+public class RenanSantosEntity extends RetaliatingCharacterEntity implements io.github.omarflk.guerraezuberante.combat.NpcGunUser {
     public RenanSantosEntity(EntityType<? extends RenanSantosEntity> type, Level level) {
         super(type, level);
         if (!level.isClientSide) io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.equipRenan(this);
@@ -29,6 +29,8 @@ public class RenanSantosEntity extends RetaliatingCharacterEntity {
         super.defineSynchedData();entityData.define(SHOT_START,-1000L);entityData.define(AIM_START,-1000L);entityData.define(AIMING,false);
     }
     public boolean isArmed() { return io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.renanArmed(this); }
+    @Override public void setGunAiming(boolean aim){setRifleAiming(aim);}
+    @Override public boolean tryGunShot(){return tryRifleShot();}
     public boolean isRifleAiming() { return entityData.get(AIMING); }
     public float rifleShotAge(float partialTick) { return level().getGameTime()-entityData.get(SHOT_START)+partialTick; }
     public float rifleAimAge(float partialTick) { return level().getGameTime()-entityData.get(AIM_START)+partialTick; }
@@ -53,15 +55,7 @@ public class RenanSantosEntity extends RetaliatingCharacterEntity {
         lastShot=level().getGameTime();entityData.set(SHOT_START,lastShot);noteCombatProgress();return true;
     }
     public boolean hasSafeShot(net.minecraft.world.entity.LivingEntity target) {
-        if(!getSensing().hasLineOfSight(target))return false;
-        var from=getEyePosition();var to=target.getBoundingBox().getCenter();
-        var hit=level().clip(new net.minecraft.world.level.ClipContext(from,to,net.minecraft.world.level.ClipContext.Block.COLLIDER,
-                net.minecraft.world.level.ClipContext.Fluid.NONE,this));
-        if(hit.getType()!=net.minecraft.world.phys.HitResult.Type.MISS)return false;
-        for(var e:level().getEntities(this,new net.minecraft.world.phys.AABB(from,to).inflate(.6),e->e.isAlive() && e!=target)) {
-            if((isAlliedTo(e)||e.isAlliedTo(this)) && e.getBoundingBox().inflate(.25).clip(from,to).isPresent())return false;
-        }
-        return true;
+        return io.github.omarflk.guerraezuberante.combat.NpcRangedGoal.safeShot(this,target);
     }
     @Override protected void registerGoals() {
         super.registerGoals();goalSelector.addGoal(1,new io.github.omarflk.guerraezuberante.combat.RenanRangedGoal(this));
