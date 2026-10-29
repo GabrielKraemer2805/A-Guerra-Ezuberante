@@ -165,5 +165,35 @@
                                         }
                                     ],
                          "subtitle":  "subtitles.guerra_ezuberante.lula.racismo"
-                     }
+                     },
+    "jair.canalha":  {
+                    "sounds":  [
+                                   {
+                                       "attenuation_distance":  32,
+                                       "name":  "guerra_ezuberante:jair/canalha",
+                                       "stream":  true
+                                   }
+                               ],
+                    "subtitle":  "subtitles.guerra_ezuberante.jair.canalha"
+                },
+    "jair.eu_nao_te":  {
+                    "sounds":  [
+                                   {
+                                       "attenuation_distance":  32,
+                                       "name":  "guerra_ezuberante:jair/eu_nao_te",
+                                       "stream":  true
+                                   }
+                               ],
+                    "subtitle":  "subtitles.guerra_ezuberante.jair.eu_nao_te"
+                },
+    "jair.popcorn":  {
+                    "sounds":  [
+                                   {
+                                       "attenuation_distance":  32,
+                                       "name":  "guerra_ezuberante:jair/popcorn",
+                                       "stream":  true
+                                   }
+                               ],
+                    "subtitle":  "subtitles.guerra_ezuberante.jair.popcorn"
+                }
 }

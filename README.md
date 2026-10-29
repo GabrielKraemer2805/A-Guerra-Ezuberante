@@ -25,6 +25,10 @@ Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pre
 
 > **Estado atual — 0.013.0.** Cada jogador escolhe sua **facção** ao entrar (prefixo colorido no nome; só um operador troca) e ganha **um poder na tecla B**, um passivo e um kit. Agora também **sobe de nível derrotando inimigos**: o **perfil na tecla J** mostra nível, barra de XP e pontos para gastar em **Força, Velocidade, Vida, Força Ideológica e Convicção Ideológica**. A Convicção libera o **2º e o 3º poder** de cada facção. **Fogo amigo continua ativo.** [Nível, status e poderes](docs/PROGRESSAO_0.013.md) · [Facções, poderes e kits](docs/FACCOES_0.012.md).
 
+## Vozes do Jair — 0.013.1
+
+O Jair agora fala. **Botão direito** toca uma das gravações longas (Eu não te, Popcorn). **"Canalha"** só aparece quando ele **recebe dano**, com cerca de **40% de chance** (`[jair] canalha_chance`), nunca por cima de outra fala. Inventário e durações em [docs/AUDIOS.md](docs/AUDIOS.md).
+
 ## Nível, status e poderes de Convicção — 0.013.0
 
 ![Perfil na tecla J](docs/preview/progressao-0.013/perfil-conviccao.png)

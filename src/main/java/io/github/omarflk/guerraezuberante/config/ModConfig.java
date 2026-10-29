@@ -13,7 +13,7 @@ public final class ModConfig {
     public static final ForgeConfigSpec.DoubleValue LULA_HEALTH, LULA_EXPLOSION_POWER, LULA_RISE;
     public static final ForgeConfigSpec.BooleanValue LULA_EXPLOSION_ENABLED, LULA_BLOCK_DAMAGE;
     public static final ForgeConfigSpec.IntValue LULA_DEATH_TICKS;
-    public static final ForgeConfigSpec.DoubleValue JAIR_HEALTH,JAIR_SPEED,JAIR_MELEE,JAIR_EXPLOSION_POWER,JAIR_RISE;
+    public static final ForgeConfigSpec.DoubleValue JAIR_HEALTH,JAIR_SPEED,JAIR_MELEE,JAIR_EXPLOSION_POWER,JAIR_RISE,JAIR_CANALHA_CHANCE;
     public static final ForgeConfigSpec.IntValue JAIR_DEATH_TICKS,JAIR_SUMMON_COUNT,JAIR_SUMMON_COOLDOWN,JAIR_MAX_SUMMONS;
     public static final ForgeConfigSpec.BooleanValue JAIR_EXPLOSION_ENABLED,JAIR_BLOCK_DAMAGE,JAIR_SUMMON_ENABLED;
     public static final ForgeConfigSpec.DoubleValue FLAVIO_HEALTH,FLAVIO_SPEED,FLAVIO_MELEE,FISSURE_RANGE,FISSURE_WIDTH,FISSURE_DAMAGE,FISSURE_KNOCKBACK;
@@ -78,6 +78,8 @@ public final class ModConfig {
         JAIR_EXPLOSION_ENABLED=builder.define("death_explosion_enabled",true);
         JAIR_EXPLOSION_POWER=builder.defineInRange("death_explosion_power",7D,0D,16D);
         JAIR_RISE=builder.defineInRange("death_rise_blocks",2D,0D,8D);
+        JAIR_CANALHA_CHANCE=builder.comment("Chance of saying \"Canalha\" each time Jair takes damage (never over another line).")
+                .defineInRange("canalha_chance",.4D,0D,1D);
         JAIR_DEATH_TICKS=builder.defineInRange("death_animation_ticks",60,20,200);
         JAIR_BLOCK_DAMAGE=builder.define("death_explosion_block_damage",true);
         JAIR_SUMMON_ENABLED=builder.define("summon_enabled",true);

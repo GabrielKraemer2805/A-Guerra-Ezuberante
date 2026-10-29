@@ -56,6 +56,11 @@ public final class ProgressionGameTests {
         }
         return Vec3.atBottomCenterOf(p);
     }
+    /** Natural spawns at night would become extra targets of the area powers. */
+    private static void clearNaturalMonsters(GameTestHelper h, Vec3 at) {
+        h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.monster.Monster.class, new AABB(BlockPos.containing(at)).inflate(24))
+                .forEach(net.minecraft.world.entity.Entity::discard);
+    }
     /** Spiders: hostile, no armor and they do not burn in daylight, so damage checks are exact. */
     private static Mob enemy(GameTestHelper h, Vec3 at) {
         var spider = EntityType.SPIDER.create(h.getLevel());
@@ -145,6 +150,7 @@ public final class ProgressionGameTests {
     }
     @GameTest(template="empty", batch="ge_stomp", timeoutTicks=200) public static void endOfShiftHitsEnemiesAndSparesLulistas(GameTestHelper h) {
         var p = arena(h, 150);
+        clearNaturalMonsters(h, p);
         var player = real(h, p, "StompQA");
         Factions.assign(player, Faction.LULISTA);
         var spider = enemy(h, p.add(3, 0, 0)); var pig = animal(h, p.add(-3, 0, 0));
@@ -289,6 +295,7 @@ public final class ProgressionGameTests {
     }
     @GameTest(template="empty", batch="ge_area", timeoutTicks=200) public static void areaPowersOfEsquerdaDireitaAndCentro(GameTestHelper h) {
         var p = arena(h, 150);
+        clearNaturalMonsters(h, p);
         var player = real(h, p, "AreaQA");
         Factions.assign(player, Faction.ESQUERDA); unlockAll(player);
         var spider = enemy(h, p.add(3, 0, 0)); var pig = animal(h, p.add(-3, 0, 0));

@@ -81,7 +81,19 @@ public final class JairBolsonaroEntity extends SpecialDeathEntity implements Npc
         if((isActionLocked() || !validRangedTarget(getTarget())) && isGunAiming())setGunAiming(false);
     }
     @Override public boolean isAlliedTo(Entity other){return other instanceof JairBolsonaroEntity || other instanceof FlavioBolsonaroEntity || super.isAlliedTo(other);}
-    @Override protected List<ModSounds.VoiceLine> interactionVoices(){return List.of();}
+    @Override protected List<ModSounds.VoiceLine> interactionVoices(){return ModSounds.JAIR_INTERACTION_VOICES;}
+    /** "Canalha" only when he actually loses health, about 40% of the time, never over another line. */
+    @Override public boolean hurt(net.minecraft.world.damagesource.DamageSource source,float amount){
+        float before=getHealth();
+        boolean accepted=super.hurt(source,amount);
+        if(accepted && !level().isClientSide && getHealth()<before)reactToDamage(random.nextFloat());
+        return accepted;
+    }
+    /** Says "Canalha" when the roll (0..1) is below canalha_chance. Public so GameTests can pass a fixed roll. */
+    public boolean reactToDamage(float roll){
+        if(!isAlive() || isSpeaking() || !ModSounds.JAIR_CANALHA.isAvailable() || roll>=ModConfig.JAIR_CANALHA_CHANCE.get())return false;
+        speak(ModSounds.JAIR_CANALHA);return true;
+    }
     @Override public boolean greenDeathEnergy(){return true;}
     @Override protected String deathSavePrefix(){return "Jair";}
     @Override protected double configuredMaxHealth(){return ModConfig.JAIR_HEALTH.get();}

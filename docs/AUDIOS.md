@@ -1,6 +1,6 @@
 # Áudios — inventário atualizado na sprint 0.004.0
 
-Originais preservados em `audios/`; cópias de entrada em `assets-entrada/audio/renan/` e `assets-entrada/audio/arthur/`. Os OGGs usam Vorbis mono a 44.100 Hz, sem cortes, alteração de velocidade ou de duração.
+Originais preservados em `audios/`; cópias de entrada em `assets-entrada/audio/renan/`, `assets-entrada/audio/arthur/` e `assets-entrada/audio/jair/`. Os OGGs usam Vorbis mono a 44.100 Hz, sem cortes, alteração de velocidade ou de duração.
 
 ## Efeito novo: invocação
 
@@ -39,6 +39,20 @@ O phonk foi identificado pelo nome explícito do arquivo, separado da fala norma
 Os sete áudios estão registrados e disponíveis completos no botão direito. O autor escolheu “É vagabundo sim” (9,98 s) como reação automática do Arthur ao entrar em combate. A gravação inteira usa recarga de 11 s e não reinicia a cada golpe. A recarga é preservada no salvamento.
 
 Os nomes e as legendas identificam os arquivos recebidos; não foi feita transcrição integral das gravações nem edição de conteúdo.
+
+## Jair Bolsonaro — 0.013.1
+
+Recebidos em `assets-entrada/audio/jair/` como `.mpeg` (MP3 estéreo 48 kHz com capa embutida; a capa é descartada). Gravações inteiras, sem cortes.
+
+| Original | Duração | SHA-256 | OGG em `sounds/jair/` | Uso |
+| --- | --- | --- | --- | --- |
+| CANALHA.mpeg | 6,55 s | `53e49f88…a91f191` | canalha.ogg | **Só ao receber dano**, 40% de chance (`[jair] canalha_chance`); trava de 7 s |
+| EU NAO TE.mpeg | 53,30 s | `b435f05b…d87d8` | eu_nao_te.ogg | Botão direito; recarga 55,5 s |
+| POPCORN.mpeg | 42,38 s | `3ec03c00…6543a` | popcorn.ogg | Botão direito; recarga 44,5 s |
+
+- O "Canalha" é sorteado a cada dano que tira vida do Jair, nunca por cima de outra fala dele e nunca no botão direito. A reação genérica de entrada em combate continua vazia para o Jair.
+- Enquanto uma fala toca, o botão direito mostra a recarga restante em vez de sobrepor outra.
+- O mod passa a empacotar **3 OGGs a mais** (evento `guerra_ezuberante:jair.*`, streaming, legendas "Jair — gravação: …"). O painel K → Personagens → Jair lista as três.
 
 ## Conversão
 

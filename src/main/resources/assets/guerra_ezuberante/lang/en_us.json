@@ -251,5 +251,8 @@
     "faction.guerra_ezuberante.centro.power2":  "Isenção",
     "faction.guerra_ezuberante.centro.power2.desc":  "Resistance IV for 3 s. Cooldown 30 s.",
     "faction.guerra_ezuberante.centro.power3":  "Toma Lá, Dá Cá",
-    "faction.guerra_ezuberante.centro.power3.desc":  "drains 4 health from each enemy within 6 blocks and heals you by the total. Cooldown 30 s."
+    "faction.guerra_ezuberante.centro.power3.desc":  "drains 4 health from each enemy within 6 blocks and heals you by the total. Cooldown 30 s.",
+    "subtitles.guerra_ezuberante.jair.canalha":  "Jair — recording: canalha",
+    "subtitles.guerra_ezuberante.jair.eu_nao_te":  "Jair — recording: eu não te",
+    "subtitles.guerra_ezuberante.jair.popcorn":  "Jair — recording: popcorn"
 }

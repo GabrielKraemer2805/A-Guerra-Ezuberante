@@ -1,5 +1,15 @@
 # Contexto de trabalho — Guerra Ezuberante
 
+## Vozes do Jair — 0.013.1
+
+- Pedido em 28/10/2026 pelo colaborador: vozes só no Jair. "CANALHA" apenas ao receber dano, ~40% de chance; as outras no botão direito. Branch `feat/vozes-bolsonaro`.
+- FFmpeg 9.0.2 instalado via `winget install Gyan.FFmpeg` (fora do PATH deste shell até reiniciar; o conversor recebe `-FFmpegPath` ou acha no PATH). `tools/convert_audio.ps1` aceita `-Character jair` e as extensões .mp3/.mpeg/.wav/.m4a/.ogg.
+- `RetaliatingCharacterEntity`: `speak(VoiceLine)` (som vinculado à entidade + trava `combatAudioCooldown`) e `isSpeaking()` público, reaproveitados pela reação de combate. `JairBolsonaroEntity.hurt` chama `reactToDamage(random)` quando a vida cai; `reactToDamage(roll)` é público para testes com sorteio fixo. Config `[jair] canalha_chance` (0.4). `interactionVoices` = Eu não te (1110 ticks) e Popcorn (890).
+- **Lição de teste:** GameTest que chama `ModConfig.X.set` grava o toml do mundo de teste ao mesmo tempo que `oldDefaultsUpgradeButCustomBalanceSurvives` (Windows: "arquivo já está sendo usado"); o `finally` desse teste falhou e deixou `rachadinha_cooldown_ticks = 400` em `run-gametest/world/serverconfig`, quebrando `actualAiRepeatsRiftAndKeepsCasterGround` em todas as rodadas seguintes (inclusive no código base). O valor foi devolvido a 120 e o teste de voz passou a usar sorteio fixo, sem tocar na config. Também `firstCombatSummonCooldownCapAndOwnerCleanup` falhou duas vezes só enquanto o teste de voz gravava config. Ao ver falhas nesses dois testes, conferir primeiro esse arquivo.
+- O teste de área (`ProgressionGameTests`) agora remove monstros de spawn natural perto da arena antes de começar.
+- GameTests: 1 novo (`JairVoiceGameTests`). **104/104 com TaCZ e 40/40 sem TaCZ.** Versão 0.013.1.
+- Entrega: cliente normal `run/` às 22:31 de 28/10. O colaborador testou e aprovou ("testei e ta funcionando") e autorizou commit e merge na `main` do fork.
+
 ## Progressão por nível, status e poderes de Convicção — 0.013.0
 
 - Pedido em 28/10/2026 pelo colaborador: perfil com nível, barra de XP, pontos e upgrades (Força, Velocidade, Vida, Força Ideológica, Convicção Ideológica), com a Convicção liberando poderes novos. Decisões do colaborador: tecla **J** (V é do TaCZ), XP por abates, Convicção 5/10 libera o 2º/3º poder, nível máximo 30 com 1 ponto por nível e 10 por status. Poderes da Lulista, Bolsonarista, Missão e o 2º da Esquerda descritos pelo colaborador; os demais seguem a proposta do agente, aprovada. Branch `feat/progressao-0.013`.
