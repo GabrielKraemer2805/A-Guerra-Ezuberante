@@ -12,6 +12,9 @@ public final class ModEffects {
             DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, GuerraEzuberanteMod.MOD_ID);
     /** "O Livro Amarelo": the target cannot walk or jump while it lasts. */
     public static final RegistryObject<MobEffect> BORED = REGISTER.register("entediado", BoredEffect::new);
+    /** Haddad's slaps: the target cannot walk or jump while it lasts. */
+    public static final RegistryObject<MobEffect> PARALYZED = REGISTER.register("paralisado",
+            io.github.omarflk.guerraezuberante.entity.ParalyzedEffect::new);
 
     private ModEffects() {}
 }

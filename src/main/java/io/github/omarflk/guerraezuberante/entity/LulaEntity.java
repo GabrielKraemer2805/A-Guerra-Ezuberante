@@ -34,6 +34,7 @@ public final class LulaEntity extends SpecialDeathEntity {
 
     @Override protected boolean allowsMeleeCombat(){return false;}
     @Override protected List<ModSounds.VoiceLine> interactionVoices(){return List.of();}
+    @Override public boolean isAlliedTo(Entity other){return other instanceof LulistaAllyEntity || other instanceof PetistaEntity || super.isAlliedTo(other);}
     @Override public List<MusicTrack> musicTracks(){return CharacterAudio.LULA;}
     @Override protected boolean isValidAggressor(LivingEntity target){return deathState()==ALIVE && super.isValidAggressor(target);}
     public boolean validBeanTarget(LivingEntity target){return target!=null && isValidAggressor(target);}

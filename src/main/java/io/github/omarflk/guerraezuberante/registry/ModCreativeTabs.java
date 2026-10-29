@@ -21,6 +21,9 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.ARTHUR_INVOCADOR_EGG.get());
                         output.accept(ModItems.UKRAINIAN_SWORD.get());
                         output.accept(ModItems.LULA_SPAWN_EGG.get());
+                        output.accept(ModItems.HADDAD_SPAWN_EGG.get());
+                        output.accept(ModItems.BOULOS_SPAWN_EGG.get());
+                        output.accept(ModItems.PETISTA_SPAWN_EGG.get());
                         output.accept(ModItems.JAIR_SPAWN_EGG.get());
                         output.accept(ModItems.FLAVIO_SPAWN_EGG.get());
                         output.accept(ModItems.BEAN.get());

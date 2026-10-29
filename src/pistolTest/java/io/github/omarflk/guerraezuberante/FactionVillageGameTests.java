@@ -228,6 +228,14 @@ public final class FactionVillageGameTests {
             var leaders=h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.LulaEntity.class, area(start.getBoundingBox()));
             h.assertTrue(leaders.size()==1 && castle.getBoundingBox().isInside(leaders.get(0).blockPosition()), "Lula missing or outside castle");
             assertFlags(h,Faction.LULISTA,castle.getBoundingBox());
+            var haddad=h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.HaddadEntity.class, area(start.getBoundingBox()));
+            var boulos=h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.BoulosEntity.class, area(start.getBoundingBox()));
+            h.assertTrue(haddad.size()==1 && boulos.size()==1, haddad.size()+" Haddad, "+boulos.size()+" Boulos");
+            var petistas=h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.PetistaEntity.class, area(start.getBoundingBox()));
+            int expected=io.github.omarflk.guerraezuberante.config.ModConfig.PETISTAS_PER_VILLAGE.get();
+            h.assertTrue(petistas.size()==expected, petistas.size()+" petistas, expected "+expected);
+            h.assertTrue(petistas.stream().noneMatch(p -> castle.getBoundingBox().isInside(p.blockPosition())), "Petista locked in the castle");
+            h.assertTrue(petistas.stream().allMatch(p -> p.isPersistenceRequired()), "Petista would despawn");
         } finally { cleanUp(h,start); }
         h.succeed();
     }

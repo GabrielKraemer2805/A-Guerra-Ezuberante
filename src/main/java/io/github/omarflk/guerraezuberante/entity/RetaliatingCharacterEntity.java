@@ -94,6 +94,11 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
 
     public boolean isLeftPunch() { return entityData.get(ATTACK_LEFT); }
     public long attackAnimationToken() { return entityData.get(ATTACK_START); }
+    /** Plays the punch clip for a special strike; the caller applies the hit itself, at {@link #ATTACK_IMPACT}. */
+    protected void startAttackAnimation(boolean left) {
+        entityData.set(ATTACK_LEFT, left);
+        entityData.set(ATTACK_START, level().getGameTime());
+    }
     public boolean isActionLocked() { return false; }
     protected void noteCombatProgress() { stalledPursuitTicks = 0; }
 

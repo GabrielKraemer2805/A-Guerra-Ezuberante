@@ -23,6 +23,16 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.LulaEntity>> LULA = REGISTER.register(
             "lula", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.LulaEntity::new, MobCategory.CREATURE)
                     .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":lula"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.HaddadEntity>> HADDAD = REGISTER.register(
+            "haddad", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.HaddadEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":haddad"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.BoulosEntity>> BOULOS = REGISTER.register(
+            "guilherme_boulos", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.BoulosEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":guilherme_boulos"));
+    /** Same size and tracking as the vanilla villager. */
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.PetistaEntity>> PETISTA = REGISTER.register(
+            "petista", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.PetistaEntity::new, MobCategory.MISC)
+                    .sized(.6F,1.95F).clientTrackingRange(10).build(GuerraEzuberanteMod.MOD_ID+":petista"));
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.BeanProjectile>> BEAN = REGISTER.register(
             "semente_feijao", () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.BeanProjectile>of(
                     io.github.omarflk.guerraezuberante.entity.BeanProjectile::new, MobCategory.MISC)

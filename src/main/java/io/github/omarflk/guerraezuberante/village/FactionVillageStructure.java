@@ -2,6 +2,7 @@ package io.github.omarflk.guerraezuberante.village;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.omarflk.guerraezuberante.config.ModConfig;
 import io.github.omarflk.guerraezuberante.faction.Faction;
 import io.github.omarflk.guerraezuberante.registry.ModEntities;
 import io.github.omarflk.guerraezuberante.registry.ModWorldgen;
@@ -70,6 +71,7 @@ public final class FactionVillageStructure extends Structure {
     /** The other characters, one each, around the village square. */
     public static List<EntityType<?>> members(Faction faction) {
         return switch (faction) {
+            case LULISTA -> List.of(ModEntities.HADDAD.get(), ModEntities.BOULOS.get());
             case BOLSONARISTA -> List.of(ModEntities.FLAVIO_BOLSONARO.get());
             case MISSAO -> List.of(ModEntities.ARTHUR_INVOCADOR.get());
             default -> List.of();
@@ -142,6 +144,25 @@ public final class FactionVillageStructure extends Structure {
         for (int index = 0; index < members.size(); index++) {
             int offset = index % 2 == 0 ? 3 : -3;
             spawn(level, chunkBox, members.get(index), center.offset(offset, 0, -offset));
+        }
+        if (faction == Faction.LULISTA) { spawnPetistas(level, chunkBox, pieces); }
+    }
+
+    /**
+     * Petistas live with the vanilla villagers, spread over the village streets (open ground, never a roof). The spots
+     * come from the whole village and are the same for every chunk, so each petista is created exactly once: by the
+     * chunk that holds its spot.
+     */
+    private static void spawnPetistas(WorldGenLevel level, BoundingBox chunkBox, PiecesContainer pieces) {
+        List<BoundingBox> streets = pieces.pieces().stream()
+                .filter(piece -> piece instanceof PoolElementStructurePiece pool && pool.getElement().toString().contains("/streets/"))
+                .map(StructurePiece::getBoundingBox).toList();
+        if (streets.isEmpty()) { streets = List.of(pieces.pieces().get(0).getBoundingBox()); }
+        int count = ModConfig.PETISTAS_PER_VILLAGE.get();
+        for (int index = 0; index < count; index++) {
+            BlockPos center = streets.get(index % streets.size()).getCenter();
+            int round = index / streets.size();
+            spawn(level, chunkBox, ModEntities.PETISTA.get(), center.offset(round % 2 == 0 ? round : -round, 0, 0));
         }
     }
 

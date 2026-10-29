@@ -100,19 +100,21 @@ public final class ModPanelScreen extends Screen {
             case CHARACTERS -> {
                 int gap = 4;
                 int buttonWidth = (width - contentX - 24 - gap) / 2;
-                for (int index = 0; index < 7; index++) {
+                for (int index = 0; index < 9; index++) {
                     int selected = index;
                     addRenderableWidget(Button.builder(Component.translatable("gui.guerra_ezuberante.character_tab." + index),
                             ignored -> minecraft.setScreen(new ModPanelScreen(parent, selected)))
                             .bounds(contentX + (index % 2) * (buttonWidth + gap), 66 + (index / 2) * 24, buttonWidth, 20).build())
                             .active = characterSelected != index;
                 }
-                contentTop = 166;
+                contentTop = 66 + 5 * 24 + 4;
                 String character = characterSelected == 0 ? "renan" : characterSelected == 1 ? "arthur_fighter"
-                        : characterSelected == 2 ? "arthur_summoner" : characterSelected == 3 ? "ucraniana" : characterSelected == 4 ? "lula" : characterSelected == 5 ? "jair" : "flavio";
+                        : characterSelected == 2 ? "arthur_summoner" : characterSelected == 3 ? "ucraniana" : characterSelected == 4 ? "lula" : characterSelected == 5 ? "jair"
+                        : characterSelected == 7 ? "haddad" : characterSelected == 8 ? "boulos" : "flavio";
                 String entityId = characterSelected == 0 ? "renan_santos"
                         : characterSelected == 1 ? "arthur_do_val_combatente"
-                        : characterSelected == 2 ? "arthur_do_val_invocador" : characterSelected == 3 ? "combatente_ucraniana" : characterSelected == 4 ? "lula" : characterSelected == 5 ? "jair_bolsonaro" : "flavio_bolsonaro";
+                        : characterSelected == 2 ? "arthur_do_val_invocador" : characterSelected == 3 ? "combatente_ucraniana" : characterSelected == 4 ? "lula" : characterSelected == 5 ? "jair_bolsonaro"
+                        : characterSelected == 7 ? "haddad" : characterSelected == 8 ? "guilherme_boulos" : "flavio_bolsonaro";
                 paragraph(textWidth, "entity.guerra_ezuberante." + entityId);
                 paragraph(textWidth, "gui.guerra_ezuberante." + character + "_details");
                 List<ModSounds.VoiceLine> voices = characterSelected == 0 ? java.util.List.of(ModSounds.RENAN_VOICES.get(0), ModSounds.RENAN_PHONK, ModSounds.RENAN_VOICES.get(1))
@@ -133,6 +135,8 @@ public final class ModPanelScreen extends Screen {
                             : characterSelected == 3 ? ModEntities.UKRAINIAN_FIGHTER.get().create(minecraft.level)
                             : characterSelected == 4 ? ModEntities.LULA.get().create(minecraft.level)
                             : characterSelected == 5 ? ModEntities.JAIR_BOLSONARO.get().create(minecraft.level)
+                            : characterSelected == 7 ? ModEntities.HADDAD.get().create(minecraft.level)
+                            : characterSelected == 8 ? ModEntities.BOULOS.get().create(minecraft.level)
                             : ModEntities.FLAVIO_BOLSONARO.get().create(minecraft.level);
                 }
             }

@@ -9,7 +9,15 @@ if ($difference) { throw 'As traduções pt_br e en_us possuem chaves diferentes
 foreach ($skin in @(
     @{ Texture = 'renan_santos'; Source = 'renan_santos_skin_64x64.png' },
     @{ Texture = 'arthur_do_val'; Source = 'arthur_do_val_skin_64x64_corrigida.png' },
-    @{ Texture = 'combatente_ucraniana'; Source = 'skin-loira.png' }
+    @{ Texture = 'combatente_ucraniana'; Source = 'skin-loira.png' },
+    @{ Texture = 'haddad'; Source = 'haddad_skin_64x64.png' },
+    @{ Texture = 'guilherme_boulos'; Source = 'guilherme_boulos_skin_64x64.png' },
+    @{ Texture = 'petista\petista_0'; Source = 'petistas\petista_0.png' },
+    @{ Texture = 'petista\petista_1'; Source = 'petistas\petista_1.png' },
+    @{ Texture = 'petista\petista_2' },
+    @{ Texture = 'petista\petista_3'; Source = 'petistas\petista_3.png' },
+    @{ Texture = 'petista\petista_4'; Source = 'petistas\petista_4.png' },
+    @{ Texture = 'petista\petista_5'; Source = 'petistas\petista_5.png' }
 )) {
     $skinPath = Join-Path $assets ('textures\entity\' + $skin.Texture + '.png')
     $bytes = [IO.File]::ReadAllBytes($skinPath)
@@ -23,6 +31,8 @@ foreach ($skin in @(
     if ([BitConverter]::ToInt32($widthBytes, 0) -ne 64 -or [BitConverter]::ToInt32($heightBytes, 0) -ne 64) {
         throw "A skin deve ter 64 x 64 pixels: $skinPath"
     }
+    # petista_2 has no byte-identical source: it is the 64x32 legacy skin converted to 64x64.
+    if (-not $skin.Source) { continue }
     $source = Join-Path $projectRoot ('assets-entrada\skins\' + $skin.Source)
     if ((Test-Path -LiteralPath $source) -and
         (Get-FileHash -LiteralPath $source).Hash -ne (Get-FileHash -LiteralPath $skinPath).Hash) {

@@ -459,11 +459,11 @@ public final class ConvictionPowers {
         }
     }
 
-    /** Bored creatures cannot jump. Runs on both sides so the local player does not even start the jump. */
+    /** Bored or paralysed creatures cannot jump. Runs on both sides so the local player does not even start the jump. */
     @SubscribeEvent
     public static void jump(LivingEvent.LivingJumpEvent event) {
         LivingEntity entity = event.getEntity();
-        if (entity.hasEffect(ModEffects.BORED.get())) {
+        if (entity.hasEffect(ModEffects.BORED.get()) || entity.hasEffect(ModEffects.PARALYZED.get())) {
             Vec3 motion = entity.getDeltaMovement();
             entity.setDeltaMovement(motion.x, Math.min(0, motion.y), motion.z);
         }
