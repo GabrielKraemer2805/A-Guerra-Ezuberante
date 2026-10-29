@@ -116,7 +116,8 @@ public final class ModPanelScreen extends Screen {
                 paragraph(textWidth, "entity.guerra_ezuberante." + entityId);
                 paragraph(textWidth, "gui.guerra_ezuberante." + character + "_details");
                 List<ModSounds.VoiceLine> voices = characterSelected == 0 ? java.util.List.of(ModSounds.RENAN_VOICES.get(0), ModSounds.RENAN_PHONK, ModSounds.RENAN_VOICES.get(1))
-                        : characterSelected == 1 || characterSelected == 2 ? ModSounds.ARTHUR_VOICES : characterSelected == 4 ? ModSounds.LULA_VOICES : List.of();
+                        : characterSelected == 1 || characterSelected == 2 ? ModSounds.ARTHUR_VOICES : characterSelected == 4 ? ModSounds.LULA_VOICES
+                        : characterSelected == 5 ? ModSounds.JAIR_VOICES : List.of();
                 for (ModSounds.VoiceLine voice : voices) {
                     paragraph(textWidth, "gui.guerra_ezuberante.voice_entry",
                             Component.translatable(voice.subtitleKey()),
@@ -141,13 +142,30 @@ public final class ModPanelScreen extends Screen {
                 if (current.isPresent()) {
                     Faction faction = current.get();
                     paragraph(textWidth, "gui.guerra_ezuberante.faction_current", faction.displayName());
-                    paragraph(textWidth, "gui.guerra_ezuberante.faction_power", faction.powerName(), faction.powerDescription(),
+                    int selected = io.github.omarflk.guerraezuberante.client.ProgressionClient.selected();
+                    paragraph(textWidth, "gui.guerra_ezuberante.faction_power", faction.powerName(selected), faction.powerDescription(selected),
                             ModKeyBindings.USE_POWER.getTranslatedKeyMessage());
                     int remaining = FactionClient.remainingCooldown();
                     shownCooldown = (remaining + 19) / 20;
                     paragraph(textWidth, remaining > 0 ? "gui.guerra_ezuberante.faction_power_cooldown"
                             : "gui.guerra_ezuberante.faction_power_ready", (remaining + 19) / 20);
                     paragraph(textWidth, "gui.guerra_ezuberante.faction_passive", faction.passive());
+                    int[] villages = FactionClient.villages();
+                    if (villages.length == 0) {
+                        paragraph(textWidth, "gui.guerra_ezuberante.faction_villages_none");
+                    } else {
+                        paragraph(textWidth, "gui.guerra_ezuberante.faction_villages");
+                        java.util.List<int[]> sorted = new java.util.ArrayList<>();
+                        for (int index = 0; index + 1 < villages.length; index += 2) {
+                            int distance = (int) Math.hypot(villages[index] - minecraft.player.getX(), villages[index + 1] - minecraft.player.getZ());
+                            sorted.add(new int[]{villages[index], villages[index + 1], distance});
+                        }
+                        sorted.sort(java.util.Comparator.comparingInt(village -> village[2]));
+                        for (int[] village : sorted) {
+                            paragraph(textWidth, "gui.guerra_ezuberante.faction_village_entry", village[0], village[1], village[2]);
+                        }
+                    }
+                    paragraph(textWidth, "gui.guerra_ezuberante.faction_profile_hint", ModKeyBindings.OPEN_PROFILE.getTranslatedKeyMessage());
                 } else {
                     paragraph(textWidth, "gui.guerra_ezuberante.faction_none");
                     if (minecraft.player != null) {

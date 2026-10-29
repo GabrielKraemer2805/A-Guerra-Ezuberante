@@ -1,0 +1,8 @@
+{
+  "type": "guerra_ezuberante:vila_faccao",
+  "faction": "esquerda",
+  "biomes": "#guerra_ezuberante:has_structure/vila_faccao",
+  "step": "top_layer_modification",
+  "terrain_adaptation": "beard_thin",
+  "spawn_overrides": {}
+}

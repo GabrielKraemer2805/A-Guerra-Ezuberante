@@ -1,4 +1,16 @@
-# Validação — 0.012.1
+# Validação — 0.014.1
+
+Nova contribuição de Gabriel integrada com progressão, poderes, vozes e vilas, preservando os commits e as proteções anteriores. [Recursos, correções e limites](INTEGRACAO_0.014.1.md).
+
+- **120 GameTests com TaCZ** e **56 sem TaCZ** aprovados, incluindo seis regressões novas de proteção de terreno, cancelamento de explosão/dano, PvP no impacto e crédito de XP. Logs `.tools/integration-014-final-tests.log` e `.tools/integration-014-no-tacz.log`.
+- **Build, validadores e reobf aprovados** em `.tools/integration-014-package.log`. JAR0.014.1 inspecionado sem classes de teste nem TaCZ embutido. SHA256: `c28c4b1a0e14a822e593098233bd172b1e9f7d7f3139da85cc43c95686011181`.
+- **Dois clientes reais aprovados** em perfis isolados e silenciosos. Além dos fluxos anteriores, perfil J/pontos/seleção de poderes via pacotes reais,20 meteoros,6 livros e10 Manifestantes com os mesmos IDs nos dois clientes; Manifestantes PvP OFF sem hits/ON com hit; Faz o L derruba duas pilhas e sincroniza inventário; seis bandeiras e Jair renderizados. [Servidor](validacao/integracao-0.014.1/server.json), [host](validacao/integracao-0.014.1/host.json), [observador](validacao/integracao-0.014.1/observer.json).
+- **Vilas:** posições em cinco sementes e geração real de vilas/castelos de três facções representativas nos GameTests. Mundos antigos não recebem retrogeneração; usar mundo novo para ver as estruturas completas.
+- **Cliente normal aberto**, menu pronto às14:17:48 em `run/`, sem flags de teste, com volume normal preservado. Log `.tools/integration-014-normal-client.log`.
+
+Limites: rede local, sem latência artificial, todas as sementes ou todos os mods de proteção. Recursos/timers de áudio verificados; testes automatizados sem audição, conforme preferência do autor. Capturas em `docs/preview/integracao-0.014.1/`.
+
+## Histórico — 0.012.1
 
 Contribuição de GabrielKraemer2805 integrada preservando os commits originais e corrigindo PvP, ciclo de vida das tropas e regeneração após relog. [Entrega completa](INTEGRACAO_FACCOES_0.012.1.md).
 

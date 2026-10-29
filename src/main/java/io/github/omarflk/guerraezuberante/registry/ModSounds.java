@@ -32,6 +32,9 @@ public final class ModSounds {
     public static final RegistryObject<SoundEvent> PRIVATIZAR_TUDO = register("arthur.privatizar_tudo");
     public static final RegistryObject<SoundEvent> SAO_FACEIS = register("arthur.sao_faceis_pq_sao_pobres");
     public static final RegistryObject<SoundEvent> SO_DEUSA = register("arthur.so_deusa");
+    public static final RegistryObject<SoundEvent> JAIR_CANALHA_EVENT = register("jair.canalha");
+    public static final RegistryObject<SoundEvent> JAIR_EU_NAO_TE = register("jair.eu_nao_te");
+    public static final RegistryObject<SoundEvent> JAIR_POPCORN = register("jair.popcorn");
 
     public record VoiceLine(RegistryObject<SoundEvent> event, String directory, String file, int cooldownTicks) {
         public VoiceLine(RegistryObject<SoundEvent> event, String file, int cooldownTicks) {
@@ -70,6 +73,14 @@ public final class ModSounds {
             new VoiceLine(PRIVATIZAR_TUDO, "arthur", "privatizar_tudo", 360),
             new VoiceLine(SAO_FACEIS, "arthur", "sao_faceis_pq_sao_pobres", 180),
             new VoiceLine(SO_DEUSA, "arthur", "so_deusa", 220));
+
+    // Full recordings. "Canalha" (6.55 s) only plays when Jair takes damage; the others on right-click.
+    public static final VoiceLine JAIR_CANALHA = new VoiceLine(JAIR_CANALHA_EVENT, "jair", "canalha", 140);
+    public static final List<VoiceLine> JAIR_INTERACTION_VOICES = List.of(
+            new VoiceLine(JAIR_EU_NAO_TE, "jair", "eu_nao_te", 1110),
+            new VoiceLine(JAIR_POPCORN, "jair", "popcorn", 890));
+    public static final List<VoiceLine> JAIR_VOICES = List.of(JAIR_CANALHA,
+            JAIR_INTERACTION_VOICES.get(0), JAIR_INTERACTION_VOICES.get(1));
 
     // Author selected the full recording; its 11-second cooldown exceeds the 9.98-second audio.
     public static final List<VoiceLine> ARTHUR_REACTIONS = List.of(ARTHUR_VOICES.get(0));

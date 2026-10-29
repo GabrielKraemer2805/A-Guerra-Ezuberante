@@ -28,7 +28,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
-public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
+public final class UkrainianFighterEntity extends RetaliatingCharacterEntity implements io.github.omarflk.guerraezuberante.summon.OwnedSummon {
     private static final EntityDataAccessor<Long> EMERGENCE_START = SynchedEntityData.defineId(
             UkrainianFighterEntity.class, EntityDataSerializers.LONG);
     private static final EntityDataAccessor<Integer> EMERGENCE_DURATION = SynchedEntityData.defineId(
@@ -82,6 +82,7 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
         wasEmerging = true;
     }
 
+    @Override
     public UUID getOwnerId() { return ownerId; }
     public UUID getPlayerSummonToken() { return playerSummonToken; }
     public ArthurDoValEntity getOwnerEntity() { return cachedOwner instanceof ArthurDoValEntity arthur ? arthur : null; }

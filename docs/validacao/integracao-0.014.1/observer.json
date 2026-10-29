@@ -1,0 +1,71 @@
+{
+  "choiceViaScreen": true,
+  "remoteName": "[Lulista] Dev",
+  "remoteTab": "[Lulista] Dev",
+  "panelCooldown": [
+    30,
+    27
+  ],
+  "reconnectedWithoutChoice": true,
+  "inventoryDropPacket": true,
+  "bannerMaterials": true,
+  "selectionConfirmed": true,
+  "passed": true,
+  "captures": [
+    "names-tab",
+    "cooldown-start",
+    "cooldown-running",
+    "summoned-troops",
+    "before-reconnect",
+    "after-reconnect",
+    "faz-o-l-inventory",
+    "banners-jair"
+  ],
+  "beanIds": [
+    304,
+    305,
+    303
+  ],
+  "meteorIds": [
+    352,
+    354,
+    356,
+    358,
+    360,
+    362,
+    364,
+    334,
+    366,
+    336,
+    368,
+    338,
+    370,
+    340,
+    372,
+    342,
+    344,
+    346,
+    348,
+    350
+  ],
+  "bookIds": [
+    384,
+    374,
+    376,
+    378,
+    380,
+    382
+  ],
+  "protesterIds": [
+    386,
+    387,
+    388,
+    389,
+    390,
+    391,
+    392,
+    393,
+    394,
+    395
+  ]
+}

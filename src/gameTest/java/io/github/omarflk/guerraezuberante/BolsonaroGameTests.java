@@ -174,10 +174,11 @@ public final class BolsonaroGameTests {
         });
     }
     @GameTest(template="empty",batch="bolsonaro_terrain",timeoutTicks=390) public static void narrowTerrainFlagsMobGriefingAndProtection(GameTestHelper h){
-        var p=arena(h,25);terrainCase(h,p,false,true,0,()->terrainCase(h,p,true,false,0,()->terrainCase(h,p,true,true,1,()->terrainCase(h,p,true,true,2,()->terrainCase(h,p,true,true,0,h::succeed)))));
+        // Keep excavation above external water fixtures; water replacing holes must not masquerade as failed destruction.
+        var p=arena(h,240);terrainCase(h,p,false,true,0,()->terrainCase(h,p,true,false,0,()->terrainCase(h,p,true,true,1,()->terrainCase(h,p,true,true,2,()->terrainCase(h,p,true,true,0,h::succeed)))));
     }
     private static void terrainCase(GameTestHelper h,Vec3 p,boolean enabled,boolean grief,int protection,Runnable next){
-        arena(h,25);var f=flavio(h,p);f.setNoAi(true);f.setNoGravity(true);var target=cow(h,p.add(0,0,7));
+        arena(h,240);var f=flavio(h,p);f.setNoAi(true);f.setNoGravity(true);var target=cow(h,p.add(0,0,7));
         boolean old=h.getLevel().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);h.getLevel().getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,h.getLevel().getServer());
         if(protection==1)protectedCasters.add(f.getUUID());protectBreakEvent=protection==2;
         var effect=fissure(f,target,enabled);h.assertTrue(effect!=null,"No terrain effect");var path=effect.surfaces();
@@ -185,7 +186,7 @@ public final class BolsonaroGameTests {
         h.runAfterDelay(path.size()*RachadinhaEntity.SEGMENT_TICKS+RachadinhaEntity.FADE_TICKS+3,()->{
             h.getLevel().getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(old,h.getLevel().getServer());protectedCasters.remove(f.getUUID());protectBreakEvent=false;
             long broken=path.stream().filter(s->h.getLevel().getBlockState(s.block()).isAir()).count();
-            h.assertTrue(enabled && grief && protection==0?broken>0:broken==0,"Terrain protection/flags failed: "+enabled+"/"+grief+"/"+protection+" broken="+broken);
+            h.assertTrue(enabled && grief && protection==0?broken>0:broken==0,"Terrain protection/flags failed: "+enabled+"/"+grief+"/"+protection+" broken="+broken+" cells="+path.size()+" blocks="+path.stream().map(s->h.getLevel().getBlockState(s.block()).toString()).toList());
             h.assertTrue(target.getHealth()==1014 && effect.isRemoved(),"Terrain flag changed damage/lifetime: HP="+target.getHealth()+" removed="+effect.isRemoved()+" cells="+path.size());
             h.assertTrue(h.getLevel().getBlockState(bedrock).is(Blocks.BEDROCK),"Bedrock broken");
             for(var s:path)h.assertTrue(!h.getLevel().getBlockState(s.block().below()).isAir(),"Excavation deeper than one surface layer");

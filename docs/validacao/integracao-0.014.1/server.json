@@ -1,0 +1,36 @@
+{
+  "protestPvpOffHits": 0,
+  "pvpOnTroopHits": 1,
+  "pvpOffHp": 20.0,
+  "profile": [
+    30,
+    10,
+    1,
+    18,
+    3
+  ],
+  "pvpOffTroopHits": 0,
+  "fissurePvpOnHp": 12.0,
+  "dashBlocks": 9.483302777049175,
+  "groupHealHp": [
+    14.0,
+    15.0
+  ],
+  "beanTargetHp": 35.0,
+  "books": 6,
+  "pvpOnHp": 15.0,
+  "deathAndRespawnCleanup": true,
+  "reconnectTicks": 53,
+  "meteors": 20,
+  "fazOLStacksLeft": 1,
+  "recoveryHpAfterDelay": 11.0,
+  "fazOLHp": 13.85,
+  "protestPvpOnHits": 1,
+  "passed": true,
+  "choices": [
+    "LULISTA",
+    "ESQUERDA"
+  ],
+  "fissurePvpOffHp": 20.0,
+  "jairAudioResource": true
+}

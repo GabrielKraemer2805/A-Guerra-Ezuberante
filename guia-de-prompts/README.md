@@ -87,7 +87,7 @@ Exemplo: “Flávio usa a Rachadinha quando começa a luta, depois só dá socos
 - **Referência visual:** “Use esta prévia para entender o personagem; a textura final é o PNG 64×64 separado”.
 - **Referência externa:** “Estude o funcionamento, confirme a licença e adapte somente o necessário; mantenha dependências e procedência documentadas”.
 
-Um anexo pode conter um plano grande e instruções antigas. Diga qual parte está autorizando agora. O guia registra a versão **0.012.1**; nas próximas sprints, as versões efetivas continuam em [gradle.properties](../gradle.properties), as dependências em [build.gradle](../build.gradle) e o estado técnico em [CONTEXTO.md](../CONTEXTO.md).
+Um anexo pode conter um plano grande e instruções antigas. Diga qual parte está autorizando agora. O guia registra a versão **0.014.1**; nas próximas sprints, as versões efetivas continuam em [gradle.properties](../gradle.properties), as dependências em [build.gradle](../build.gradle) e o estado técnico em [CONTEXTO.md](../CONTEXTO.md).
 
 ## Preferências deste projeto
 

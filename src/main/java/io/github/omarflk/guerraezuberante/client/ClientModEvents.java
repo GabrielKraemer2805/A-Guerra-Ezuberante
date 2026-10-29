@@ -7,6 +7,7 @@ import io.github.omarflk.guerraezuberante.client.renderer.RenanRenderer;
 import io.github.omarflk.guerraezuberante.client.renderer.ArthurRenderer;
 import io.github.omarflk.guerraezuberante.client.renderer.UkrainianFighterRenderer;
 import io.github.omarflk.guerraezuberante.registry.ModEntities;
+import io.github.omarflk.guerraezuberante.registry.ModWorldgen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -30,12 +31,23 @@ public final class ClientModEvents {
         event.registerEntityRenderer(ModEntities.ARTHUR_COMBATENTE.get(), ArthurRenderer::new);
         event.registerEntityRenderer(ModEntities.ARTHUR_INVOCADOR.get(), ArthurRenderer::new);
         event.registerEntityRenderer(ModEntities.UKRAINIAN_FIGHTER.get(), UkrainianFighterRenderer::new);
+        event.registerEntityRenderer(ModEntities.FAZ_O_L.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 3.0F, true));
+        event.registerEntityRenderer(ModEntities.METEOR.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 2.2F, false));
+        event.registerEntityRenderer(ModEntities.YELLOW_BOOK.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 1.1F, false));
+        event.registerEntityRenderer(ModEntities.MANIFESTANTE.get(), io.github.omarflk.guerraezuberante.client.renderer.ManifestanteRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void registerParticles(net.minecraftforge.client.event.RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(io.github.omarflk.guerraezuberante.registry.ModParticles.ZZZ.get(),
+                io.github.omarflk.guerraezuberante.client.particle.ZzzParticle.Provider::new);
     }
 
     @SubscribeEvent
     public static void registerKeys(RegisterKeyMappingsEvent event) {
         event.register(ModKeyBindings.OPEN_PANEL);
         event.register(ModKeyBindings.USE_POWER);
+        event.register(ModKeyBindings.OPEN_PROFILE);
     }
 
     @SubscribeEvent
@@ -43,6 +55,15 @@ public final class ClientModEvents {
         ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
                 () -> new ConfigScreenHandler.ConfigScreenFactory((minecraft, parent) ->
                         new ModPanelScreen(parent, ModPanelScreen.Page.HOME)));
+        // Sheets builds its banner/shield tables before mod patterns are registered; without these the flags crash the renderer.
+        event.enqueueWork(() -> {
+            for (var key : java.util.List.of(ModWorldgen.STAR, ModWorldgen.SMALL_STAR, ModWorldgen.DOLLAR, ModWorldgen.BRAZIL)) {
+                net.minecraft.client.renderer.Sheets.BANNER_MATERIALS.computeIfAbsent(key, ignored -> new net.minecraft.client.resources.model.Material(
+                        net.minecraft.client.renderer.Sheets.BANNER_SHEET, net.minecraft.world.level.block.entity.BannerPattern.location(key, true)));
+                net.minecraft.client.renderer.Sheets.SHIELD_MATERIALS.computeIfAbsent(key, ignored -> new net.minecraft.client.resources.model.Material(
+                        net.minecraft.client.renderer.Sheets.SHIELD_SHEET, net.minecraft.world.level.block.entity.BannerPattern.location(key, false)));
+            }
+        });
     }
 
     private ClientModEvents() {}

@@ -4,6 +4,11 @@ import com.google.gson.GsonBuilder;
 import io.github.omarflk.guerraezuberante.client.*;
 import io.github.omarflk.guerraezuberante.client.gui.ModPanelScreen;
 import io.github.omarflk.guerraezuberante.client.screen.FactionSelectionScreen;
+import io.github.omarflk.guerraezuberante.client.screen.ProfileScreen;
+import io.github.omarflk.guerraezuberante.progression.*;
+import io.github.omarflk.guerraezuberante.config.ModConfig;
+import io.github.omarflk.guerraezuberante.village.FactionBanners;
+import io.github.omarflk.guerraezuberante.registry.ModWorldgen;
 import io.github.omarflk.guerraezuberante.entity.*;
 import io.github.omarflk.guerraezuberante.faction.*;
 import io.github.omarflk.guerraezuberante.registry.ModEntities;
@@ -38,6 +43,11 @@ public final class FactionMultiplayerChecks {
     private static boolean started,finished,selectionClicked,selectionConfirmed,disconnected,reconnecting,sawLeft;
     private static volatile boolean arenaReady;
     private static int elapsed,serverStage,age,deathWait,rejoinWait,cooldownFirst=-1,cooldownLast=-1,troopHits;
+    private static int protestHits,protestLockedAt=-1,lastClientStage=-1,clientStageTicks,captureFrames;
+    private static float protestHp;
+    private static final Set<Integer> meteorIds=new HashSet<>(),bookIds=new HashSet<>(),protestIds=new HashSet<>();
+    private static final Queue<String> pendingCaptures=new ArrayDeque<>();
+    private static int serverMeteors,serverBooks;
     private static final Set<Integer> requested=new HashSet<>(),beanIds=new HashSet<>();
     private static final Set<String> captures=new LinkedHashSet<>();
     private static final Map<String,Object> serverResults=new ConcurrentHashMap<>(),clientResults=new LinkedHashMap<>();
@@ -55,9 +65,14 @@ public final class FactionMultiplayerChecks {
     private static boolean exists(String name){return Files.exists(session().resolve(name));}
     private static int stage(){try{return Integer.parseInt(Files.readString(session().resolve("stage.txt")).trim());}catch(Exception e){return -1;}}
     private static void next(){serverStage++;age=0;signal("stage.txt",""+serverStage);System.out.println("FACTION_STAGE: "+serverStage);}
-    private static void capture(String name){if(!captures.add(name))return;var mc=Minecraft.getInstance();Screenshot.grab(mc.gameDirectory,"faction121-"+(observer()?"observer-":"host-")+name+".png",mc.getMainRenderTarget(),m->{});}
+    private static void capture(String name){if(captures.add(name))pendingCaptures.add(name);}
+    @SubscribeEvent public static void frame(TickEvent.RenderTickEvent event){
+        if(!enabled() || finished || event.phase!=TickEvent.Phase.END || pendingCaptures.isEmpty() || ++captureFrames<2)return;
+        captureFrames=0;var name=pendingCaptures.remove();var mc=Minecraft.getInstance();Screenshot.grab(mc.gameDirectory,"guerra0141-"+(observer()?"observer-":"host-")+name+".png",mc.getMainRenderTarget(),m->{});
+        if(name.equals("names-tab"))mc.options.keyPlayerList.setDown(false);
+    }
     private static void finish(String failure){
-        if(finished)return;finished=true;clientResults.put("passed",failure==null);clientResults.put("error",failure);clientResults.put("captures",captures);clientResults.put("beanIds",beanIds);
+        if(finished)return;finished=true;clientResults.put("passed",failure==null);clientResults.put("error",failure);clientResults.put("captures",captures);clientResults.put("beanIds",beanIds);clientResults.put("meteorIds",meteorIds);clientResults.put("bookIds",bookIds);clientResults.put("protesterIds",protestIds);
         signal(observer()?"observer.json":"host.json",new GsonBuilder().setPrettyPrinting().create().toJson(clientResults));
         if(failure!=null)signal("error.txt",failure);
         System.out.println("FACTION_CLIENT: "+(observer()?"observer":"host")+" "+(failure==null?"PASS":failure));Minecraft.getInstance().stop();
@@ -76,7 +91,12 @@ public final class FactionMultiplayerChecks {
     }catch(Throwable e){error=e.toString();}});}
     private static List<UkrainianFighterEntity> troops(ServerPlayer owner){var list=new ArrayList<UkrainianFighterEntity>();for(var e:owner.serverLevel().getAllEntities())if(e instanceof UkrainianFighterEntity u && owner.getUUID().equals(u.getOwnerId()))list.add(u);return list;}
     private static void position(ServerPlayer player,boolean host){player.setGameMode(GameType.SURVIVAL);player.teleportTo(player.server.overworld(),host?13000.5:13003.5,220,13000.5,0,10);player.getFoodData().setFoodLevel(20);}
-    @SubscribeEvent public static void damage(LivingDamageEvent e){if(enabled() && !observer() && e.getEntity() instanceof ServerPlayer && e.getSource().getEntity() instanceof UkrainianFighterEntity && e.getAmount()>0)troopHits++;}
+    @SubscribeEvent public static void damage(LivingDamageEvent e){if(enabled() && !observer() && e.getEntity() instanceof ServerPlayer && e.getAmount()>0){
+        if(e.getSource().getEntity() instanceof UkrainianFighterEntity)troopHits++;
+        if(e.getSource().getEntity() instanceof ManifestanteEntity unit){protestHits++;if(serverStage==17)for(var entity:((net.minecraft.server.level.ServerLevel)unit.level()).getAllEntities())if(entity instanceof ManifestanteEntity other)other.setNoAi(true);}
+    }}
+    @SubscribeEvent public static void joined(net.minecraftforge.event.entity.EntityJoinLevelEvent e){if(enabled() && !observer() && !e.getLevel().isClientSide){if(e.getEntity() instanceof MeteorProjectile)serverMeteors++;if(e.getEntity() instanceof YellowBookProjectile)serverBooks++;}}
+    private static List<ManifestanteEntity> protesters(ServerPlayer player){return player.serverLevel().getEntitiesOfClass(ManifestanteEntity.class,player.getBoundingBox().inflate(80),m->player.getUUID().equals(m.getOwnerId()));}
     @SubscribeEvent public static void serverTick(TickEvent.ServerTickEvent e){
         if(!enabled() || observer() || !arenaReady || finished || e.phase!=TickEvent.Phase.END)return;
         try{
@@ -116,8 +136,24 @@ public final class FactionMultiplayerChecks {
                     Factions.assign(host,Faction.BOLSONARISTA);FactionPowers.resetCooldown(host);server.setPvpAllowed(false);next();}
                 case 11->{if(age<90)return;require(other.getHealth()==20,"Player fissure bypassed PvP OFF: "+other.getHealth());serverResults.put("fissurePvpOffHp",other.getHealth());
                     position(host,true);other.teleportTo(server.overworld(),13000.5,220,13006.5,180,0);other.invulnerableTime=0;FactionPowers.resetCooldown(host);server.setPvpAllowed(true);next();}
-                case 12->{if(age<90)return;require(other.getHealth()<20,"Player fissure did not hit real player with PvP ON");serverResults.put("fissurePvpOnHp",other.getHealth());serverResults.put("passed",true);
-                    signal("server.json",new GsonBuilder().setPrettyPrinting().create().toJson(serverResults));next();}
+                case 12->{if(age<90)return;require(other.getHealth()<20,"Player fissure did not hit real player with PvP ON");serverResults.put("fissurePvpOnHp",other.getHealth());
+                    other.setGameMode(GameType.CREATIVE);Factions.assign(host,Faction.MISSAO);Progression.addXp(host,1_000_000);FactionPowers.resetCooldown(host);position(host,true);next();}
+                case 13->{if(age<45)return;require(Progression.level(host)==30 && Progression.stat(host,Stat.CONVICCAO)==10 && Progression.stat(host,Stat.FORCA_IDEOLOGICA)==1,"Point spending packets failed");
+                    require(Progression.availablePoints(host)==18 && Progression.unlockedPowers(host)==3,"Profile/unlock mismatch");serverResults.put("profile",List.of(30,10,1,18,3));next();}
+                case 14->{if(age<135)return;require(serverMeteors==20 && Progression.selectedPower(host)==1 && FactionPowers.remainingCooldown(host,1)>0,"Meteor RPC/selected power failed");serverResults.put("meteors",serverMeteors);next();}
+                case 15->{if(age<55)return;require(serverBooks>=3 && Progression.selectedPower(host)==2 && FactionPowers.remainingCooldown(host,1)>0 && FactionPowers.remainingCooldown(host,2)>0,"Book RPC/independent slots failed");serverResults.put("books",serverBooks);
+                    Factions.assign(host,Faction.ESQUERDA);Factions.assign(other,Faction.BOLSONARISTA);FactionPowers.resetCooldown(host);position(host,true);position(other,false);host.removeAllEffects();other.removeAllEffects();other.setHealth(20);server.setPvpAllowed(false);next();}
+                case 16->{if(age==65){require(protesters(host).size()==10,"Manifestando did not spawn ten units");server.setPvpAllowed(true);host.attack(other);}
+                    if(age>65 && protestLockedAt<0 && protesters(host).stream().anyMatch(m->m.getTarget()==other)){server.setPvpAllowed(false);protestLockedAt=age;protestHp=other.getHealth();}
+                    require(age<200,"Manifestantes did not acquire a target");if(protestLockedAt<0 || age-protestLockedAt<35)return;
+                    require(other.getHealth()==protestHp && protestHits==0,"Manifestante ignored changed PvP");serverResults.put("protestPvpOffHits",protestHits);server.setPvpAllowed(true);host.attack(other);next();}
+                case 17->{if(protestHits==0){require(age<180,"Manifestantes did not attack with PvP ON");return;}serverResults.put("protestPvpOnHits",protestHits);protesters(host).forEach(Entity::discard);
+                    Factions.assign(host,Faction.LULISTA);FactionPowers.resetCooldown(host);position(host,true);other.teleportTo(server.overworld(),13000.5,220,13006.5,180,0);other.getInventory().clearContent();other.getInventory().setItem(0,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND,3));other.getInventory().setItem(1,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.COBBLESTONE,64));other.getInventory().setItem(2,new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_INGOT,8));other.setHealth(20);other.invulnerableTime=0;ModConfig.FAZ_O_L_BREAK_BLOCKS.set(false);next();}
+                case 18->{if(age<90)return;require(other.getHealth()>0 && other.getHealth()<20 && other.getInventory().items.stream().filter(s->!s.isEmpty()).count()==1,"Faz o L did not damage/drop two stacks");serverResults.put("fazOLHp",other.getHealth());serverResults.put("fazOLStacksLeft",1);next();}
+                case 19->{if(!exists("observer-theft.ack"))return;host.setGameMode(GameType.CREATIVE);other.setGameMode(GameType.CREATIVE);host.teleportTo(server.overworld(),13000.5,220,12994.5,0,0);other.teleportTo(server.overworld(),13001.5,220,12994.5,0,0);
+                    for(Faction faction:Faction.values()){var at=new BlockPos(12996+faction.ordinal()*2,220,13003);host.serverLevel().setBlockAndUpdate(at,FactionBanners.standing(faction,8));FactionBanners.paint(host.serverLevel(),at,faction);}
+                    var j=ModEntities.JAIR_BOLSONARO.get().create(host.serverLevel());j.moveTo(13008.5,220,13003.5,180,0);j.setNoAi(true);host.serverLevel().addFreshEntity(j);serverResults.put("jairAudioResource",io.github.omarflk.guerraezuberante.registry.ModSounds.JAIR_CANALHA.isAvailable());next();}
+                case 20->{if(age<70 || !exists("host-banners.ack") || !exists("observer-banners.ack"))return;serverResults.put("passed",true);signal("server.json",new GsonBuilder().setPrettyPrinting().create().toJson(serverResults));next();}
             }
         }catch(Throwable failure){error=failure.toString();signal("error.txt",error);}
     }
@@ -132,19 +168,20 @@ public final class FactionMultiplayerChecks {
         if(!enabled() || finished || e.phase!=TickEvent.Phase.END)return;var mc=Minecraft.getInstance();if(++elapsed>11000){finish("Timeout stage="+stage());return;}
         try{
             if(exists("error.txt")){finish(Files.readString(session().resolve("error.txt")));return;}
-            if(error!=null){finish(error);return;}int stage=stage();
+            if(error!=null){finish(error);return;}int stage=stage();if(stage!=lastClientStage){lastClientStage=stage;clientStageTicks=0;}clientStageTicks++;
             if(observer() && disconnected && mc.level==null && !reconnecting && ++rejoinWait>25){reconnecting=true;ConnectScreen.startConnecting(new TitleScreen(),mc,ServerAddress.parseString("127.0.0.1:25586"),new ServerData("Faction local","127.0.0.1:25586",false),false);}
             if(mc.level==null || mc.player==null || mc.getOverlay()!=null)return;
             mc.options.pauseOnLostFocus=false;mc.options.hideGui=false;mc.setWindowActive(true);
+            mc.getToasts().clear();
             require(mc.options.getSoundSourceVolume(SoundSource.MASTER)==0,"Automated client not muted");choose(mc);
             if(!started){started=true;if(!observer())setup();}
             if(mc.screen instanceof DeathScreen && !observer()){if(++deathWait>23){mc.player.respawn();mc.setScreen(null);}return;}
-            for(var entity:mc.level.entitiesForRendering())if(entity instanceof BeanProjectile bean)beanIds.add(bean.getId());
+            for(var entity:mc.level.entitiesForRendering()){if(entity instanceof BeanProjectile bean)beanIds.add(bean.getId());if(entity instanceof MeteorProjectile)meteorIds.add(entity.getId());if(entity instanceof YellowBookProjectile)bookIds.add(entity.getId());if(entity instanceof ManifestanteEntity)protestIds.add(entity.getId());}
             if(stage==1){
                 var remote=mc.level.players().stream().filter(p->p!=mc.player).findFirst().orElse(null);if(remote==null || Factions.of(mc.player).isEmpty() || Factions.of(remote).isEmpty())return;
                 var info=mc.player.connection.getPlayerInfo(remote.getUUID());if(info==null || info.getTabListDisplayName()==null)return;
                 require(remote.getDisplayName().getString().startsWith("["),"Remote nametag lacks prefix");require(info.getTabListDisplayName().getString().startsWith("["),"Remote TAB lacks prefix");
-                clientResults.put("remoteName",remote.getDisplayName().getString());clientResults.put("remoteTab",info.getTabListDisplayName().getString());mc.options.keyPlayerList.setDown(true);capture("names-tab");mc.options.keyPlayerList.setDown(false);
+                clientResults.put("remoteName",remote.getDisplayName().getString());clientResults.put("remoteTab",info.getTabListDisplayName().getString());mc.options.keyPlayerList.setDown(true);capture("names-tab");
                 signal(observer()?"observer-names.ack":"host-names.ack","ok");
             }
             boolean use=(!observer() && (stage==2 || stage==4 || stage==7 || stage==10 || stage==11 || stage==12)) || (observer() && stage==3);
@@ -163,10 +200,22 @@ public final class FactionMultiplayerChecks {
             }
             if(stage>=4 && mc.screen instanceof ModPanelScreen && !(stage==9 && !observer()))mc.setScreen(null);
             if(stage==9 && !observer() && !(mc.screen instanceof ModPanelScreen))mc.setScreen(new ModPanelScreen(null,ModPanelScreen.Page.FACTIONS));
-            if(stage==4)capture("summoned-troops");
+            if(stage==4 && clientStageTicks>60)capture("summoned-troops");
             if(stage==8 && observer() && !disconnected){capture("before-reconnect");disconnected=true;mc.level.disconnect();mc.clearLevel(new TitleScreen());return;}
-            if(stage>=9 && observer()){require(Factions.of(mc.player).orElse(null)==Faction.ESQUERDA,"Reconnect lost faction");clientResults.put("reconnectedWithoutChoice",true);capture("after-reconnect");}
-            if(stage==13 && (observer() || exists("observer.json"))){clientResults.put("selectionConfirmed",selectionConfirmed);finish(null);}
+            if(stage>=9 && stage<=15 && observer()){require(Factions.of(mc.player).orElse(null)==Faction.ESQUERDA,"Reconnect lost faction");clientResults.put("reconnectedWithoutChoice",true);capture("after-reconnect");}
+            if(stage==13 && !observer() && Factions.of(mc.player).orElse(null)==Faction.MISSAO && ProgressionClient.level()==30 && requested.add(13)){
+                mc.setScreen(new ProfileScreen());for(int i=0;i<10;i++)FactionNetwork.spendPoint(Stat.CONVICCAO);FactionNetwork.spendPoint(Stat.FORCA_IDEOLOGICA);
+            }
+            if(stage==13 && !observer() && ProgressionClient.unlocked()==3 && ProgressionClient.points()==18){clientResults.put("profilePackets",true);capture("profile-unlocked");}
+            if(!observer() && (stage==14 || stage==15 || stage==16 || stage==18) && !requested.contains(stage)){
+                Faction desired=stage<=15?Faction.MISSAO:stage==16?Faction.ESQUERDA:Faction.LULISTA;
+                if(Factions.of(mc.player).orElse(null)==desired){int slot=stage==14 || stage==16?1:2;if(!(mc.screen instanceof ProfileScreen))mc.setScreen(new ProfileScreen());
+                    var field=ProfileScreen.class.getDeclaredField("powerButtons");field.setAccessible(true);var buttons=(Button[])field.get(mc.screen);if(buttons[slot].active){buttons[slot].onPress();mc.setScreen(null);mc.player.setYRot(0);mc.player.setXRot(10);FactionNetwork.usePower();requested.add(stage);}}
+            }
+            if(stage==19 && observer() && mc.player.getInventory().items.stream().filter(s->!s.isEmpty()).count()==1){clientResults.put("inventoryDropPacket",true);capture("faz-o-l-inventory");signal("observer-theft.ack","ok");}
+            if(stage==20 && clientStageTicks>30){for(var key:List.of(ModWorldgen.STAR,ModWorldgen.SMALL_STAR,ModWorldgen.BRAZIL,ModWorldgen.DOLLAR))require(net.minecraft.client.renderer.Sheets.BANNER_MATERIALS.containsKey(key),"Banner material missing");
+                mc.player.setYRot(0);mc.player.setXRot(0);mc.options.fov().set(65);clientResults.put("bannerMaterials",true);capture("banners-jair");signal(observer()?"observer-banners.ack":"host-banners.ack","ok");}
+            if(stage==21 && pendingCaptures.isEmpty() && (observer() || exists("observer.json"))){clientResults.put("selectionConfirmed",selectionConfirmed);finish(null);}
         }catch(Throwable failure){finish(failure.toString());}
     }
 }

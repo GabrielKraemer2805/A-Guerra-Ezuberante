@@ -1,6 +1,9 @@
 package io.github.omarflk.guerraezuberante.faction;
 
 import io.github.omarflk.guerraezuberante.GuerraEzuberanteMod;
+import io.github.omarflk.guerraezuberante.progression.Progression;
+import io.github.omarflk.guerraezuberante.progression.Stat;
+import io.github.omarflk.guerraezuberante.village.FactionVillages;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,15 +16,22 @@ import java.util.UUID;
 
 /** The client only asks to join; the server decides and then tells everyone. */
 public final class FactionNetwork {
+    /** 2: per-slot cooldowns, the J profile, spending points and choosing the B power (0.013). 3: faction villages (0.014). */
+    private static final String VERSION = "3";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(GuerraEzuberanteMod.MOD_ID, "faction"), () -> "1", "1"::equals, "1"::equals);
+            new ResourceLocation(GuerraEzuberanteMod.MOD_ID, "faction"), () -> VERSION, VERSION::equals, VERSION::equals);
     /** ordinal -1 means "no faction". */
     public record Sync(UUID player, int ordinal) {}
     public record Prompt() {}
     public record Choose(int ordinal) {}
     public record UsePower() {}
-    /** Ticks until the faction power is ready again, for the K panel. */
-    public record Cooldown(int ticks) {}
+    /** Everything the J profile shows; sent on login and on every change. Cooldowns in ticks, one per power slot. */
+    public record Profile(int level, int maxLevel, int xp, int xpToNext, int points, int[] stats, int statMax,
+                          int selected, int unlocked, int[] cooldowns) {}
+    public record SpendPoint(int stat) {}
+    public record SelectPower(int slot) {}
+    /** Village centres of the player's faction as x/z pairs; empty without a faction or in a world without villages. */
+    public record Villages(int[] coords) {}
 
     public static void register() {
         CHANNEL.messageBuilder(Sync.class, 0, NetworkDirection.PLAY_TO_CLIENT)
@@ -63,12 +73,43 @@ public final class FactionNetwork {
                     if (player != null) { FactionPowers.use(player); }
                     context.get().setPacketHandled(true);
                 }).add();
-        CHANNEL.messageBuilder(Cooldown.class, 4, NetworkDirection.PLAY_TO_CLIENT)
-                .encoder((packet, buffer) -> buffer.writeVarInt(packet.ticks()))
-                .decoder(buffer -> new Cooldown(buffer.readVarInt()))
+        CHANNEL.messageBuilder(Profile.class, 4, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder((packet, buffer) -> {
+                    buffer.writeVarInt(packet.level()); buffer.writeVarInt(packet.maxLevel()); buffer.writeVarInt(packet.xp());
+                    buffer.writeVarInt(packet.xpToNext()); buffer.writeVarInt(packet.points()); buffer.writeVarIntArray(packet.stats());
+                    buffer.writeVarInt(packet.statMax()); buffer.writeVarInt(packet.selected()); buffer.writeVarInt(packet.unlocked());
+                    buffer.writeVarIntArray(packet.cooldowns());
+                })
+                .decoder(buffer -> new Profile(buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt(),
+                        buffer.readVarInt(), buffer.readVarIntArray(Stat.values().length), buffer.readVarInt(), buffer.readVarInt(),
+                        buffer.readVarInt(), buffer.readVarIntArray(Progression.POWER_SLOTS)))
                 .consumerMainThread((packet, context) -> {
                     DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
-                            io.github.omarflk.guerraezuberante.client.FactionClient.cooldown(packet.ticks()));
+                            io.github.omarflk.guerraezuberante.client.ProgressionClient.apply(packet));
+                    context.get().setPacketHandled(true);
+                }).add();
+        CHANNEL.messageBuilder(SpendPoint.class, 5, NetworkDirection.PLAY_TO_SERVER)
+                .encoder((packet, buffer) -> buffer.writeVarInt(packet.stat()))
+                .decoder(buffer -> new SpendPoint(buffer.readVarInt()))
+                .consumerMainThread((packet, context) -> {
+                    ServerPlayer player = context.get().getSender();
+                    if (player != null) { Stat.byOrdinal(packet.stat()).ifPresent(stat -> Progression.spend(player, stat)); }
+                    context.get().setPacketHandled(true);
+                }).add();
+        CHANNEL.messageBuilder(SelectPower.class, 6, NetworkDirection.PLAY_TO_SERVER)
+                .encoder((packet, buffer) -> buffer.writeVarInt(packet.slot()))
+                .decoder(buffer -> new SelectPower(buffer.readVarInt()))
+                .consumerMainThread((packet, context) -> {
+                    ServerPlayer player = context.get().getSender();
+                    if (player != null) { Progression.select(player, packet.slot()); }
+                    context.get().setPacketHandled(true);
+                }).add();
+        CHANNEL.messageBuilder(Villages.class, 7, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder((packet, buffer) -> buffer.writeVarIntArray(packet.coords()))
+                .decoder(buffer -> new Villages(buffer.readVarIntArray(2 * FactionVillages.PER_FACTION)))
+                .consumerMainThread((packet, context) -> {
+                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+                            io.github.omarflk.guerraezuberante.client.FactionClient.setVillages(packet.coords()));
                     context.get().setPacketHandled(true);
                 }).add();
     }
@@ -80,8 +121,31 @@ public final class FactionNetwork {
         }
     }
 
-    public static void sendCooldown(ServerPlayer player, int ticks) {
-        send(player, new Cooldown(Math.max(0, ticks)));
+    public static void sendProfile(ServerPlayer player) {
+        int[] stats = new int[Stat.values().length];
+        for (Stat stat : Stat.values()) { stats[stat.ordinal()] = Progression.stat(player, stat); }
+        int[] cooldowns = new int[Progression.POWER_SLOTS];
+        for (int slot = 0; slot < cooldowns.length; slot++) { cooldowns[slot] = FactionPowers.remainingCooldown(player, slot); }
+        int level = Progression.level(player);
+        send(player, new Profile(level, Progression.maxLevel(), Progression.xp(player), Progression.xpToNext(level),
+                Progression.availablePoints(player), stats, io.github.omarflk.guerraezuberante.config.ModConfig.STAT_MAX.get(),
+                Progression.selectedPower(player), Progression.unlockedPowers(player), cooldowns));
+    }
+
+    public static void sendVillages(ServerPlayer player) {
+        int[] coords = Factions.of(player)
+                .flatMap(faction -> FactionVillages.locate(player.server, faction))
+                .map(list -> list.stream().flatMapToInt(pos -> java.util.stream.IntStream.of(pos.getX(), pos.getZ())).toArray())
+                .orElse(new int[0]);
+        send(player, new Villages(coords));
+    }
+
+    public static void spendPoint(Stat stat) {
+        CHANNEL.sendToServer(new SpendPoint(stat.ordinal()));
+    }
+
+    public static void selectPower(int slot) {
+        CHANNEL.sendToServer(new SelectPower(slot));
     }
 
     public static void usePower() {

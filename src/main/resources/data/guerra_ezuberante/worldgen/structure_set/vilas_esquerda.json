@@ -1,0 +1,10 @@
+{
+  "structures": [
+    { "structure": "guerra_ezuberante:vila_esquerda", "weight": 1 }
+  ],
+  "placement": {
+    "type": "guerra_ezuberante:vilas_faccao",
+    "faction": "esquerda",
+    "salt": 20141004
+  }
+}

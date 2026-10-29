@@ -1,7 +1,7 @@
 ﻿param(
     [string]$InputDirectory,
     [string]$FFmpegPath,
-    [ValidateSet('renan', 'arthur')][string]$Character = 'renan'
+    [ValidateSet('renan', 'arthur', 'jair')][string]$Character = 'renan'
 )
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
@@ -25,8 +25,8 @@ if (-not $FFmpegPath -or -not (Test-Path -LiteralPath $FFmpegPath)) {
     throw 'FFmpeg não encontrado. Instale-o no PATH ou passe -FFmpegPath com o caminho do executável.'
 }
 if (-not (Test-Path -LiteralPath $InputDirectory)) { throw "Pasta de entrada inexistente: $InputDirectory" }
-$files = @(Get-ChildItem -LiteralPath $InputDirectory -File -Recurse | Where-Object { $_.Extension -ieq '.mp3' } | Sort-Object Name)
-if ($files.Count -eq 0) { throw "Nenhum MP3 encontrado em $InputDirectory" }
+$files = @(Get-ChildItem -LiteralPath $InputDirectory -File -Recurse | Where-Object { $_.Extension -in @('.mp3', '.mpeg', '.wav', '.m4a', '.ogg') } | Sort-Object Name)
+if ($files.Count -eq 0) { throw "Nenhum áudio (MP3, WAV, M4A ou OGG) encontrado em $InputDirectory" }
 New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
 $outputs = @{}
 $hashes = @{}
@@ -44,7 +44,7 @@ $jobs = foreach ($file in $files) {
     if ($name -eq 'renan_risadinha_safada') { $name = 'risadinha' }
     if ($name -eq 'me_respeita_creu_creu_phonk') { $name = 'phonk' }
     if (-not $name) { throw "Nome inválido: $($file.Name)" }
-    if ($outputs.ContainsKey($name)) { throw "Dois MP3s produzem o mesmo nome '$name'. Renomeie as entradas." }
+    if ($outputs.ContainsKey($name)) { throw "Dois áudios produzem o mesmo nome '$name'. Renomeie as entradas." }
     $outputs[$name] = $true
     [pscustomobject]@{ Input = $file.FullName; Output = (Join-Path $outputDirectory ($name + '.ogg')) }
 }

@@ -6,7 +6,7 @@
 
 **Seis facções · Personagens com IA · Exércitos invocáveis · Multiplayer**
 
-![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.012.1-DBA434?style=for-the-badge)
+![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.014.1-DBA434?style=for-the-badge)
 ![GeckoLib](https://img.shields.io/badge/GeckoLib-4.8.4-58A64B?style=for-the-badge)
 ![TaCZ](https://img.shields.io/badge/TaCZ-1.1.8--hotfix2-397BA8?style=for-the-badge)
 ![Plataforma](https://img.shields.io/badge/PLATAFORMA-MINECRAFT_JAVA-62B447?style=for-the-badge)
@@ -23,7 +23,50 @@ Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pre
 
 📚 **[Guia de prompts](guia-de-prompts/README.md)** — como pedir personagens, poderes, correções e arte, com **[modelos para copiar](guia-de-prompts/MODELOS.md)**, **[requisitos para jogar/desenvolver](guia-de-prompts/REQUISITOS.md)** e **[instruções para modificar o mod](guia-de-prompts/COMO-MODIFICAR.md)**. A pasta tem seu próprio README e pode ser consultada diretamente no GitHub.
 
-> **Estado atual — 0.012.1.** Sistema de facções criado por **[GabrielKraemer2805](https://github.com/GabrielKraemer2805)** integrado ao projeto: escolha persistente, prefixos, poderes na tecla B, passivos e kits. Esta atualização corrige PvP das tropas, limpeza de invocações após morte/desconexão e regeneração após relog; o painel K atualiza a recarga em tempo real. [Facções, poderes e kits](docs/FACCOES_0.012.md), [integração e correções](docs/INTEGRACAO_FACCOES_0.012.1.md).
+> **Estado atual — 0.014.1.** As contribuições de **[GabrielKraemer2805](https://github.com/GabrielKraemer2805)** acrescentam progressão até o nível30, perfil **J**, cinco atributos, doze poderes de Convicção, vozes do Jair e vilas com castelos. A integração preserva as correções da0.012.1 e protege o terreno no modo Aventura, cancelamentos de explosão/dano, PvP dos Manifestantes e XP de mortes canceladas. **B** usa o poder selecionado; **K** abre o painel. [Integração e validação](docs/INTEGRACAO_0.014.1.md) · [Progressão e poderes](docs/PROGRESSAO_0.013.md) · [Vilas](docs/VILAS_0.014.md).
+
+## Vilas de facção — 0.014.0
+
+![Castelo da Missão por dentro](docs/preview/vilas-0.014/castelo-missao-interior.png)
+
+Mundos novos planejam **18 vilas**, **3 de cada facção**, em anéis com raio alvo de350–1.000 blocos do centro; a busca de bioma pode deslocar os pontos além dessa faixa. Cada uma usa casas do bioma, cores e estandartes da facção, praça e **castelo**. As vilas são o **único spawn natural** dos personagens, um de cada por vila, e **quem morre não volta**. Em mundos antigos, chunks já explorados não recebem a vila completa; use um mundo novo para conferir toda a geração.
+
+| Facção | No castelo | Na vila | Bandeira |
+| --- | --- | --- | --- |
+| Lulista | Lula | — | vermelha com estrela branca |
+| Bolsonarista | Jair | Flávio | verde com o mapa do Brasil em amarelo |
+| Missão | Renan | Arthur | metade amarela, metade preta |
+| Direita | trono vazio | — | azul com cifrão amarelo |
+| Centro | trono vazio | — | cinza |
+| Esquerda | trono vazio | — | vermelha com estrela amarela pequena |
+
+Ao escolher a facção, o chat mostra as coordenadas das 3 vilas dela (clique copia). Elas também ficam no **painel K → Facções** e em `/ge vilas`. Mundos criados antes da 0.014 só ganham vila em áreas ainda não exploradas. Detalhes em [docs/VILAS_0.014.md](docs/VILAS_0.014.md).
+
+## Vozes do Jair — 0.013.1
+
+O Jair agora fala. **Botão direito** toca uma das gravações longas (Eu não te, Popcorn). **"Canalha"** só aparece quando ele **recebe dano**, com cerca de **40% de chance** (`[jair] canalha_chance`), nunca por cima de outra fala. Inventário e durações em [docs/AUDIOS.md](docs/AUDIOS.md).
+
+## Nível, status e poderes de Convicção — 0.013.0
+
+![Perfil na tecla J](docs/preview/progressao-0.013/perfil-conviccao.png)
+
+- **Tecla J** abre o perfil: nível (até 30), barra de XP, pontos livres, os cinco status com botão **+** e os três poderes da facção. Clicar num poder liberado faz dele o poder da **B**.
+- **XP por abates**: mob hostil 10, personagem do mod 40, boss 200, jogador de outra facção 60. Abates feitos com poderes e pelas suas tropas contam. 1 ponto por nível, até 10 por status.
+- **Status**: Força (+0,5 de dano corpo a corpo), Velocidade (+2%), Vida (+1), Força Ideológica (+5% no dano dos poderes) e Convicção Ideológica (−2% de recarga; **5 libera o 2º poder, 10 libera o 3º**).
+
+| Facção | 2º poder | 3º poder |
+| --- | --- | --- |
+| Lulista | Fim da Escala! (pisão com onda de choque) | Faz o L (L gigante com a explosão da morte do Lula; quem sobrevive perde 2 itens) |
+| Bolsonarista | Histórico de Atleta (Força, Velocidade, Pressa, Salto e Vida) | Não Sou Coveiro (cova 10 × 5 × 5, 10 de dano) |
+| Missão | Aborto Zacarias (chuva de pedras rosas) | O Livro Amarelo (livros que deixam o alvo Entediado) |
+| Esquerda | Manifestando (10 zumbis vermelhos que agem como lobos) | Greve Geral (Lentidão II e Fraqueza em área) |
+| Direita | Salto Liberal (salto com impacto) | Mão Invisível (empurrão com dano) |
+| Centro | Isenção (Resistência IV) | Toma Lá, Dá Cá (drena vida dos inimigos) |
+
+Operadores: `/ge nivel xp <jogadores> <quantidade>` e `/ge nivel resetar <jogadores>`. Detalhes, números e configuração em [docs/PROGRESSAO_0.013.md](docs/PROGRESSAO_0.013.md).
+
+
+> **Integração anterior — 0.012.1.** Escolha persistente, prefixos, poderes, passivos e kits criados por GabrielKraemer2805. As correções de PvP das tropas, limpeza após morte/desconexão e recuperação após relog continuam preservadas. [Detalhes](docs/INTEGRACAO_FACCOES_0.012.1.md).
 
 ## Facções, poderes e kits — 0.012.0
 
@@ -331,7 +374,7 @@ sequenceDiagram
 
 Mira, recuo e animação de recarga deste protótipo são simples; ainda não há mãos articuladas, carregador animado separado, acessórios ou receitas Survival. São recursos para uma possível próxima etapa, não uma substituição completa do TaCZ. O suporte anterior continua disponível quando ele está instalado; cada sistema atua somente em seus próprios itens.
 
-O build gera também **`build/distributions/guerra-ezuberante-0.012.1-sem-tacz/mods/`**, com Guerra Ezuberante e GeckoLib. A GE-P12 não adiciona outro mod na lista. **GeckoLib ainda aparece separadamente**, pois os personagens dependem dele. Para preservar armas já salvas, o perfil normal de desenvolvimento mantém TaCZ; os testes de independência usam um mundo isolado sem ele.
+O build gera também **`build/distributions/guerra-ezuberante-0.014.1-sem-tacz/mods/`**, com Guerra Ezuberante e GeckoLib. A GE-P12 não adiciona outro mod na lista. **GeckoLib ainda aparece separadamente**, pois os personagens dependem dele. Para preservar armas já salvas, o perfil normal de desenvolvimento mantém TaCZ; os testes de independência usam um mundo isolado sem ele.
 
 **Validação executada:** 47 GameTests com TaCZ e 10 próprios sem ele. Os dois cenários gráficos passaram: modelo 3D, ADS/FOV, tiro e dano, som único, recoil, recarga/conservação, gatilho segurado sem rajada e rejeição sem munição. A aba criativa real abriu com 6 itens sem TaCZ e 15 com ele. Multiplayer gráfico entre dois clientes da GE-P12 ainda não foi testado.
 
@@ -386,11 +429,11 @@ Os controles podem ser remapeados no Minecraft. A integração não registra tec
 | Minecraft Java | 1.20.1 | Plataforma |
 | Forge | 47.4.28 | Cliente e servidor |
 | Java | 17 | Jogo e desenvolvimento |
-| Guerra Ezuberante | 0.012.1 | Este mod, inclui menu ilustrado, Renan armado e GE-P12 |
+| Guerra Ezuberante | 0.014.1 | Este mod, inclui menu ilustrado, Renan armado e GE-P12 |
 | GeckoLib | 4.8.4 para Forge 1.20.1 | Personagens e animações existentes |
 | TaCZ | **1.1.8-hotfix2**, arquivo CurseForge **9037989** | Opcional; necessário nos dois lados para usar as cinco armas nativas |
 
-O build prepara os três JARs separados em **`build/distributions/guerra-ezuberante-0.012.1/mods/`** e a alternativa sem TaCZ em **`build/distributions/guerra-ezuberante-0.012.1-sem-tacz/mods/`**. O artefato próprio fica em **`build/libs/guerra_ezuberante-0.012.1.jar`**. Cliente e servidor devem usar o mesmo conjunto. O gunpack padrão já vem no JAR oficial do TaCZ; a GE-P12 não precisa dele.
+O build prepara os três JARs separados em **`build/distributions/guerra-ezuberante-0.014.1/mods/`** e a alternativa sem TaCZ em **`build/distributions/guerra-ezuberante-0.014.1-sem-tacz/mods/`**. O artefato próprio fica em **`build/libs/guerra_ezuberante-0.014.1.jar`**. Cliente e servidor devem usar o mesmo conjunto. O gunpack padrão já vem no JAR oficial do TaCZ; a GE-P12 não precisa dele.
 
 A dependência foi fixada pelo [arquivo oficial publicado em 02/10/2026](https://www.curseforge.com/minecraft/mc-mods/timeless-and-classics-zero/files/9037989), não pelo exemplo antigo 1.1.6 do README do TaCZ. Gradle usa CurseMaven com `fg.deobf`; o pacote local utiliza o JAR original, sem o remapeamento de desenvolvimento. `mods.toml` exige a versão exata. `validateTacz` verifica SHA-256 e os IDs/calibres no gunpack dessa distribuição.
 
@@ -656,7 +699,7 @@ Com comandos habilitados:
 /summon guerra_ezuberante:arthur_do_val_invocador ~4 ~ ~
 ```
 
-O JAR atual fica em **`build/libs/guerra_ezuberante-0.012.1.jar`**. O build prepara **`build/distributions/guerra-ezuberante-0.012.1/mods/`** com o mod, GeckoLib 4.8.4 e TaCZ 1.1.8-hotfix2 originais, separados, e **`build/distributions/guerra-ezuberante-0.012.1-sem-tacz/mods/`** apenas com o mod e GeckoLib. A GE-P12 funciona nos dois conjuntos. Não distribua `.tools/` ou caches, nem instale múltiplas versões do mod juntas.
+O JAR atual fica em **`build/libs/guerra_ezuberante-0.014.1.jar`**. O build prepara **`build/distributions/guerra-ezuberante-0.014.1/mods/`** com o mod, GeckoLib 4.8.4 e TaCZ 1.1.8-hotfix2 originais, separados, e **`build/distributions/guerra-ezuberante-0.014.1-sem-tacz/mods/`** apenas com o mod e GeckoLib. A GE-P12 funciona nos dois conjuntos. Não distribua `.tools/` ou caches, nem instale múltiplas versões do mod juntas.
 
 ### Áudios: entrada, conversão e novas falas
 

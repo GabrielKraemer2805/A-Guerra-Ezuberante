@@ -34,4 +34,14 @@ try{
  if(-not(Test-Path $result)){throw 'Missing faction report.'}
  $report=Get-Content $result -Raw|ConvertFrom-Json
  if(-not $report.passed){throw $report.error}
+ if(-not $Observer){
+  $remote=Get-Content (Join-Path $session 'observer.json') -Raw|ConvertFrom-Json
+  $server=Get-Content (Join-Path $session 'server.json') -Raw|ConvertFrom-Json
+  if(-not($remote.passed -and $server.passed)){throw 'Incomplete multiplayer reports.'}
+  $expected=@{beanIds=3;meteorIds=[int]$server.meteors;bookIds=[int]$server.books;protesterIds=10}
+  foreach($key in $expected.Keys){
+   $a=@($report.$key|Sort-Object);$b=@($remote.$key|Sort-Object)
+   if($a.Count -ne $expected[$key] -or (Compare-Object $a $b)){throw "Missing or different client entities: $key"}
+  }
+ }
 }finally{Pop-Location}

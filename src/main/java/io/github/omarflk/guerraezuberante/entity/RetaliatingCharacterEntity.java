@@ -171,8 +171,16 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
         }
         List<ModSounds.VoiceLine> alternatives = available.stream()
                 .filter(voice -> !voice.file().equals(lastReaction)).toList();
-        ModSounds.VoiceLine voice = alternatives.isEmpty() ? available.get(0)
-                : alternatives.get(random.nextInt(alternatives.size()));
+        speak(alternatives.isEmpty() ? available.get(0) : alternatives.get(random.nextInt(alternatives.size())));
+    }
+
+    /** True while a voice line of this character may still be playing (right-click or combat). */
+    public final boolean isSpeaking() {
+        return voiceCooldown > 0 || combatAudioCooldown > 0;
+    }
+
+    /** Plays a voice line attached to the character and blocks other lines until it has finished. */
+    protected final void speak(ModSounds.VoiceLine voice) {
         if (level() instanceof ServerLevel server) {
             server.playSeededSound(null, this, voice.event().getHolder().orElseThrow(),
                     getSoundSource(), 0.8F, 1.0F, random.nextLong());

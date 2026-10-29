@@ -22,6 +22,11 @@ public final class ClientGameEvents {
                 minecraft.setScreen(new ModPanelScreen(null, ModPanelScreen.Page.HOME));
             }
         }
+        while (ModKeyBindings.OPEN_PROFILE.consumeClick()) {
+            if (minecraft.player != null && minecraft.screen == null) {
+                minecraft.setScreen(new io.github.omarflk.guerraezuberante.client.screen.ProfileScreen());
+            }
+        }
     }
 
     private ClientGameEvents() {}

@@ -27,6 +27,9 @@ public final class GuerraEzuberanteMod {
         ModItems.REGISTER.register(bus);
         ModCreativeTabs.REGISTER.register(bus);
         ModSounds.REGISTER.register(bus);
+        io.github.omarflk.guerraezuberante.registry.ModWorldgen.register(bus);
+        io.github.omarflk.guerraezuberante.registry.ModEffects.REGISTER.register(bus);
+        io.github.omarflk.guerraezuberante.registry.ModParticles.REGISTER.register(bus);
         io.github.omarflk.guerraezuberante.pistol.PistolNetwork.register();
         io.github.omarflk.guerraezuberante.faction.FactionNetwork.register();
         io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.register();
@@ -42,5 +45,6 @@ public final class GuerraEzuberanteMod {
         event.put(ModEntities.ARTHUR_COMBATENTE.get(), ArthurDoValEntity.createAttributes().build());
         event.put(ModEntities.ARTHUR_INVOCADOR.get(), ArthurDoValEntity.createAttributes().build());
         event.put(ModEntities.UKRAINIAN_FIGHTER.get(), UkrainianFighterEntity.createAttributes().build());
+        event.put(ModEntities.MANIFESTANTE.get(), io.github.omarflk.guerraezuberante.entity.ManifestanteEntity.createAttributes().build());
     }
 }

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "guerra_ezuberante:item/faz_o_l"
+  }
+}
