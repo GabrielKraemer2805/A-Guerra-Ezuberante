@@ -195,5 +195,14 @@
                                    }
                                ],
                     "subtitle":  "subtitles.guerra_ezuberante.jair.popcorn"
-                }
+                },
+    "batalha.renan_santos":  {
+                                 "subtitle":  "subtitles.guerra_ezuberante.batalha.renan_santos",
+                                 "sounds":  [
+                                                {
+                                                    "name":  "guerra_ezuberante:batalha/renan_santos",
+                                                    "stream":  true
+                                                }
+                                            ]
+                             }
 }

@@ -16,8 +16,8 @@ import java.util.UUID;
 
 /** The client only asks to join; the server decides and then tells everyone. */
 public final class FactionNetwork {
-    /** 2: per-slot cooldowns, the J profile, spending points and choosing the B power (0.013). 3: faction villages (0.014). */
-    private static final String VERSION = "3";
+    /** 2: per-slot cooldowns, the J profile, spending points and choosing the B power (0.013). 3: faction villages (0.014). 4: village music (0.014.3). */
+    private static final String VERSION = "4";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(GuerraEzuberanteMod.MOD_ID, "faction"), () -> VERSION, VERSION::equals, VERSION::equals);
     /** ordinal -1 means "no faction". */
@@ -32,6 +32,8 @@ public final class FactionNetwork {
     public record SelectPower(int slot) {}
     /** Village centres of the player's faction as x/z pairs; empty without a faction or in a world without villages. */
     public record Villages(int[] coords) {}
+    /** Ordinal of the faction village whose music should loop now; -1 stops it. */
+    public record VillageMusic(int ordinal) {}
 
     public static void register() {
         CHANNEL.messageBuilder(Sync.class, 0, NetworkDirection.PLAY_TO_CLIENT)
@@ -112,6 +114,14 @@ public final class FactionNetwork {
                             io.github.omarflk.guerraezuberante.client.FactionClient.setVillages(packet.coords()));
                     context.get().setPacketHandled(true);
                 }).add();
+        CHANNEL.messageBuilder(VillageMusic.class, 8, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder((packet, buffer) -> buffer.writeVarInt(packet.ordinal() + 1))
+                .decoder(buffer -> new VillageMusic(buffer.readVarInt() - 1))
+                .consumerMainThread((packet, context) -> {
+                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+                            io.github.omarflk.guerraezuberante.client.VillageMusicClient.set(packet.ordinal()));
+                    context.get().setPacketHandled(true);
+                }).add();
     }
 
     /** Skips connections that are not open (disconnecting players, GameTest mock players). */
@@ -138,6 +148,10 @@ public final class FactionNetwork {
                 .map(list -> list.stream().flatMapToInt(pos -> java.util.stream.IntStream.of(pos.getX(), pos.getZ())).toArray())
                 .orElse(new int[0]);
         send(player, new Villages(coords));
+    }
+
+    public static void sendVillageMusic(ServerPlayer player, int ordinal) {
+        send(player, new VillageMusic(ordinal));
     }
 
     public static void spendPoint(Stat stat) {

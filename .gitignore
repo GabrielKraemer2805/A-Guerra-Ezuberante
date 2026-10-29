@@ -28,6 +28,7 @@ Thumbs.db
 
 # Preserve original recordings locally; package only converted game resources
 audios/
+audios batalha/
 assets-entrada/audio/*
 !assets-entrada/audio/README.md
 

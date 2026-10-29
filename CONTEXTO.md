@@ -1,5 +1,13 @@
 # Contexto de trabalho — Guerra Ezuberante
 
+## Música da vila da Missão — 0.014.3 (29/10/2026)
+
+- Pedido do colaborador: pasta `audios batalha/` com uma subpasta por político (Renan Santos, Arthur do Val, Lula, Jair Bolsonaro, Flavio Bolsonaro) e a música enviada na pasta do Renan, tocando de fundo em loop infinito sempre que o jogador chega numa vila da Missão. Branch `feat/musica-batalha-vila-missao`, a partir da main do Omar (`de8b39f`).
+- Original preservado em `audios batalha/Renan Santos/musica_minecraft.mp3` (150,5 s). Recurso `sounds/batalha/renan_santos.ogg`, Vorbis 44.100 Hz **estéreo** (música de fundo não posicional, por isso não segue a regra mono das falas), sem cortes. Evento `batalha.renan_santos`, `stream: true`, legendas pt_br/en_us.
+- `village/VillageMusic`: servidor confere a cada 20 ticks, no overworld, se o jogador está dentro da caixa horizontal de uma estrutura `vila_missao` (casas, ruas e castelo) e só envia mudanças. Ao sair, a música segue até 8 blocos além da borda para não piscar. Tabela `TRACKS` por facção; as outras vilas continuam sem música até ganharem faixa. Canal `faction` **versão 4** (pacote `VillageMusic`, id 8): cliente e servidor precisam ser atualizados juntos.
+- `client/VillageMusicClient`: `SimpleSoundInstance` em loop nativo, não posicional, na categoria **Música** (controlada pelo slider de música). Enquanto toca, segura a música vanilla; ela volta no ritmo normal depois. Recomeça após F3+T; para ao sair da vila, morrer em espectador/trocar de dimensão e ao sair do mundo. `-PsilentClient` continua silenciando tudo.
+- Validação: build/check aprovados. Vila só existe em mundo novo (sem retrogeneração).
+
 ## Manual para IAs colaboradoras (29/10/2026)
 
 - Autor solicitou um único Markdown completo para os amigos entregarem às IAs deles. Criado `guia-de-prompts/guerra-ezuberante/SKILL.md`, transportável como anexo e com frontmatter de skill, referenciado no README principal e no guia de prompts.

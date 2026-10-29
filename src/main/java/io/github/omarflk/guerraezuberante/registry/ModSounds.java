@@ -35,6 +35,8 @@ public final class ModSounds {
     public static final RegistryObject<SoundEvent> JAIR_CANALHA_EVENT = register("jair.canalha");
     public static final RegistryObject<SoundEvent> JAIR_EU_NAO_TE = register("jair.eu_nao_te");
     public static final RegistryObject<SoundEvent> JAIR_POPCORN = register("jair.popcorn");
+    /** Background music, looped while a player stands inside a Missão village (one folder per politician in "audios batalha"). */
+    public static final RegistryObject<SoundEvent> BATTLE_RENAN = register("batalha.renan_santos");
 
     public record VoiceLine(RegistryObject<SoundEvent> event, String directory, String file, int cooldownTicks) {
         public VoiceLine(RegistryObject<SoundEvent> event, String file, int cooldownTicks) {
