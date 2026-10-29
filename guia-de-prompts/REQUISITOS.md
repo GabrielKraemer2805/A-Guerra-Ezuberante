@@ -2,7 +2,7 @@
 
 [Voltar ao guia](README.md) · [Prompts prontos](MODELOS.md) · [Como modificar](COMO-MODIFICAR.md)
 
-Referência deste documento: **Guerra Ezuberante 0.011.0**. As versões vêm dos arquivos do próprio repositório; não substitua uma dependência pela versão mais nova sem conferir compatibilidade.
+Referência deste documento: **Guerra Ezuberante 0.012.1**. As versões vêm dos arquivos do próprio repositório; não substitua uma dependência pela versão mais nova sem conferir compatibilidade.
 
 ## Para jogar
 
@@ -11,7 +11,7 @@ Referência deste documento: **Guerra Ezuberante 0.011.0**. As versões vêm dos
 | Minecraft **Java Edition** | **1.20.1** | Jogo base; este projeto não é um addon de Bedrock |
 | Java de 64 bits | **17** | Runtime usado nesta versão; o launcher deve iniciar o perfil com Java compatível |
 | Forge | **47.4.28**, versão validada | Carrega o mod e os eventos de gameplay |
-| Guerra Ezuberante | **0.011.0** | Personagens, habilidades, painel, menu e GE-P12 |
+| Guerra Ezuberante | **0.012.1** | Facções, poderes, personagens, painel, menu e GE-P12 |
 | GeckoLib **para Forge 1.20.1** | **4.8.4**, obrigatório | Modelos e animações dos personagens |
 | TaCZ **para Forge 1.20.1** | **1.1.8-hotfix2**, opcional | Arsenal externo e armas nativas de Renan/Jair |
 
@@ -27,7 +27,7 @@ Sem TaCZ, a **GE-P12 própria continua funcionando** e Renan/Jair usam o comport
 4. Remova o JAR antigo do Guerra Ezuberante dessa pasta para não carregar duas versões do mesmo mod. Guarde os mundos antes de alterar um conjunto de mods.
 5. Inicie o perfil e confira o carregamento na lista de mods. No jogo, use a aba criativa do mod ou o painel **K** para conferir os personagens.
 
-O menu ilustrado é parte do mod. Os testes atuais, as mecânicas e os recursos estão descritos no [README principal](../README.md) e na [entrega 0.011.0](../docs/BOSSES_0.011.md).
+O menu ilustrado é parte do mod. Os testes atuais, as mecânicas e os recursos estão descritos no [README principal](../README.md) e na [entrega 0.012.1](../docs/INTEGRACAO_FACCOES_0.012.1.md). Ao entrar no mundo, escolha a facção; use B para o poder e K para o painel.
 
 ### Onde obter os arquivos deste projeto
 
@@ -36,12 +36,12 @@ O repositório publica o **código, recursos e documentação**. `build/` é ign
 Depois de compilar, use um dos conjuntos gerados:
 
 ```text
-build/libs/guerra_ezuberante-0.011.0.jar
+build/libs/guerra_ezuberante-0.012.1.jar
 
-build/distributions/guerra-ezuberante-0.011.0/mods/
+build/distributions/guerra-ezuberante-0.012.1/mods/
   Guerra Ezuberante + GeckoLib + TaCZ, em JARs separados
 
-build/distributions/guerra-ezuberante-0.011.0-sem-tacz/mods/
+build/distributions/guerra-ezuberante-0.012.1-sem-tacz/mods/
   Guerra Ezuberante + GeckoLib
 ```
 

@@ -6,7 +6,7 @@
 
 **Seis facções · Personagens com IA · Exércitos invocáveis · Multiplayer**
 
-![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.011.0-DBA434?style=for-the-badge)
+![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.012.1-DBA434?style=for-the-badge)
 ![GeckoLib](https://img.shields.io/badge/GeckoLib-4.8.4-58A64B?style=for-the-badge)
 ![TaCZ](https://img.shields.io/badge/TaCZ-1.1.8--hotfix2-397BA8?style=for-the-badge)
 ![Plataforma](https://img.shields.io/badge/PLATAFORMA-MINECRAFT_JAVA-62B447?style=for-the-badge)
@@ -23,7 +23,7 @@ Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pre
 
 📚 **[Guia de prompts](guia-de-prompts/README.md)** — como pedir personagens, poderes, correções e arte, com **[modelos para copiar](guia-de-prompts/MODELOS.md)**, **[requisitos para jogar/desenvolver](guia-de-prompts/REQUISITOS.md)** e **[instruções para modificar o mod](guia-de-prompts/COMO-MODIFICAR.md)**. A pasta tem seu próprio README e pode ser consultada diretamente no GitHub.
 
-> **Estado atual — 0.012.0.** Ao entrar no mundo pela primeira vez, cada jogador **escolhe sua facção** entre as seis. A escolha fica salva no mundo, aparece como prefixo colorido no nome (chat, TAB e acima da cabeça) e só um operador pode trocá-la (`/ge faccao definir`). Cada facção tem **um poder na tecla B**, **um passivo** e **um kit inicial**. **Fogo amigo continua ativo.** [Facções, poderes e kits](docs/FACCOES_0.012.md).
+> **Estado atual — 0.012.1.** Sistema de facções criado por **[GabrielKraemer2805](https://github.com/GabrielKraemer2805)** integrado ao projeto: escolha persistente, prefixos, poderes na tecla B, passivos e kits. Esta atualização corrige PvP das tropas, limpeza de invocações após morte/desconexão e regeneração após relog; o painel K atualiza a recarga em tempo real. [Facções, poderes e kits](docs/FACCOES_0.012.md), [integração e correções](docs/INTEGRACAO_FACCOES_0.012.1.md).
 
 ## Facções, poderes e kits — 0.012.0
 
@@ -40,7 +40,7 @@ Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pre
 | Direita Bolsonarista | Rachadinha: fenda de 8 blocos, 8 de dano, sem escavar (15 s) | Colete: +2 de armadura | GE-P12 carregada e 24 cartuchos |
 | Direita Missão | Exército Ucraniano: 2 Combatentes por 30 s (45 s) | Disciplina: +2 de vida máxima | Espada Ucraniana e escudo |
 | Esquerda Independente | Cura em Grupo: Regeneração II em 6 blocos (30 s) | Recuperação: 1 de vida a cada 4 s fora de combate | Escudo, peitoral de ferro e 2 poções de cura |
-| Direita Independente | Investida: dash de ~6 blocos e Força I (12 s) | Agilidade: +10% de velocidade | Arco com Poder I e 32 flechas |
+| Direita Independente | Investida: impulso frontal e Força I (12 s) | Agilidade: +10% de velocidade | Arco com Poder I e 32 flechas |
 | Centro | Adaptação: Defesa ↔ Mobilidade (5 s) | Postura sempre ativa | Espada de ferro, escudo e 8 bifes |
 
 O kit sai uma única vez por jogador por mundo. A facção não bloqueia dano entre membros nem muda o comportamento dos personagens com IA. Valores na seção `[faction_powers]` da configuração do servidor.
@@ -331,7 +331,7 @@ sequenceDiagram
 
 Mira, recuo e animação de recarga deste protótipo são simples; ainda não há mãos articuladas, carregador animado separado, acessórios ou receitas Survival. São recursos para uma possível próxima etapa, não uma substituição completa do TaCZ. O suporte anterior continua disponível quando ele está instalado; cada sistema atua somente em seus próprios itens.
 
-O build gera também **`build/distributions/guerra-ezuberante-0.011.0-sem-tacz/mods/`**, com Guerra Ezuberante e GeckoLib. A GE-P12 não adiciona outro mod na lista. **GeckoLib ainda aparece separadamente**, pois os personagens dependem dele. Para preservar armas já salvas, o perfil normal de desenvolvimento mantém TaCZ; os testes de independência usam um mundo isolado sem ele.
+O build gera também **`build/distributions/guerra-ezuberante-0.012.1-sem-tacz/mods/`**, com Guerra Ezuberante e GeckoLib. A GE-P12 não adiciona outro mod na lista. **GeckoLib ainda aparece separadamente**, pois os personagens dependem dele. Para preservar armas já salvas, o perfil normal de desenvolvimento mantém TaCZ; os testes de independência usam um mundo isolado sem ele.
 
 **Validação executada:** 47 GameTests com TaCZ e 10 próprios sem ele. Os dois cenários gráficos passaram: modelo 3D, ADS/FOV, tiro e dano, som único, recoil, recarga/conservação, gatilho segurado sem rajada e rejeição sem munição. A aba criativa real abriu com 6 itens sem TaCZ e 15 com ele. Multiplayer gráfico entre dois clientes da GE-P12 ainda não foi testado.
 
@@ -386,11 +386,11 @@ Os controles podem ser remapeados no Minecraft. A integração não registra tec
 | Minecraft Java | 1.20.1 | Plataforma |
 | Forge | 47.4.28 | Cliente e servidor |
 | Java | 17 | Jogo e desenvolvimento |
-| Guerra Ezuberante | 0.011.0 | Este mod, inclui menu ilustrado, Renan armado e GE-P12 |
+| Guerra Ezuberante | 0.012.1 | Este mod, inclui menu ilustrado, Renan armado e GE-P12 |
 | GeckoLib | 4.8.4 para Forge 1.20.1 | Personagens e animações existentes |
 | TaCZ | **1.1.8-hotfix2**, arquivo CurseForge **9037989** | Opcional; necessário nos dois lados para usar as cinco armas nativas |
 
-O build prepara os três JARs separados em **`build/distributions/guerra-ezuberante-0.011.0/mods/`** e a alternativa sem TaCZ em **`build/distributions/guerra-ezuberante-0.011.0-sem-tacz/mods/`**. O artefato próprio fica em **`build/libs/guerra_ezuberante-0.011.0.jar`**. Cliente e servidor devem usar o mesmo conjunto. O gunpack padrão já vem no JAR oficial do TaCZ; a GE-P12 não precisa dele.
+O build prepara os três JARs separados em **`build/distributions/guerra-ezuberante-0.012.1/mods/`** e a alternativa sem TaCZ em **`build/distributions/guerra-ezuberante-0.012.1-sem-tacz/mods/`**. O artefato próprio fica em **`build/libs/guerra_ezuberante-0.012.1.jar`**. Cliente e servidor devem usar o mesmo conjunto. O gunpack padrão já vem no JAR oficial do TaCZ; a GE-P12 não precisa dele.
 
 A dependência foi fixada pelo [arquivo oficial publicado em 02/10/2026](https://www.curseforge.com/minecraft/mc-mods/timeless-and-classics-zero/files/9037989), não pelo exemplo antigo 1.1.6 do README do TaCZ. Gradle usa CurseMaven com `fg.deobf`; o pacote local utiliza o JAR original, sem o remapeamento de desenvolvimento. `mods.toml` exige a versão exata. `validateTacz` verifica SHA-256 e os IDs/calibres no gunpack dessa distribuição.
 
@@ -656,7 +656,7 @@ Com comandos habilitados:
 /summon guerra_ezuberante:arthur_do_val_invocador ~4 ~ ~
 ```
 
-O JAR atual fica em **`build/libs/guerra_ezuberante-0.011.0.jar`**. O build prepara **`build/distributions/guerra-ezuberante-0.011.0/mods/`** com o mod, GeckoLib 4.8.4 e TaCZ 1.1.8-hotfix2 originais, separados, e **`build/distributions/guerra-ezuberante-0.011.0-sem-tacz/mods/`** apenas com o mod e GeckoLib. A GE-P12 funciona nos dois conjuntos. Não distribua `.tools/` ou caches, nem instale múltiplas versões do mod juntas.
+O JAR atual fica em **`build/libs/guerra_ezuberante-0.012.1.jar`**. O build prepara **`build/distributions/guerra-ezuberante-0.012.1/mods/`** com o mod, GeckoLib 4.8.4 e TaCZ 1.1.8-hotfix2 originais, separados, e **`build/distributions/guerra-ezuberante-0.012.1-sem-tacz/mods/`** apenas com o mod e GeckoLib. A GE-P12 funciona nos dois conjuntos. Não distribua `.tools/` ou caches, nem instale múltiplas versões do mod juntas.
 
 ### Áudios: entrada, conversão e novas falas
 
@@ -760,7 +760,7 @@ As três primeiras são facções especiais, com líderes, habilidades próprias
 - **Implementado na 0.012.0:** a escolha fica salva no mundo e continua válida após desconectar e voltar ao servidor.
 - **Implementado na 0.012.0:** o administrador troca ou remove a facção com `/ge faccao definir` e `/ge faccao limpar`.
 - **Implementado na 0.012.0:** prefixo colorido da facção no nome, um poder ativo (tecla B), um passivo e um kit inicial por facção.
-- **Decisão do autor na 0.012.0:** jogadores da mesma facção **não** ficam protegidos entre si; fogo amigo continua ativo.
+- **Proposta do colaborador na 0.012.0, aceita pelo autor na integração 0.012.1:** jogadores da mesma facção **não** ficam protegidos entre si; fogo amigo continua ativo, respeitando PvP e equipes do servidor.
 
 As regras completas de diplomacia, fogo amigo, troca de facção e progressão ainda precisam de detalhamento.
 

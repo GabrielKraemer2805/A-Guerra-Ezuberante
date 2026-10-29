@@ -43,6 +43,8 @@ public final class ModPanelScreen extends Screen {
     private int contentBottom;
     private RetaliatingCharacterEntity preview;
     private int characterSelected;
+    private int shownCooldown = -1;
+    private Faction shownFaction;
 
     public ModPanelScreen(Screen parent, Page page) {
         super(Component.translatable("gui.guerra_ezuberante.title"));
@@ -135,12 +137,14 @@ public final class ModPanelScreen extends Screen {
             }
             case FACTIONS -> {
                 var current = minecraft.player == null ? java.util.Optional.<Faction>empty() : Factions.of(minecraft.player);
+                shownFaction = current.orElse(null);
                 if (current.isPresent()) {
                     Faction faction = current.get();
                     paragraph(textWidth, "gui.guerra_ezuberante.faction_current", faction.displayName());
                     paragraph(textWidth, "gui.guerra_ezuberante.faction_power", faction.powerName(), faction.powerDescription(),
                             ModKeyBindings.USE_POWER.getTranslatedKeyMessage());
                     int remaining = FactionClient.remainingCooldown();
+                    shownCooldown = (remaining + 19) / 20;
                     paragraph(textWidth, remaining > 0 ? "gui.guerra_ezuberante.faction_power_cooldown"
                             : "gui.guerra_ezuberante.faction_power_ready", (remaining + 19) / 20);
                     paragraph(textWidth, "gui.guerra_ezuberante.faction_passive", faction.passive());
@@ -181,6 +185,16 @@ public final class ModPanelScreen extends Screen {
     private void paragraph(int width, String key, Object... args) {
         lines.addAll(font.split(Component.translatable(key, args), width));
         lines.add(FormattedCharSequence.EMPTY);
+    }
+
+    @Override public void tick() {
+        super.tick();
+        if (page == Page.FACTIONS && minecraft.player != null) {
+            var faction = Factions.of(minecraft.player).orElse(null);
+            if (faction != shownFaction || (faction != null && shownCooldown != (FactionClient.remainingCooldown() + 19) / 20)) {
+                rebuildWidgets();
+            }
+        }
     }
 
     private int maxScroll() {

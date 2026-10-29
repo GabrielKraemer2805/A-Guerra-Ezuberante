@@ -28,9 +28,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * One active power per faction (B key), its cooldown and the light passives. Server authoritative:
@@ -39,13 +37,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Mod.EventBusSubscriber(modid = GuerraEzuberanteMod.MOD_ID)
 public final class FactionPowers {
-    private static final String DATA = "GuerraEzuberanteFaction", READY_AT = "PowerReadyAt", STANCE = "CentroMobility";
+    private static final String DATA = "GuerraEzuberanteFaction", READY_AT = "PowerReadyAt", STANCE = "CentroMobility", LAST_HURT = "LastHurtAt";
     private static final UUID ARMOR_ID = UUID.fromString("2f0f6f1e-7c58-4d6b-9c41-0b6e8c2a3d01");
     private static final UUID HEALTH_ID = UUID.fromString("2f0f6f1e-7c58-4d6b-9c41-0b6e8c2a3d02");
     private static final UUID SPEED_ID = UUID.fromString("2f0f6f1e-7c58-4d6b-9c41-0b6e8c2a3d03");
     /** Stance effects are re-applied with this duration, so leaving Centro lets them run out within seconds. */
     private static final int STANCE_EFFECT_TICKS = 60;
-    private static final Map<UUID, Long> LAST_HURT = new ConcurrentHashMap<>();
 
     public static int cooldown(Faction faction) {
         return switch (faction) {
@@ -136,7 +133,7 @@ public final class FactionPowers {
     }
 
     private static boolean ukrainianArmy(ServerPlayer player) {
-        int missing = ModConfig.PLAYER_TROOPS_COUNT.get() - SummonLedger.get(player.serverLevel()).count(player.getUUID());
+        int missing = ModConfig.PLAYER_TROOPS_COUNT.get() - SummonLedger.get(player.serverLevel()).countPlayer(player.getUUID(), now(player));
         if (missing <= 0) {
             player.displayClientMessage(Component.translatable("power.guerra_ezuberante.troops_full"), true);
             return false;
@@ -247,15 +244,15 @@ public final class FactionPowers {
         }
         if (faction.get() == Faction.ESQUERDA && player.getHealth() < player.getMaxHealth()
                 && player.tickCount % ModConfig.ESQUERDA_REGEN_INTERVAL.get() < 20
-                && now(player) - LAST_HURT.getOrDefault(player.getUUID(), Long.MIN_VALUE / 2) >= ModConfig.ESQUERDA_REGEN_DELAY.get()) {
+                && (!data.contains(LAST_HURT) || now(player) - data.getLong(LAST_HURT) >= ModConfig.ESQUERDA_REGEN_DELAY.get())) {
             player.heal(1);
         }
     }
 
     @SubscribeEvent
     public static void hurt(LivingHurtEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            LAST_HURT.put(player.getUUID(), now(player));
+        if (event.getAmount() > 0 && event.getEntity() instanceof ServerPlayer player) {
+            data(player).putLong(LAST_HURT, now(player));
         }
     }
 
@@ -277,13 +274,23 @@ public final class FactionPowers {
     @SubscribeEvent
     public static void login(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
+            applyPassives(player);
             FactionNetwork.sendCooldown(player, remainingCooldown(player));
         }
     }
 
     @SubscribeEvent
-    public static void logout(PlayerEvent.PlayerLoggedOutEvent event) {
-        LAST_HURT.remove(event.getEntity().getUUID());
+    public static void respawn(PlayerEvent.PlayerRespawnEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            applyPassives(player); FactionNetwork.sendCooldown(player, remainingCooldown(player));
+        }
+    }
+
+    @SubscribeEvent
+    public static void dimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            FactionNetwork.sendCooldown(player, remainingCooldown(player));
+        }
     }
 
     private FactionPowers() {}

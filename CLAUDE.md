@@ -16,10 +16,10 @@ As regras do autor valem para qualquer agente, inclusive o Claude:
 - Build: `.\gradlew.bat build`
 - Abrir o jogo: `.\gradlew.bat runClient`
 - GameTests: `.\gradlew.bat runGameTestServer`
-- `tools/gradle.ps1` espera um JDK portátil em `.tools/jdk17`. Se ele não existir, usar o `gradlew.bat` com o Java 17 do sistema.
+- `tools/gradle.ps1` usa um JDK portátil em `.tools/jdk17` quando disponível; caso contrário, aceita `JAVA_HOME` apontando para um JDK 17.
 
 ## Trabalho em dupla
 
 - O projeto tem mais de um colaborador. Trabalhar em branch própria; não fazer push na `main` nem forçar push sem pedido explícito.
-- Antes de começar uma tarefa, fazer `git pull` para pegar as mudanças dos outros.
+- Antes de começar uma tarefa, conferir `git status` e fazer `git fetch`; comparar a branch local com o remoto e integrar conscientemente, preservando alterações locais.
 - Ao registrar uma entrega no `CONTEXTO.md`, seguir o formato das seções existentes.

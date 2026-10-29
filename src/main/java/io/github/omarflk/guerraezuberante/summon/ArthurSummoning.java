@@ -55,7 +55,10 @@ public final class ArthurSummoning {
                         if (!level.noCollision(unit, box) || !level.getEntities(unit, box).isEmpty()) { continue; }
                         unit.bindTo(owner, created * 2, lifetimeTicks);
                         if (level.addFreshEntity(unit)) {
-                            ledger.register(owner.getUUID(), unit.getUUID());
+                            if (owner instanceof net.minecraft.server.level.ServerPlayer) {
+                                ledger.registerPlayer(owner.getUUID(), unit.getUUID(), unit.getPlayerSummonToken(),
+                                        level.getServer().overworld().getGameTime() + lifetimeTicks);
+                            } else { ledger.register(owner.getUUID(), unit.getUUID()); }
                             created++;
                         }
                         break;

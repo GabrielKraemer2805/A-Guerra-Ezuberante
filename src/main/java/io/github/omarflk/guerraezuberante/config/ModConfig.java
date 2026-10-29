@@ -88,7 +88,7 @@ public final class ModConfig {
         FISSURE_BLOCK_DAMAGE=builder.comment("Narrow surface break only; respects mobGriefing, block hardness and Forge destroy events.")
                 .define("rachadinha_block_damage",true);
         builder.pop();
-        builder.comment("Player faction powers (V key), passives and the one-time starting kit.").push("faction_powers");
+        builder.comment("Player faction powers (B key), passives and the one-time starting kit.").push("faction_powers");
         FACTION_KIT_ENABLED=builder.comment("Kit is given once per player per world, only on the player's own first choice.")
                 .define("starting_kit_enabled",true);
         BEAN_VOLLEY_COOLDOWN=builder.defineInRange("lulista_bean_volley_cooldown_ticks",160,20,72000);
@@ -112,7 +112,7 @@ public final class ModConfig {
                 .defineInRange("esquerda_passive_regen_delay_ticks",200,20,6000);
         ESQUERDA_REGEN_INTERVAL=builder.defineInRange("esquerda_passive_regen_interval_ticks",80,20,6000);
         DASH_COOLDOWN=builder.defineInRange("direita_dash_cooldown_ticks",240,40,72000);
-        DASH_STRENGTH=builder.comment("Horizontal launch speed; 1.3 is about 6 blocks on flat ground.")
+        DASH_STRENGTH=builder.comment("Horizontal launch speed; travel distance depends on ground, effects and movement, not a fixed teleport.")
                 .defineInRange("direita_dash_strength",1.3D,.2D,5D);
         DASH_BUFF_TICKS=builder.defineInRange("direita_dash_strength_effect_ticks",100,20,1200);
         DIREITA_SPEED=builder.comment("Fraction of base movement speed; 0.1 = +10%.")

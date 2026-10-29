@@ -34,6 +34,7 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
     private static final EntityDataAccessor<Integer> EMERGENCE_DURATION = SynchedEntityData.defineId(
             UkrainianFighterEntity.class, EntityDataSerializers.INT);
     private UUID ownerId;
+    private UUID playerSummonToken;
     private LivingEntity cachedOwner;
     private int lifeTicks;
     private int missingOwnerTicks;
@@ -70,6 +71,9 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
     public void bindTo(LivingEntity owner, int delayTicks, int lifetimeTicks) {
         ownerId = owner.getUUID();
         cachedOwner = owner;
+        if (owner instanceof net.minecraft.server.level.ServerPlayer && level() instanceof ServerLevel server) {
+            playerSummonToken = SummonLedger.get(server).playerToken(ownerId);
+        }
         lifeTicks = lifetimeTicks;
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(ModConfig.FIGHTER_HEALTH.get());
         setHealth(getMaxHealth());
@@ -79,6 +83,7 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
     }
 
     public UUID getOwnerId() { return ownerId; }
+    public UUID getPlayerSummonToken() { return playerSummonToken; }
     public ArthurDoValEntity getOwnerEntity() { return cachedOwner instanceof ArthurDoValEntity arthur ? arthur : null; }
     public LivingEntity getOwner() { return cachedOwner; }
 
@@ -136,6 +141,10 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
 
     @Override
     public void tick() {
+        if (level() instanceof ServerLevel server && playerSummonToken != null
+                && !SummonLedger.get(server).playerUnitActive(ownerId, getUUID(), playerSummonToken, server.getServer().overworld().getGameTime())) {
+            vanish(server); return;
+        }
         if (!level().isClientSide && isActionLocked()) { getNavigation().stop(); }
         super.tick();
         if (!(level() instanceof ServerLevel server) || !isAlive()) { return; }
@@ -159,7 +168,8 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
             return;
         }
         missingOwnerTicks = 0;
-        SummonLedger.get(server).register(ownerId, getUUID());
+        if (cachedOwner instanceof Player && playerSummonToken == null) { vanish(server); return; } // Retire legacy player units safely.
+        if (!(cachedOwner instanceof Player)) { SummonLedger.get(server).register(ownerId, getUUID()); }
         LivingEntity target = cachedOwner instanceof Player player ? playerCombatTarget(player)
                 : ((ArthurDoValEntity) cachedOwner).getTarget();
         if (!isActionLocked() && target != null && isValidAggressor(target)) { setTarget(target); }
@@ -196,12 +206,27 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
 
     @Override
     public boolean doHurtTarget(Entity target) {
+        if (!ownerAllowsDamage(target)) { return false; }
         boolean hit = super.doHurtTarget(target);
         if (hit && target instanceof LivingEntity living) {
             getMainHandItem().getItem().hurtEnemy(getMainHandItem(), living, this);
             if (cachedOwner instanceof ArthurDoValEntity arthur) { arthur.noteTroopAttack(living); }
         }
         return hit;
+    }
+
+    private boolean ownerAllowsDamage(Entity target) {
+        if (!(target instanceof Player victim)) { return true; }
+        LivingEntity owner = cachedOwner;
+        if (level() instanceof ServerLevel server && ownerId != null) {
+            if (server.getEntity(ownerId) instanceof Player player) { owner = player; }
+            else if (playerSummonToken != null) { return false; }
+        }
+        return !(owner instanceof Player player) || player.canHarmPlayer(victim);
+    }
+
+    @Override protected boolean isValidAggressor(LivingEntity target) {
+        return super.isValidAggressor(target) && ownerAllowsDamage(target);
     }
 
     @Override
@@ -211,6 +236,7 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         if (ownerId != null) { tag.putUUID("Summoner", ownerId); }
+        if (playerSummonToken != null) { tag.putUUID("PlayerSummonToken", playerSummonToken); }
         tag.putInt("LifeTicks", lifeTicks);
         tag.putInt("EmergenceRemaining", Math.max(0, (int) (entityData.get(EMERGENCE_DURATION)
                 - (level().getGameTime() - entityData.get(EMERGENCE_START)))));
@@ -221,6 +247,7 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity {
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         ownerId = tag.hasUUID("Summoner") ? tag.getUUID("Summoner") : null;
+        playerSummonToken = tag.hasUUID("PlayerSummonToken") ? tag.getUUID("PlayerSummonToken") : null;
         lifeTicks = tag.getInt("LifeTicks");
         int remaining = net.minecraft.util.Mth.clamp(tag.getInt("EmergenceRemaining"), 0, 260);
         int duration = tag.contains("EmergenceDuration") ? Math.max(44, tag.getInt("EmergenceDuration")) : 44;

@@ -1,0 +1,25 @@
+{
+  "choiceViaScreen": true,
+  "remoteName": "[Lulista] Dev",
+  "remoteTab": "[Lulista] Dev",
+  "panelCooldown": [
+    30,
+    27
+  ],
+  "reconnectedWithoutChoice": true,
+  "selectionConfirmed": true,
+  "passed": true,
+  "captures": [
+    "names-tab",
+    "cooldown-start",
+    "cooldown-running",
+    "summoned-troops",
+    "before-reconnect",
+    "after-reconnect"
+  ],
+  "beanIds": [
+    283,
+    284,
+    285
+  ]
+}

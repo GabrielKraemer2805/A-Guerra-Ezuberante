@@ -1,0 +1,22 @@
+{
+  "pvpOnTroopHits": 1,
+  "pvpOffHp": 20.0,
+  "pvpOffTroopHits": 0,
+  "fissurePvpOnHp": 12.0,
+  "dashBlocks": 9.483302777049175,
+  "groupHealHp": [
+    14.0,
+    15.0
+  ],
+  "beanTargetHp": 35.0,
+  "pvpOnHp": 15.0,
+  "deathAndRespawnCleanup": true,
+  "reconnectTicks": 53,
+  "recoveryHpAfterDelay": 11.0,
+  "passed": true,
+  "choices": [
+    "LULISTA",
+    "ESQUERDA"
+  ],
+  "fissurePvpOffHp": 20.0
+}

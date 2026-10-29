@@ -1,5 +1,7 @@
 # Guerra Ezuberante 0.012.0 — facções, poderes e kits
 
+> Documento da contribuição original de **GabrielKraemer2805**. A integração autorizada pelo autor e as correções posteriores estão na [0.012.1](INTEGRACAO_FACCOES_0.012.1.md). Os resultados e limitações abaixo registram os testes originais da 0.012.0.
+
 Primeira versão do sistema de facções descrito no README. Cada jogador escolhe uma das seis facções ao entrar no mundo pela primeira vez; a escolha fica salva no mundo e aparece no nome do jogador. Só um operador pode trocá-la depois. Cada facção tem **um poder ativo (tecla B)**, **um passivo** e **um kit inicial** entregue uma única vez.
 
 ![Tela de escolha de facção](preview/faccoes-0.012/poderes12-tela-escolha.png)
@@ -74,7 +76,7 @@ Seção `[faction_powers]` em `serverconfig/guerra_ezuberante-server.toml` do mu
 
 ## Fogo amigo continua ativo
 
-Pedido do autor nesta versão: **membros da mesma facção podem se ferir**. A facção é só identidade. Ela não cria time de scoreboard, não altera `isAlliedTo` nem bloqueia dano. A regra de PvP do servidor (`pvp` no `server.properties`) e os times criados por `/team` continuam valendo como antes.
+Proposta do colaborador, aceita pelo autor na integração 0.012.1: **membros da mesma facção podem se ferir**. A facção é só identidade. Ela não cria time de scoreboard, não altera `isAlliedTo` nem bloqueia dano. A regra de PvP do servidor (`pvp` no `server.properties`) e os times criados por `/team` continuam valendo como antes.
 
 Os personagens com IA (Renan, Arthur, Lula, Jair, Flávio, Ucranianas) **não mudam**: continuam neutros até serem provocados e com as mesmas alianças fixas entre si. Ser Lulista não faz o Lula proteger o jogador.
 

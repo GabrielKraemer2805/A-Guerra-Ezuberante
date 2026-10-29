@@ -182,11 +182,11 @@ public final class BolsonaroGameTests {
         if(protection==1)protectedCasters.add(f.getUUID());protectBreakEvent=protection==2;
         var effect=fissure(f,target,enabled);h.assertTrue(effect!=null,"No terrain effect");var path=effect.surfaces();
         var bedrock=path.get(2).block();h.getLevel().setBlockAndUpdate(bedrock,Blocks.BEDROCK.defaultBlockState());
-        h.runAfterDelay(65,()->{
+        h.runAfterDelay(path.size()*RachadinhaEntity.SEGMENT_TICKS+RachadinhaEntity.FADE_TICKS+3,()->{
             h.getLevel().getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(old,h.getLevel().getServer());protectedCasters.remove(f.getUUID());protectBreakEvent=false;
             long broken=path.stream().filter(s->h.getLevel().getBlockState(s.block()).isAir()).count();
             h.assertTrue(enabled && grief && protection==0?broken>0:broken==0,"Terrain protection/flags failed: "+enabled+"/"+grief+"/"+protection+" broken="+broken);
-            h.assertTrue(target.getHealth()==1014 && effect.isRemoved(),"Terrain flag changed entity damage/lifetime");
+            h.assertTrue(target.getHealth()==1014 && effect.isRemoved(),"Terrain flag changed damage/lifetime: HP="+target.getHealth()+" removed="+effect.isRemoved()+" cells="+path.size());
             h.assertTrue(h.getLevel().getBlockState(bedrock).is(Blocks.BEDROCK),"Bedrock broken");
             for(var s:path)h.assertTrue(!h.getLevel().getBlockState(s.block().below()).isAir(),"Excavation deeper than one surface layer");
             h.assertTrue(broken<=path.size(),"Circular craters or region destruction");

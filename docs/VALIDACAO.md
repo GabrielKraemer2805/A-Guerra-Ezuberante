@@ -1,4 +1,17 @@
-# Validação — 0.011.0
+# Validação — 0.012.1
+
+Contribuição de GabrielKraemer2805 integrada preservando os commits originais e corrigindo PvP, ciclo de vida das tropas e regeneração após relog. [Entrega completa](INTEGRACAO_FACCOES_0.012.1.md).
+
+- **95 GameTests com TaCZ passaram**, incluindo cinco regressões novas das falhas da revisão. `.tools/faction-final-tests.log`.
+- **31 GameTests sem TaCZ passaram**. `.tools/faction-final-no-tacz.log`.
+- **Build, validadores e reobf passaram**. `.tools/faction-release-package.log`. JAR inspecionado sem fixtures/classes TaCZ embutidas.
+- **Dois clientes reais passaram** em perfis isolados, master0 antes do launch, mundo copiado: escolhas C2S, nomes/TAB remotos, mesmos três IDs de feijão283/284/285, cura de dois jogadores10→14/15, K30→27s e mudança de facção com painel aberto, tropas PvP OFF sem dano/ON com dano, morte/respawn/NBT antigo rejeitado e nova invocação, reconexão53ticks com espera de recuperação preservada, Rachadinha PvP OFF20→20/ON20→12 e investida1,3 medida em9,4833blocos nesse cenário.
+
+Relatórios [servidor](validacao/faccoes-0.012.1/servidor.json), [host](validacao/faccoes-0.012.1/host.json), [observador](validacao/faccoes-0.012.1/observer.json). Capturas em `docs/preview/faccoes-0.012.1/`. Logs `.tools/faction-{host,observer}-release.log`. A execução inicial de PvP foi descartada por fome na fixture; a final mantém comida e desliga regeneração natural. Dados de TAB foram verificados no cliente, não deduzidos só de screenshots. A investida mantém seu impulso original e deixa de prometer distância fixa.
+
+Limites: loopback local, sem latência artificial/internet pública, sem outros mods de proteção e sem cobrir todos os terrenos. Áudio automatizado silenciado por preferência do autor; audição manual permanece a cargo do teste normal.
+
+## Histórico — 0.011.0
 
 **76 GameTests obrigatórios passaram**, incluindo cinco novos casos de recasts reais da IA, ponto próximo/área final maior, bossbars, migração de vida salva e configurações personalizadas. Intervalos observados entre quatro casts: 121/120/120 ticks. Log `.tools/boss-rift-final-tests.log`. **12 testes sem TaCZ passaram** em `.tools/boss-rift-no-tacz.log`. Build/check/reobf aprovado em `.tools/boss-rift-package.log`; JAR inspecionado sem fixtures ou classes do TaCZ embutidas. [Mudanças e configurações](BOSSES_0.011.md).
 

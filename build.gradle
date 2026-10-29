@@ -85,6 +85,13 @@ minecraft {
                 if (project.hasProperty('lulaObserver')) { property 'guerra.lulaObserver', 'true' }
                 mods { "${mod_id}" { source sourceSets.gameTest } }
             }
+            if (project.hasProperty('factionTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.factionTest', 'true'
+                property 'guerra.factionObserver', project.hasProperty('factionObserver').toString()
+                property 'guerra.factionTestSession', providers.gradleProperty('factionTestSession').get()
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
             if (project.hasProperty('bossRiftTest')) {
                 args '--width', '1280', '--height', '720'
                 property 'guerra.bossRiftTest', 'true'
