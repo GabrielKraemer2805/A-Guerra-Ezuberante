@@ -12,6 +12,10 @@ public final class ModKeyBindings {
     public static final KeyMapping USE_POWER = new KeyMapping(
             "key.guerra_ezuberante.use_power", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B,
             "key.categories.guerra_ezuberante");
+    /** J: free in vanilla and in TaCZ 1.1.8 (T, C, G, H, O, V, Z and R are taken). */
+    public static final KeyMapping OPEN_PROFILE = new KeyMapping(
+            "key.guerra_ezuberante.open_profile", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J,
+            "key.categories.guerra_ezuberante");
 
     private ModKeyBindings() {}
 }

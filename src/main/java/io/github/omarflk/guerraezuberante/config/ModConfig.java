@@ -27,6 +27,15 @@ public final class ModConfig {
             ESQUERDA_REGEN_INTERVAL,DASH_COOLDOWN,DASH_BUFF_TICKS,STANCE_COOLDOWN;
     public static final ForgeConfigSpec.DoubleValue BEAN_VOLLEY_DAMAGE,LULISTA_SATURATION_BONUS,PLAYER_FISSURE_DAMAGE,
             PLAYER_FISSURE_RANGE,BOLSONARISTA_ARMOR,MISSAO_HEALTH,GROUP_HEAL_RADIUS,DASH_STRENGTH,DIREITA_SPEED;
+    public static final ForgeConfigSpec.IntValue MAX_LEVEL,POINTS_PER_LEVEL,STAT_MAX,XP_BASE,XP_PER_LEVEL,XP_HOSTILE,XP_NPC,XP_BOSS,XP_PLAYER,
+            CONVICTION_SECOND_POWER,CONVICTION_THIRD_POWER;
+    public static final ForgeConfigSpec.DoubleValue STRENGTH_PER_POINT,SPEED_PER_POINT,HEALTH_PER_POINT,IDEOLOGY_PER_POINT,CONVICTION_PER_POINT;
+    public static final ForgeConfigSpec.IntValue STOMP_COOLDOWN,FAZ_O_L_COOLDOWN,FAZ_O_L_ITEMS,ATHLETE_COOLDOWN,ATHLETE_TICKS,GRAVEDIGGER_COOLDOWN,
+            METEOR_COOLDOWN,METEOR_COUNT,BOOK_COOLDOWN,BOOK_TICKS,BOOK_INTERVAL,BORED_TICKS,PROTEST_COOLDOWN,PROTEST_COUNT,PROTEST_LIFETIME,
+            STRIKE_COOLDOWN,STRIKE_TICKS,LEAP_COOLDOWN,PUSH_COOLDOWN,EXEMPTION_COOLDOWN,EXEMPTION_TICKS,DRAIN_COOLDOWN;
+    public static final ForgeConfigSpec.DoubleValue STOMP_DAMAGE,STOMP_RADIUS,FAZ_O_L_DAMAGE,FAZ_O_L_RADIUS,GRAVEDIGGER_DAMAGE,METEOR_DAMAGE,
+            METEOR_RADIUS,BOOK_DAMAGE,STRIKE_RADIUS,LEAP_DAMAGE,PUSH_DAMAGE,PUSH_RADIUS,DRAIN_AMOUNT,DRAIN_RADIUS;
+    public static final ForgeConfigSpec.BooleanValue FAZ_O_L_BREAK_BLOCKS,GRAVEDIGGER_BREAK_BLOCKS;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -88,7 +97,7 @@ public final class ModConfig {
         FISSURE_BLOCK_DAMAGE=builder.comment("Narrow surface break only; respects mobGriefing, block hardness and Forge destroy events.")
                 .define("rachadinha_block_damage",true);
         builder.pop();
-        builder.comment("Player faction powers (V key), passives and the one-time starting kit.").push("faction_powers");
+        builder.comment("Player faction powers (B key), passives and the one-time starting kit.").push("faction_powers");
         FACTION_KIT_ENABLED=builder.comment("Kit is given once per player per world, only on the player's own first choice.")
                 .define("starting_kit_enabled",true);
         BEAN_VOLLEY_COOLDOWN=builder.defineInRange("lulista_bean_volley_cooldown_ticks",160,20,72000);
@@ -118,6 +127,66 @@ public final class ModConfig {
         DIREITA_SPEED=builder.comment("Fraction of base movement speed; 0.1 = +10%.")
                 .defineInRange("direita_speed_bonus",.1D,0D,1D);
         STANCE_COOLDOWN=builder.defineInRange("centro_stance_switch_cooldown_ticks",100,20,72000);
+        builder.pop();
+        builder.comment("Faction level, XP from kills and the five upgradeable stats (J key).").push("progression");
+        MAX_LEVEL=builder.defineInRange("max_level",30,2,200);
+        POINTS_PER_LEVEL=builder.defineInRange("points_per_level",1,1,10);
+        STAT_MAX=builder.defineInRange("stat_max_points",10,1,50);
+        XP_BASE=builder.comment("XP from level n to n+1 = xp_base + xp_per_level * n.").defineInRange("xp_base",40,1,100000);
+        XP_PER_LEVEL=builder.defineInRange("xp_per_level",20,0,100000);
+        XP_HOSTILE=builder.defineInRange("xp_hostile_mob",10,0,100000);
+        XP_NPC=builder.defineInRange("xp_mod_character",40,0,100000);
+        XP_BOSS=builder.comment("Characters with a boss bar and vanilla bosses.").defineInRange("xp_boss",200,0,100000);
+        XP_PLAYER=builder.comment("Only for players of another faction or without one.").defineInRange("xp_enemy_player",60,0,100000);
+        STRENGTH_PER_POINT=builder.defineInRange("strength_attack_damage_per_point",.5D,0D,10D);
+        SPEED_PER_POINT=builder.comment("Fraction of base movement speed per point.").defineInRange("speed_bonus_per_point",.02D,0D,.5D);
+        HEALTH_PER_POINT=builder.defineInRange("health_bonus_per_point",1D,0D,20D);
+        IDEOLOGY_PER_POINT=builder.comment("Power damage (or duration, for powers without damage) per point.").defineInRange("ideological_strength_per_point",.05D,0D,1D);
+        CONVICTION_PER_POINT=builder.comment("Cooldown reduction per point.").defineInRange("conviction_cooldown_reduction_per_point",.02D,0D,.09D);
+        CONVICTION_SECOND_POWER=builder.defineInRange("conviction_for_second_power",5,0,50);
+        CONVICTION_THIRD_POWER=builder.defineInRange("conviction_for_third_power",10,0,50);
+        builder.pop();
+        builder.comment("Second and third faction powers, unlocked by Ideological Conviction.").push("conviction_powers");
+        STOMP_COOLDOWN=builder.defineInRange("lulista_fim_da_escala_cooldown_ticks",400,20,72000);
+        STOMP_DAMAGE=builder.defineInRange("lulista_fim_da_escala_damage",6D,0D,100D);
+        STOMP_RADIUS=builder.defineInRange("lulista_fim_da_escala_radius",6D,1D,16D);
+        FAZ_O_L_COOLDOWN=builder.defineInRange("lulista_faz_o_l_cooldown_ticks",900,20,72000);
+        FAZ_O_L_DAMAGE=builder.defineInRange("lulista_faz_o_l_damage",10D,0D,100D);
+        FAZ_O_L_RADIUS=builder.comment("Damage radius. The blast itself (blocks and visuals) is the same as Lula's death: [lula] death_explosion_power.")
+                .defineInRange("lulista_faz_o_l_radius",7D,1D,16D);
+        FAZ_O_L_BREAK_BLOCKS=builder.define("faz_o_l_break_blocks",true);
+        FAZ_O_L_ITEMS=builder.comment("Items knocked out of a surviving player of another faction.").defineInRange("lulista_faz_o_l_dropped_items",2,0,36);
+        ATHLETE_COOLDOWN=builder.defineInRange("bolsonarista_historico_de_atleta_cooldown_ticks",900,20,72000);
+        ATHLETE_TICKS=builder.defineInRange("bolsonarista_historico_de_atleta_ticks",300,20,6000);
+        GRAVEDIGGER_COOLDOWN=builder.defineInRange("bolsonarista_nao_sou_coveiro_cooldown_ticks",1200,20,72000);
+        GRAVEDIGGER_DAMAGE=builder.defineInRange("bolsonarista_nao_sou_coveiro_damage",10D,0D,100D);
+        GRAVEDIGGER_BREAK_BLOCKS=builder.define("nao_sou_coveiro_break_blocks",true);
+        METEOR_COOLDOWN=builder.defineInRange("missao_aborto_zacarias_cooldown_ticks",600,20,72000);
+        METEOR_COUNT=builder.defineInRange("missao_aborto_zacarias_meteors",20,1,100);
+        METEOR_DAMAGE=builder.defineInRange("missao_aborto_zacarias_damage_per_meteor",2D,0D,100D);
+        METEOR_RADIUS=builder.defineInRange("missao_aborto_zacarias_radius",7D,2D,16D);
+        BOOK_COOLDOWN=builder.comment("Starts when the power is used, so it should be longer than the 10 s volley.")
+                .defineInRange("missao_livro_amarelo_cooldown_ticks",900,20,72000);
+        BOOK_TICKS=builder.defineInRange("missao_livro_amarelo_duration_ticks",200,20,1200);
+        BOOK_INTERVAL=builder.comment("10 = 2 books per second.").defineInRange("missao_livro_amarelo_interval_ticks",10,2,100);
+        BOOK_DAMAGE=builder.defineInRange("missao_livro_amarelo_damage",1D,0D,100D);
+        BORED_TICKS=builder.defineInRange("missao_livro_amarelo_bored_ticks",40,10,600);
+        PROTEST_COOLDOWN=builder.defineInRange("esquerda_manifestando_cooldown_ticks",900,20,72000);
+        PROTEST_COUNT=builder.defineInRange("esquerda_manifestando_zombies",10,1,20);
+        PROTEST_LIFETIME=builder.defineInRange("esquerda_manifestando_lifetime_ticks",300,20,6000);
+        STRIKE_COOLDOWN=builder.defineInRange("esquerda_greve_geral_cooldown_ticks",600,20,72000);
+        STRIKE_RADIUS=builder.defineInRange("esquerda_greve_geral_radius",8D,1D,32D);
+        STRIKE_TICKS=builder.defineInRange("esquerda_greve_geral_ticks",120,20,1200);
+        LEAP_COOLDOWN=builder.defineInRange("direita_salto_liberal_cooldown_ticks",300,20,72000);
+        LEAP_DAMAGE=builder.defineInRange("direita_salto_liberal_damage",6D,0D,100D);
+        PUSH_COOLDOWN=builder.defineInRange("direita_mao_invisivel_cooldown_ticks",400,20,72000);
+        PUSH_DAMAGE=builder.defineInRange("direita_mao_invisivel_damage",6D,0D,100D);
+        PUSH_RADIUS=builder.defineInRange("direita_mao_invisivel_radius",6D,1D,16D);
+        EXEMPTION_COOLDOWN=builder.defineInRange("centro_isencao_cooldown_ticks",600,20,72000);
+        EXEMPTION_TICKS=builder.defineInRange("centro_isencao_ticks",60,10,600);
+        DRAIN_COOLDOWN=builder.defineInRange("centro_toma_la_da_ca_cooldown_ticks",600,20,72000);
+        DRAIN_AMOUNT=builder.defineInRange("centro_toma_la_da_ca_drain_per_target",4D,0D,40D);
+        DRAIN_RADIUS=builder.defineInRange("centro_toma_la_da_ca_radius",6D,1D,16D);
         builder.pop();
         SPEC = builder.build();
     }

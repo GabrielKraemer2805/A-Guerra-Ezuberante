@@ -23,7 +23,27 @@ Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pre
 
 📚 **[Guia de prompts](guia-de-prompts/README.md)** — como pedir personagens, poderes, correções e arte, com **[modelos para copiar](guia-de-prompts/MODELOS.md)**, **[requisitos para jogar/desenvolver](guia-de-prompts/REQUISITOS.md)** e **[instruções para modificar o mod](guia-de-prompts/COMO-MODIFICAR.md)**. A pasta tem seu próprio README e pode ser consultada diretamente no GitHub.
 
-> **Estado atual — 0.012.0.** Ao entrar no mundo pela primeira vez, cada jogador **escolhe sua facção** entre as seis. A escolha fica salva no mundo, aparece como prefixo colorido no nome (chat, TAB e acima da cabeça) e só um operador pode trocá-la (`/ge faccao definir`). Cada facção tem **um poder na tecla B**, **um passivo** e **um kit inicial**. **Fogo amigo continua ativo.** [Facções, poderes e kits](docs/FACCOES_0.012.md).
+> **Estado atual — 0.013.0.** Cada jogador escolhe sua **facção** ao entrar (prefixo colorido no nome; só um operador troca) e ganha **um poder na tecla B**, um passivo e um kit. Agora também **sobe de nível derrotando inimigos**: o **perfil na tecla J** mostra nível, barra de XP e pontos para gastar em **Força, Velocidade, Vida, Força Ideológica e Convicção Ideológica**. A Convicção libera o **2º e o 3º poder** de cada facção. **Fogo amigo continua ativo.** [Nível, status e poderes](docs/PROGRESSAO_0.013.md) · [Facções, poderes e kits](docs/FACCOES_0.012.md).
+
+## Nível, status e poderes de Convicção — 0.013.0
+
+![Perfil na tecla J](docs/preview/progressao-0.013/perfil-conviccao.png)
+
+- **Tecla J** abre o perfil: nível (até 30), barra de XP, pontos livres, os cinco status com botão **+** e os três poderes da facção. Clicar num poder liberado faz dele o poder da **B**.
+- **XP por abates**: mob hostil 10, personagem do mod 40, boss 200, jogador de outra facção 60. Abates feitos com poderes e pelas suas tropas contam. 1 ponto por nível, até 10 por status.
+- **Status**: Força (+0,5 de dano corpo a corpo), Velocidade (+2%), Vida (+1), Força Ideológica (+5% no dano dos poderes) e Convicção Ideológica (−2% de recarga; **5 libera o 2º poder, 10 libera o 3º**).
+
+| Facção | 2º poder | 3º poder |
+| --- | --- | --- |
+| Lulista | Fim da Escala! (pisão com onda de choque) | Faz o L (L gigante com a explosão da morte do Lula; quem sobrevive perde 2 itens) |
+| Bolsonarista | Histórico de Atleta (Força, Velocidade, Pressa, Salto e Vida) | Não Sou Coveiro (cova 10 × 5 × 5, 10 de dano) |
+| Missão | Aborto Zacarias (chuva de pedras rosas) | O Livro Amarelo (livros que deixam o alvo Entediado) |
+| Esquerda | Manifestando (10 zumbis vermelhos que agem como lobos) | Greve Geral (Lentidão II e Fraqueza em área) |
+| Direita | Salto Liberal (salto com impacto) | Mão Invisível (empurrão com dano) |
+| Centro | Isenção (Resistência IV) | Toma Lá, Dá Cá (drena vida dos inimigos) |
+
+Operadores: `/ge nivel xp <jogadores> <quantidade>` e `/ge nivel resetar <jogadores>`. Detalhes, números e configuração em [docs/PROGRESSAO_0.013.md](docs/PROGRESSAO_0.013.md).
+
 
 ## Facções, poderes e kits — 0.012.0
 

@@ -30,12 +30,23 @@ public final class ClientModEvents {
         event.registerEntityRenderer(ModEntities.ARTHUR_COMBATENTE.get(), ArthurRenderer::new);
         event.registerEntityRenderer(ModEntities.ARTHUR_INVOCADOR.get(), ArthurRenderer::new);
         event.registerEntityRenderer(ModEntities.UKRAINIAN_FIGHTER.get(), UkrainianFighterRenderer::new);
+        event.registerEntityRenderer(ModEntities.FAZ_O_L.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 3.0F, true));
+        event.registerEntityRenderer(ModEntities.METEOR.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 2.2F, false));
+        event.registerEntityRenderer(ModEntities.YELLOW_BOOK.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 1.1F, false));
+        event.registerEntityRenderer(ModEntities.MANIFESTANTE.get(), io.github.omarflk.guerraezuberante.client.renderer.ManifestanteRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void registerParticles(net.minecraftforge.client.event.RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(io.github.omarflk.guerraezuberante.registry.ModParticles.ZZZ.get(),
+                io.github.omarflk.guerraezuberante.client.particle.ZzzParticle.Provider::new);
     }
 
     @SubscribeEvent
     public static void registerKeys(RegisterKeyMappingsEvent event) {
         event.register(ModKeyBindings.OPEN_PANEL);
         event.register(ModKeyBindings.USE_POWER);
+        event.register(ModKeyBindings.OPEN_PROFILE);
     }
 
     @SubscribeEvent

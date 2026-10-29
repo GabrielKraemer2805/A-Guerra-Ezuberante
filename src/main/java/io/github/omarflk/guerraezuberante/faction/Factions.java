@@ -55,6 +55,7 @@ public final class Factions {
         player.refreshTabListName();
         FactionNetwork.broadcast(player.getUUID(), faction);
         FactionPowers.applyPassives(player);
+        io.github.omarflk.guerraezuberante.progression.Progression.sync(player);
     }
 
     static void applyClient(UUID player, Faction faction) {

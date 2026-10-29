@@ -138,12 +138,14 @@ public final class ModPanelScreen extends Screen {
                 if (current.isPresent()) {
                     Faction faction = current.get();
                     paragraph(textWidth, "gui.guerra_ezuberante.faction_current", faction.displayName());
-                    paragraph(textWidth, "gui.guerra_ezuberante.faction_power", faction.powerName(), faction.powerDescription(),
+                    int selected = io.github.omarflk.guerraezuberante.client.ProgressionClient.selected();
+                    paragraph(textWidth, "gui.guerra_ezuberante.faction_power", faction.powerName(selected), faction.powerDescription(selected),
                             ModKeyBindings.USE_POWER.getTranslatedKeyMessage());
                     int remaining = FactionClient.remainingCooldown();
                     paragraph(textWidth, remaining > 0 ? "gui.guerra_ezuberante.faction_power_cooldown"
                             : "gui.guerra_ezuberante.faction_power_ready", (remaining + 19) / 20);
                     paragraph(textWidth, "gui.guerra_ezuberante.faction_passive", faction.passive());
+                    paragraph(textWidth, "gui.guerra_ezuberante.faction_profile_hint", ModKeyBindings.OPEN_PROFILE.getTranslatedKeyMessage());
                 } else {
                     paragraph(textWidth, "gui.guerra_ezuberante.faction_none");
                     if (minecraft.player != null) {

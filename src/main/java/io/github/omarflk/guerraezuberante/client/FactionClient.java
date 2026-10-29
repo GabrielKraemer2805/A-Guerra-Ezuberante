@@ -18,7 +18,6 @@ import java.util.UUID;
 @Mod.EventBusSubscriber(modid = GuerraEzuberanteMod.MOD_ID, value = Dist.CLIENT)
 public final class FactionClient {
     private static boolean selectionRequested;
-    private static long powerReadyAt;
 
     public static void requestSelection() {
         selectionRequested = true;
@@ -32,15 +31,9 @@ public final class FactionClient {
         }
     }
 
-    public static void cooldown(int ticks) {
-        Minecraft minecraft = Minecraft.getInstance();
-        powerReadyAt = minecraft.level == null ? 0 : minecraft.level.getGameTime() + ticks;
-    }
-
-    /** Client estimate for the K panel; the server keeps the authoritative cooldown. */
+    /** Client estimate of the selected power's cooldown for the K panel; the server keeps the real one. */
     public static int remainingCooldown() {
-        Minecraft minecraft = Minecraft.getInstance();
-        return minecraft.level == null ? 0 : (int) Math.max(0, powerReadyAt - minecraft.level.getGameTime());
+        return ProgressionClient.remaining(ProgressionClient.selected());
     }
 
     @SubscribeEvent
@@ -66,7 +59,6 @@ public final class FactionClient {
     @SubscribeEvent
     public static void loggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         selectionRequested = false;
-        powerReadyAt = 0;
         Factions.clearClient();
     }
 

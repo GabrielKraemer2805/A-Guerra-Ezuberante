@@ -43,6 +43,24 @@ public final class ModEntities {
                     .sized(0.6F, 1.8F).clientTrackingRange(8)
                     .build(GuerraEzuberanteMod.MOD_ID + ":combatente_ucraniana"));
 
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.FazOLProjectile>> FAZ_O_L = REGISTER.register(
+            "faz_o_l", () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.FazOLProjectile>of(
+                    io.github.omarflk.guerraezuberante.entity.FazOLProjectile::new, MobCategory.MISC)
+                    .sized(.9F, .9F).clientTrackingRange(8).updateInterval(1).noSave().build(GuerraEzuberanteMod.MOD_ID + ":faz_o_l"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.MeteorProjectile>> METEOR = REGISTER.register(
+            "meteoro", () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.MeteorProjectile>of(
+                    io.github.omarflk.guerraezuberante.entity.MeteorProjectile::new, MobCategory.MISC)
+                    .sized(.6F, .6F).clientTrackingRange(8).updateInterval(1).noSave().build(GuerraEzuberanteMod.MOD_ID + ":meteoro"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.YellowBookProjectile>> YELLOW_BOOK = REGISTER.register(
+            "livro_amarelo", () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.YellowBookProjectile>of(
+                    io.github.omarflk.guerraezuberante.entity.YellowBookProjectile::new, MobCategory.MISC)
+                    .sized(.35F, .35F).clientTrackingRange(8).updateInterval(1).noSave().build(GuerraEzuberanteMod.MOD_ID + ":livro_amarelo"));
+    /** Never saved: they last 15 s and belong to a player who may not be online after a restart. */
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.ManifestanteEntity>> MANIFESTANTE = REGISTER.register(
+            "manifestante", () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.ManifestanteEntity>of(
+                    io.github.omarflk.guerraezuberante.entity.ManifestanteEntity::new, MobCategory.MISC)
+                    .sized(.6F, 1.95F).clientTrackingRange(8).noSave().build(GuerraEzuberanteMod.MOD_ID + ":manifestante"));
+
     public static final RegistryObject<EntityType<ArthurDoValEntity>> ARTHUR_COMBATENTE = arthur("arthur_do_val_combatente", false);
     public static final RegistryObject<EntityType<ArthurDoValEntity>> ARTHUR_INVOCADOR = arthur("arthur_do_val_invocador", true);
 

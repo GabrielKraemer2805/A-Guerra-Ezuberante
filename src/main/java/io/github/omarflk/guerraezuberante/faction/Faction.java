@@ -27,8 +27,12 @@ public enum Faction {
     public Component displayName() { return Component.translatable("faction.guerra_ezuberante." + id).withStyle(color); }
     public Component tag() { return Component.translatable("faction.guerra_ezuberante." + id + ".tag"); }
     public String descriptionKey() { return "gui.guerra_ezuberante.faction." + id; }
-    public Component powerName() { return Component.translatable("faction.guerra_ezuberante." + id + ".power").withStyle(color); }
-    public Component powerDescription() { return Component.translatable("faction.guerra_ezuberante." + id + ".power.desc"); }
+    public Component powerName() { return powerName(0); }
+    public Component powerDescription() { return powerDescription(0); }
+    /** Slot 0 is the starting power; slots 1 and 2 are unlocked by Ideological Conviction. */
+    public String powerKey(int slot) { return "faction.guerra_ezuberante." + id + ".power" + (slot == 0 ? "" : String.valueOf(slot + 1)); }
+    public Component powerName(int slot) { return Component.translatable(powerKey(slot)).withStyle(color); }
+    public Component powerDescription(int slot) { return Component.translatable(powerKey(slot) + ".desc"); }
     public Component passive() { return Component.translatable("faction.guerra_ezuberante." + id + ".passive"); }
     public Component kit() { return Component.translatable("faction.guerra_ezuberante." + id + ".kit"); }
 

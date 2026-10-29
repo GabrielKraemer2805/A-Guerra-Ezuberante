@@ -4,6 +4,7 @@ import io.github.omarflk.guerraezuberante.GuerraEzuberanteMod;
 import io.github.omarflk.guerraezuberante.combat.Rachadinha;
 import io.github.omarflk.guerraezuberante.config.ModConfig;
 import io.github.omarflk.guerraezuberante.entity.BeanProjectile;
+import io.github.omarflk.guerraezuberante.progression.Progression;
 import io.github.omarflk.guerraezuberante.registry.ModSounds;
 import io.github.omarflk.guerraezuberante.summon.ArthurSummoning;
 import io.github.omarflk.guerraezuberante.summon.SummonLedger;
@@ -33,9 +34,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * One active power per faction (B key), its cooldown and the light passives. Server authoritative:
- * the client only asks to use the power. Cooldown is stored in Forge's persisted player data so
- * reconnecting or dying does not reset it.
+ * Faction powers (B key uses the one selected in the J profile), their cooldowns and the light passives.
+ * Slot 0 is the starting power implemented here; slots 1 and 2 live in {@link ConvictionPowers}.
+ * Server authoritative: the client only asks to use the power. Cooldowns are stored per slot in Forge's
+ * persisted player data so reconnecting or dying does not reset them.
  */
 @Mod.EventBusSubscriber(modid = GuerraEzuberanteMod.MOD_ID)
 public final class FactionPowers {
@@ -48,6 +50,14 @@ public final class FactionPowers {
     private static final Map<UUID, Long> LAST_HURT = new ConcurrentHashMap<>();
 
     public static int cooldown(Faction faction) {
+        return cooldown(faction, 0);
+    }
+
+    /** Base cooldown of a power slot, before Ideological Conviction shortens it. */
+    public static int cooldown(Faction faction, int slot) {
+        if (slot > 0) {
+            return ConvictionPowers.cooldown(faction, slot);
+        }
         return switch (faction) {
             case LULISTA -> ModConfig.BEAN_VOLLEY_COOLDOWN.get();
             case BOLSONARISTA -> ModConfig.PLAYER_FISSURE_COOLDOWN.get();
@@ -70,22 +80,37 @@ public final class FactionPowers {
         return data;
     }
 
-    public static int remainingCooldown(ServerPlayer player) {
-        return (int) Math.max(0, data(player).getLong(READY_AT) - now(player));
+    /** Slot 0 keeps the 0.012 key, so cooldowns saved before slots existed still count. */
+    private static String readyAtKey(int slot) {
+        return slot == 0 ? READY_AT : READY_AT + (slot + 1);
     }
 
-    /** Makes the power usable again immediately; used by GameTests. */
+    /** Cooldown of the selected power. */
+    public static int remainingCooldown(ServerPlayer player) {
+        return remainingCooldown(player, Progression.selectedPower(player));
+    }
+
+    public static int remainingCooldown(ServerPlayer player, int slot) {
+        return (int) Math.max(0, data(player).getLong(readyAtKey(slot)) - now(player));
+    }
+
+    /** Makes every power usable again immediately; used by GameTests. */
     public static void resetCooldown(ServerPlayer player) {
-        data(player).remove(READY_AT);
-        FactionNetwork.sendCooldown(player, 0);
+        for (int slot = 0; slot < Progression.POWER_SLOTS; slot++) { data(player).remove(readyAtKey(slot)); }
+        Progression.sync(player);
     }
 
     public static boolean mobilityStance(Player player) {
         return data(player).getBoolean(STANCE);
     }
 
-    /** Returns true when the power fired and the cooldown started. Refusals never start the cooldown. */
+    /** Uses the power selected in the profile. */
     public static boolean use(ServerPlayer player) {
+        return use(player, Progression.selectedPower(player));
+    }
+
+    /** Returns true when the power fired and the cooldown started. Refusals never start the cooldown. */
+    public static boolean use(ServerPlayer player, int slot) {
         var faction = Factions.of(player);
         if (faction.isEmpty()) {
             player.displayClientMessage(Component.translatable("power.guerra_ezuberante.no_faction"), true);
@@ -94,13 +119,18 @@ public final class FactionPowers {
         if (!player.isAlive() || player.isSpectator()) {
             return false;
         }
-        Component power = Component.translatable("faction.guerra_ezuberante." + faction.get().id() + ".power");
-        int remaining = remainingCooldown(player);
+        if (!Progression.isUnlocked(player, slot)) {
+            player.displayClientMessage(Component.translatable("power.guerra_ezuberante.locked",
+                    faction.get().powerName(slot), Progression.convictionFor(slot)), true);
+            return false;
+        }
+        Component power = faction.get().powerName(slot);
+        int remaining = remainingCooldown(player, slot);
         if (remaining > 0) {
             player.displayClientMessage(Component.translatable("power.guerra_ezuberante.cooldown", power, (remaining + 19) / 20), true);
             return false;
         }
-        boolean fired = switch (faction.get()) {
+        boolean fired = slot > 0 ? ConvictionPowers.fire(player, faction.get(), slot) : switch (faction.get()) {
             case LULISTA -> beanVolley(player);
             case BOLSONARISTA -> rachadinha(player);
             case MISSAO -> ukrainianArmy(player);
@@ -109,15 +139,15 @@ public final class FactionPowers {
             case CENTRO -> switchStance(player);
         };
         if (fired) {
-            data(player).putLong(READY_AT, now(player) + cooldown(faction.get()));
-            FactionNetwork.sendCooldown(player, cooldown(faction.get()));
+            data(player).putLong(readyAtKey(slot), now(player) + Progression.scaledCooldown(player, cooldown(faction.get(), slot)));
+            Progression.sync(player);
         }
         return fired;
     }
 
     private static boolean beanVolley(ServerPlayer player) {
         int count = ModConfig.BEAN_VOLLEY_COUNT.get();
-        float damage = ModConfig.BEAN_VOLLEY_DAMAGE.get().floatValue();
+        float damage = (float) (ModConfig.BEAN_VOLLEY_DAMAGE.get() * Progression.powerScale(player));
         for (int index = 0; index < count; index++) {
             BeanProjectile bean = new BeanProjectile(player.level(), player, damage);
             bean.shootFromRotation(player, player.getXRot(), player.getYRot() + (index - (count - 1) / 2.0F) * 10.0F, 0, 1.2F, 1.0F);
@@ -128,7 +158,7 @@ public final class FactionPowers {
     }
 
     private static boolean rachadinha(ServerPlayer player) {
-        if (Rachadinha.activate(player, ModConfig.PLAYER_FISSURE_RANGE.get(), ModConfig.PLAYER_FISSURE_DAMAGE.get().floatValue()) == null) {
+        if (Rachadinha.activate(player, ModConfig.PLAYER_FISSURE_RANGE.get(), (float) (ModConfig.PLAYER_FISSURE_DAMAGE.get() * Progression.powerScale(player))) == null) {
             player.displayClientMessage(Component.translatable("power.guerra_ezuberante.no_ground"), true);
             return false;
         }
@@ -141,7 +171,8 @@ public final class FactionPowers {
             player.displayClientMessage(Component.translatable("power.guerra_ezuberante.troops_full"), true);
             return false;
         }
-        if (ArthurSummoning.spawnFighters(player.serverLevel(), player, missing, ModConfig.PLAYER_TROOPS_LIFETIME.get()) == 0) {
+        if (ArthurSummoning.spawnFighters(player.serverLevel(), player, missing,
+                (int) Math.round(ModConfig.PLAYER_TROOPS_LIFETIME.get() * Progression.powerScale(player))) == 0) {
             player.displayClientMessage(Component.translatable("power.guerra_ezuberante.no_space"), true);
             return false;
         }
@@ -156,7 +187,7 @@ public final class FactionPowers {
         targets.addAll(player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius),
                 other -> other.isAlive() && !other.isSpectator() && other.distanceToSqr(player) <= radius * radius));
         for (Player target : targets) {
-            target.addEffect(new MobEffectInstance(MobEffects.REGENERATION, ModConfig.GROUP_HEAL_TICKS.get(), 1), player);
+            target.addEffect(new MobEffectInstance(MobEffects.REGENERATION, (int) Math.round(ModConfig.GROUP_HEAL_TICKS.get() * Progression.powerScale(player)), 1), player);
             player.serverLevel().sendParticles(ParticleTypes.HEART, target.getX(), target.getY() + 2.1, target.getZ(), 4, .4, .2, .4, 0);
         }
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, .8F, 1.4F);
@@ -170,7 +201,7 @@ public final class FactionPowers {
         player.setDeltaMovement(push.x, Math.max(player.getDeltaMovement().y, .3), push.z);
         player.hurtMarked = true;
         player.fallDistance = 0;
-        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, ModConfig.DASH_BUFF_TICKS.get(), 0));
+        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, (int) Math.round(ModConfig.DASH_BUFF_TICKS.get() * Progression.powerScale(player)), 0));
         player.serverLevel().sendParticles(ParticleTypes.CLOUD, player.getX(), player.getY() + .2, player.getZ(), 12, .3, .1, .3, .05);
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1, .8F);
         return true;
@@ -237,10 +268,13 @@ public final class FactionPowers {
             return;
         }
         CompoundTag data = data(player);
-        if (data.getLong(READY_AT) > 0 && remainingCooldown(player) == 0) {
-            data.remove(READY_AT);
-            player.displayClientMessage(Component.translatable("power.guerra_ezuberante.ready",
-                    Component.translatable("faction.guerra_ezuberante." + faction.get().id() + ".power")), true);
+        for (int slot = 0; slot < Progression.POWER_SLOTS; slot++) {
+            if (data.getLong(readyAtKey(slot)) > 0 && remainingCooldown(player, slot) == 0) {
+                data.remove(readyAtKey(slot));
+                if (Progression.isUnlocked(player, slot)) {
+                    player.displayClientMessage(Component.translatable("power.guerra_ezuberante.ready", faction.get().powerName(slot)), true);
+                }
+            }
         }
         if (faction.get() == Faction.CENTRO) {
             applyStance(player);
@@ -272,13 +306,6 @@ public final class FactionPowers {
         var stats = player.getFoodData();
         float extra = food.getNutrition() * food.getSaturationModifier() * 2.0F * ModConfig.LULISTA_SATURATION_BONUS.get().floatValue();
         stats.setSaturation(Math.min(stats.getFoodLevel(), stats.getSaturationLevel() + extra));
-    }
-
-    @SubscribeEvent
-    public static void login(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            FactionNetwork.sendCooldown(player, remainingCooldown(player));
-        }
     }
 
     @SubscribeEvent
