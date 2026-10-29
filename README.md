@@ -6,7 +6,7 @@
 
 **Seis facções · Personagens com IA · Exércitos invocáveis · Multiplayer**
 
-![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.014.1-DBA434?style=for-the-badge)
+![Status](https://img.shields.io/badge/STATUS-PROTOTIPO_0.014.2-DBA434?style=for-the-badge)
 ![GeckoLib](https://img.shields.io/badge/GeckoLib-4.8.4-58A64B?style=for-the-badge)
 ![TaCZ](https://img.shields.io/badge/TaCZ-1.1.8--hotfix2-397BA8?style=for-the-badge)
 ![Plataforma](https://img.shields.io/badge/PLATAFORMA-MINECRAFT_JAVA-62B447?style=for-the-badge)
@@ -23,7 +23,7 @@ Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pre
 
 📚 **[Guia de prompts](guia-de-prompts/README.md)** — como pedir personagens, poderes, correções e arte, com **[modelos para copiar](guia-de-prompts/MODELOS.md)**, **[requisitos para jogar/desenvolver](guia-de-prompts/REQUISITOS.md)** e **[instruções para modificar o mod](guia-de-prompts/COMO-MODIFICAR.md)**. A pasta tem seu próprio README e pode ser consultada diretamente no GitHub.
 
-> **Estado atual — 0.014.1.** As contribuições de **[GabrielKraemer2805](https://github.com/GabrielKraemer2805)** acrescentam progressão até o nível30, perfil **J**, cinco atributos, doze poderes de Convicção, vozes do Jair e vilas com castelos. A integração preserva as correções da0.012.1 e protege o terreno no modo Aventura, cancelamentos de explosão/dano, PvP dos Manifestantes e XP de mortes canceladas. **B** usa o poder selecionado; **K** abre o painel. [Integração e validação](docs/INTEGRACAO_0.014.1.md) · [Progressão e poderes](docs/PROGRESSAO_0.013.md) · [Vilas](docs/VILAS_0.014.md).
+> **Estado atual — 0.014.2.** Progressão, perfil **J**, cinco atributos, doze poderes novos, vozes do Jair e vilas com castelos vieram da contribuição de **[GabrielKraemer2805](https://github.com/GabrielKraemer2805)**. As correções atuais encerram gravações sem repetição automática, permitem pular as falas do Jair e param seu áudio na morte. Clicar nas coordenadas prepara `/ge vilas tp <faccao> <1–3>`, com altura calculada no chão; uma busca adicional evita posições no oceano quando a busca inicial falha. **126 testes com TaCZ,62 sem TaCZ,16 sementes e18 teleportes reais aprovados.** **B** usa o poder selecionado; **K** abre o painel. [Correções e testes](docs/CORRECOES_0.014.2.md) · [Integração](docs/INTEGRACAO_0.014.1.md) · [Progressão](docs/PROGRESSAO_0.013.md) · [Vilas](docs/VILAS_0.014.md).
 
 ## Vilas de facção — 0.014.0
 
@@ -374,7 +374,7 @@ sequenceDiagram
 
 Mira, recuo e animação de recarga deste protótipo são simples; ainda não há mãos articuladas, carregador animado separado, acessórios ou receitas Survival. São recursos para uma possível próxima etapa, não uma substituição completa do TaCZ. O suporte anterior continua disponível quando ele está instalado; cada sistema atua somente em seus próprios itens.
 
-O build gera também **`build/distributions/guerra-ezuberante-0.014.1-sem-tacz/mods/`**, com Guerra Ezuberante e GeckoLib. A GE-P12 não adiciona outro mod na lista. **GeckoLib ainda aparece separadamente**, pois os personagens dependem dele. Para preservar armas já salvas, o perfil normal de desenvolvimento mantém TaCZ; os testes de independência usam um mundo isolado sem ele.
+O build gera também **`build/distributions/guerra-ezuberante-0.014.2-sem-tacz/mods/`**, com Guerra Ezuberante e GeckoLib. A GE-P12 não adiciona outro mod na lista. **GeckoLib ainda aparece separadamente**, pois os personagens dependem dele. Para preservar armas já salvas, o perfil normal de desenvolvimento mantém TaCZ; os testes de independência usam um mundo isolado sem ele.
 
 **Validação executada:** 47 GameTests com TaCZ e 10 próprios sem ele. Os dois cenários gráficos passaram: modelo 3D, ADS/FOV, tiro e dano, som único, recoil, recarga/conservação, gatilho segurado sem rajada e rejeição sem munição. A aba criativa real abriu com 6 itens sem TaCZ e 15 com ele. Multiplayer gráfico entre dois clientes da GE-P12 ainda não foi testado.
 
@@ -429,11 +429,11 @@ Os controles podem ser remapeados no Minecraft. A integração não registra tec
 | Minecraft Java | 1.20.1 | Plataforma |
 | Forge | 47.4.28 | Cliente e servidor |
 | Java | 17 | Jogo e desenvolvimento |
-| Guerra Ezuberante | 0.014.1 | Este mod, inclui menu ilustrado, Renan armado e GE-P12 |
+| Guerra Ezuberante | 0.014.2 | Este mod, inclui menu ilustrado, Renan armado e GE-P12 |
 | GeckoLib | 4.8.4 para Forge 1.20.1 | Personagens e animações existentes |
 | TaCZ | **1.1.8-hotfix2**, arquivo CurseForge **9037989** | Opcional; necessário nos dois lados para usar as cinco armas nativas |
 
-O build prepara os três JARs separados em **`build/distributions/guerra-ezuberante-0.014.1/mods/`** e a alternativa sem TaCZ em **`build/distributions/guerra-ezuberante-0.014.1-sem-tacz/mods/`**. O artefato próprio fica em **`build/libs/guerra_ezuberante-0.014.1.jar`**. Cliente e servidor devem usar o mesmo conjunto. O gunpack padrão já vem no JAR oficial do TaCZ; a GE-P12 não precisa dele.
+O build prepara os três JARs separados em **`build/distributions/guerra-ezuberante-0.014.2/mods/`** e a alternativa sem TaCZ em **`build/distributions/guerra-ezuberante-0.014.2-sem-tacz/mods/`**. O artefato próprio fica em **`build/libs/guerra_ezuberante-0.014.2.jar`**. Cliente e servidor devem usar o mesmo conjunto. O gunpack padrão já vem no JAR oficial do TaCZ; a GE-P12 não precisa dele.
 
 A dependência foi fixada pelo [arquivo oficial publicado em 02/10/2026](https://www.curseforge.com/minecraft/mc-mods/timeless-and-classics-zero/files/9037989), não pelo exemplo antigo 1.1.6 do README do TaCZ. Gradle usa CurseMaven com `fg.deobf`; o pacote local utiliza o JAR original, sem o remapeamento de desenvolvimento. `mods.toml` exige a versão exata. `validateTacz` verifica SHA-256 e os IDs/calibres no gunpack dessa distribuição.
 
@@ -699,7 +699,7 @@ Com comandos habilitados:
 /summon guerra_ezuberante:arthur_do_val_invocador ~4 ~ ~
 ```
 
-O JAR atual fica em **`build/libs/guerra_ezuberante-0.014.1.jar`**. O build prepara **`build/distributions/guerra-ezuberante-0.014.1/mods/`** com o mod, GeckoLib 4.8.4 e TaCZ 1.1.8-hotfix2 originais, separados, e **`build/distributions/guerra-ezuberante-0.014.1-sem-tacz/mods/`** apenas com o mod e GeckoLib. A GE-P12 funciona nos dois conjuntos. Não distribua `.tools/` ou caches, nem instale múltiplas versões do mod juntas.
+O JAR atual fica em **`build/libs/guerra_ezuberante-0.014.2.jar`**. O build prepara **`build/distributions/guerra-ezuberante-0.014.2/mods/`** com o mod, GeckoLib 4.8.4 e TaCZ 1.1.8-hotfix2 originais, separados, e **`build/distributions/guerra-ezuberante-0.014.2-sem-tacz/mods/`** apenas com o mod e GeckoLib. A GE-P12 funciona nos dois conjuntos. Não distribua `.tools/` ou caches, nem instale múltiplas versões do mod juntas.
 
 ### Áudios: entrada, conversão e novas falas
 

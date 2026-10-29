@@ -33,7 +33,8 @@ public final class CharacterAudioClient {
             if(!(e instanceof RetaliatingCharacterEntity entity) || entity.musicTracks().isEmpty())continue;
             UUID id=entity.getUUID(); seen.add(id);
             int serial=entity.musicSerial(), index=entity.musicTrackIndex();
-            boolean valid=entity.isAlive() && index>=0 && index<entity.musicTracks().size();
+            boolean valid=entity.canPlayCharacterAudio() && index>=0 && index<entity.musicTracks().size()
+                    && mc.level.getGameTime()-entity.musicStart()<entity.musicTracks().get(index).durationTicks();
             var old=active.get(id);
             if(old!=null && (!valid || old.serial!=serial || old.owner!=entity)) {
                 old.cancel();mc.getSoundManager().stop(old);active.remove(id);
@@ -64,7 +65,7 @@ public final class CharacterAudioClient {
         void cancel() { stop(); }
         @Override public boolean canStartSilent() { return true; }
         @Override public void tick() {
-            if(owner.isRemoved() || !owner.isAlive() || Minecraft.getInstance().level!=owner.level()
+            if(!owner.canPlayCharacterAudio() || Minecraft.getInstance().level!=owner.level()
                     || owner.musicSerial()!=serial || owner.musicTrackIndex()<0) {stop();return;}
             x=owner.getX();y=owner.getY();z=owner.getZ();volume=owner.musicVolume();
         }

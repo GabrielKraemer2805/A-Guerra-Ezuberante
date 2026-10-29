@@ -93,10 +93,10 @@ public final class RenanArmedGameTests {
             int second=renan.musicSerial();session.activateCombat();h.assertTrue(renan.musicSerial()==second,"Damage activation duplicated session");
             renan.kill();h.assertTrue(renan.musicTrackIndex()==-1,"Death retained playback");h.succeed();});
     }
-    @GameTest(template="empty",timeoutTicks=340) public static void durationMetadataAdvancesNaturally(GameTestHelper h) {
+    @GameTest(template="empty",timeoutTicks=340) public static void durationMetadataStopsWithoutAutoplay(GameTestHelper h) {
         var renan=spawn(h);renan.setNoAi(true);renan.musicSession().interact();
         int previous=renan.musicTrackIndex(),serial=renan.musicSerial();int duration=renan.musicTracks().get(previous).durationTicks();
-        h.runAfterDelay(duration+2,()->{h.assertTrue(renan.musicSerial()>serial && renan.musicTrackIndex()!=previous,"Natural end did not advance shared bag");renan.discard();h.succeed();});
+        h.runAfterDelay(duration+2,()->{h.assertTrue(renan.musicSerial()>serial && renan.musicTrackIndex()==-1,"Natural end restarted the playlist");renan.discard();h.succeed();});
     }
     @GameTest(template="empty",batch="renan_sustained",timeoutTicks=6800) public static void acceleratedTicksPreserveNativeAmmoAndCadence(GameTestHelper h) {
         var renan=spawn(h);var cow=target(h,renan);var id=renan.getUUID();shots.put(id,new ArrayList<>());

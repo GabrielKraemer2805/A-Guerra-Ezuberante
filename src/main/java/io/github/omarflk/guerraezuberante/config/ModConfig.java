@@ -56,9 +56,9 @@ public final class ModConfig {
         builder.pop();
         builder.push("character_audio");
         CHARACTER_AUDIO_VOLUME = builder.defineInRange("volume", .8D, 0D, 2D);
-        CHARACTER_AUDIO_SESSION = builder.comment("Manual session length; finish the current recording at expiry.")
+        CHARACTER_AUDIO_SESSION = builder.comment("Legacy setting retained for old configs. Each activation now plays one recording, without autoplay.")
                 .defineInRange("interaction_session_ticks", 1200, 20, 72000);
-        CHARACTER_AUDIO_GRACE = builder.comment("Combat grace; finish the current recording instead of cutting repeatedly.")
+        CHARACTER_AUDIO_GRACE = builder.comment("Legacy setting retained for old configs. Combat now starts one recording per encounter.")
                 .defineInRange("combat_grace_ticks", 40, 0, 1200);
         builder.pop();
         builder.push("lula");

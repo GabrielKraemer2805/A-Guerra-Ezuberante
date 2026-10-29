@@ -1,4 +1,8 @@
-# Áudios — inventário atualizado na sprint 0.004.0
+# Áudios — funcionamento atual 0.014.2 e inventário histórico
+
+**Atual:** um acionamento toca uma gravação completa e termina em silêncio. Botão direito inicia ou pula para outra faixa, com debounce de0,5s. Combate inicia uma gravação por encontro, sem playlist infinita. Todos os áudios existentes de Renan, Arthur e Lula continuam nas bibliotecas compartilhadas. Morte, remoção e saída do mundo encerram o som vinculado àquela entidade.
+
+Jair usa o mesmo canal vinculado: duas falas no botão direito; Canalha apenas na reação a dano, com40% de chance, sem interromper outra fala automaticamente. O jogador pode pular inclusive Canalha com o botão direito. Os intervalos antigos das tabelas abaixo são históricos, não bloqueiam mais o clique por toda a duração da gravação. [Correção e validação](CORRECOES_0.014.2.md).
 
 Originais preservados em `audios/`; cópias de entrada em `assets-entrada/audio/renan/`, `assets-entrada/audio/arthur/` e `assets-entrada/audio/jair/`. Os OGGs usam Vorbis mono a 44.100 Hz, sem cortes, alteração de velocidade ou de duração.
 
@@ -51,7 +55,7 @@ Recebidos em `assets-entrada/audio/jair/` como `.mpeg` (MP3 estéreo 48 kHz com 
 | POPCORN.mpeg | 42,38 s | `3ec03c00…6543a` | popcorn.ogg | Botão direito; recarga 44,5 s |
 
 - O "Canalha" é sorteado a cada dano que tira vida do Jair, nunca por cima de outra fala dele e nunca no botão direito. A reação genérica de entrada em combate continua vazia para o Jair.
-- Enquanto uma fala toca, o botão direito mostra a recarga restante em vez de sobrepor outra.
+- Desde a0.014.2, o botão direito interrompe a gravação anterior e inicia outra, sem sobrepor. As durações medidas dos OGGs são131/1066/848ticks para Canalha/Eu não te/Popcorn; os cooldowns acima descrevem a implementação antiga.
 - O mod passa a empacotar **3 OGGs a mais** (evento `guerra_ezuberante:jair.*`, streaming, legendas "Jair — gravação: …"). O painel K → Personagens → Jair lista as três.
 
 ## Conversão

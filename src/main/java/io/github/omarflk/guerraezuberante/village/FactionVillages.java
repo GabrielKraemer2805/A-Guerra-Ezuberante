@@ -4,11 +4,18 @@ import io.github.omarflk.guerraezuberante.GuerraEzuberanteMod;
 import io.github.omarflk.guerraezuberante.faction.Faction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -108,6 +115,9 @@ public final class FactionVillages {
         if (found == null) { found = inSector(biomes, sampler, chosen, raw, angle, .12, bandMin, bandMax, LAND); }
         if (found == null) { found = inSector(biomes, sampler, chosen, raw, angle, .35, INNER_MIN - 50, OUTER_MAX + 100, LAND); }
         if (found == null) { found = inSector(biomes, sampler, chosen, raw, angle, .8, INNER_MIN - 50, OUTER_MAX + 100, LAND); }
+        // Ocean-heavy seeds may have no land in this faction's slice. Search the rest of the ring
+        // before falling back to an ocean coordinate; keep every previously valid choice unchanged.
+        if (found == null) { found = inSector(biomes, sampler, chosen, raw, angle, Math.PI, INNER_MIN - 50, OUTER_MAX + 100, LAND); }
         return found != null ? found : raw;
     }
 
@@ -176,7 +186,7 @@ public final class FactionVillages {
                 .map(chunk -> new BlockPos(chunk.getMinBlockX(), 0, chunk.getMinBlockZ())).toList());
     }
 
-    /** Chat list of the faction's villages, nearest first; clicking an entry copies "x z". */
+    /** Chat list, nearest first. Clicking prepares a complete command, never an incomplete vanilla /tp. */
     public static void tell(ServerPlayer player, Faction faction) {
         describe(player.server, faction, player.blockPosition()).forEach(player::sendSystemMessage);
     }
@@ -193,10 +203,56 @@ public final class FactionVillages {
                 lines.add(Component.translatable("faction.guerra_ezuberante.village_entry",
                         pos.getX(), pos.getZ(), (int) horizontalDistance(pos, here)).withStyle(style -> style
                         .withColor(faction.color())
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, pos.getX() + " " + pos.getZ()))
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+                                teleportCommand(faction, villages.get().indexOf(pos) + 1)))
                         .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                                 Component.translatable("faction.guerra_ezuberante.village_copy"))))));
         return lines;
+    }
+
+    /** Stable village number, independent of the distance sorting in chat. */
+    public static String teleportCommand(Faction faction, int number) {
+        return "/ge vilas tp " + faction.id() + " " + number;
+    }
+
+    /** Load the destination and find solid ground with standing room, not a guessed Y in midair. */
+    public static Optional<BlockPos> safeLanding(ServerLevel level, BlockPos center, ServerPlayer player) {
+        for (int radius = 0; radius <= 8; radius++) {
+            for (int dx = -radius; dx <= radius; dx++) for (int dz = -radius; dz <= radius; dz++) {
+                if (Math.max(Math.abs(dx), Math.abs(dz)) != radius) continue;
+                BlockPos column = center.offset(dx, 0, dz);
+                if (!level.getWorldBorder().isWithinBounds(column)) continue;
+                level.getChunkAt(column);
+                BlockPos feet = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, column);
+                BlockPos floor = feet.below();
+                var ground = level.getBlockState(floor);
+                if (feet.getY() < level.getMinBuildHeight() || feet.getY() + 2 >= level.getMaxBuildHeight()
+                        || !ground.getFluidState().isEmpty() || ground.is(BlockTags.LEAVES)
+                        || ground.is(Blocks.MAGMA_BLOCK) || ground.is(Blocks.CACTUS)
+                        || ground.is(Blocks.CAMPFIRE) || ground.is(Blocks.SOUL_CAMPFIRE)
+                        || ground.is(Blocks.POWDER_SNOW) || !ground.isFaceSturdy(level, floor, Direction.UP)) continue;
+                var body = player.getDimensions(Pose.STANDING).makeBoundingBox(Vec3.atBottomCenterOf(feet));
+                if (level.noCollision(player, body) && level.getBlockState(feet).getFluidState().isEmpty()
+                        && level.getBlockState(feet.above()).getFluidState().isEmpty()) return Optional.of(feet);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /** Operator-only entry point is registered in FactionEvents; all faction villages are in the overworld. */
+    public static int teleport(ServerPlayer player, Faction faction, int number) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        var villages = locate(player.server, faction);
+        if (villages.isEmpty() || number < 1 || number > villages.get().size())
+            throw new com.mojang.brigadier.exceptions.SimpleCommandExceptionType(
+                    Component.translatable("faction.guerra_ezuberante.villages_none")).create();
+        ServerLevel destination = player.server.overworld();
+        BlockPos feet = safeLanding(destination, villages.get().get(number - 1), player).orElseThrow(() ->
+                new com.mojang.brigadier.exceptions.SimpleCommandExceptionType(
+                        Component.translatable("faction.guerra_ezuberante.village_tp_unsafe")).create());
+        player.teleportTo(destination, feet.getX() + .5, feet.getY(), feet.getZ() + .5, player.getYRot(), player.getXRot());
+        player.setDeltaMovement(Vec3.ZERO);
+        player.fallDistance = 0;
+        return 1;
     }
 
     private FactionVillages() {}

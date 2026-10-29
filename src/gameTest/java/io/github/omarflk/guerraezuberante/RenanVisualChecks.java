@@ -123,7 +123,8 @@ public final class RenanVisualChecks {
                     require(clientShots>=20 && serverShots.size()>=20 && serverHits>0,"Sustained native graphical shooting failed: "+clientShots+" / "+serverShots.size()+" hits "+serverHits);
                     for(int i=1;i<serverShots.size();i++)require(serverShots.get(i)-serverShots.get(i-1)>=20,"Shot interval below 20 ticks");
                     require(serverFires==serverShots.size(),"Native trigger produced duplicate/missing bullets");
-                    require(heard.size()==3 && recordings>=3 && maxAudio==1,"Shared recordings did not rotate without duplicates: "+heard+" / "+maxAudio);
+                    require(heard.size()==1 && recordings==1 && maxAudio==1
+                            && CharacterAudioClient.instancesFor(renanId)==0,"Combat unexpectedly looped recordings: "+heard+" / "+recordings);
                     result.put("nativeServerShots",List.copyOf(serverShots));result.put("nativeFires",serverFires);result.put("nativeHits",serverHits);
                     result.put("clientShots",clientShots);result.put("recordings",recordings);result.put("heard",Set.copyOf(heard));result.put("maxInstancesPerEntity",maxAudio);
                     result.put("twoClients",mc.player.connection.getOnlinePlayers().size()>=2);

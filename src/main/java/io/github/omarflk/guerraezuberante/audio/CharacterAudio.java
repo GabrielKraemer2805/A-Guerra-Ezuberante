@@ -10,6 +10,10 @@ public final class CharacterAudio {
     }
     public static final List<MusicTrack> RENAN = List.of(
             track("renan.me_respeita",270), track("renan.phonk",252), track("renan.risadinha",48));
+    // ceil(ffprobe duration * 20), not the old voice cooldown (which included padding).
+    public static final int JAIR_DAMAGE_TRACK = 2;
+    public static final List<MusicTrack> JAIR = List.of(
+            track("jair.eu_nao_te",1066), track("jair.popcorn",848), track("jair.canalha",131));
     public static final List<MusicTrack> LULA = List.of(track("lula.feijao_puro",185),track("lula.homofobia",109),
             track("lula.machismo",146),track("lula.racismo",156));
     public static final List<MusicTrack> ARTHUR = List.of(

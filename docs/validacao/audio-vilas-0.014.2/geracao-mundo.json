@@ -1,0 +1,168 @@
+{
+  "seed": -42,
+  "passed": true,
+  "villages": [
+    {
+      "pieces": 84,
+      "castleFlags": 12,
+      "faction": "lulista",
+      "number": 1,
+      "z": 256,
+      "chunksGenerated": 56,
+      "x": -944
+    },
+    {
+      "pieces": 89,
+      "castleFlags": 12,
+      "faction": "lulista",
+      "number": 2,
+      "z": -672,
+      "chunksGenerated": 108,
+      "x": 48
+    },
+    {
+      "pieces": 105,
+      "castleFlags": 12,
+      "faction": "lulista",
+      "number": 3,
+      "z": 240,
+      "chunksGenerated": 90,
+      "x": 1072
+    },
+    {
+      "pieces": 166,
+      "castleFlags": 12,
+      "faction": "bolsonarista",
+      "number": 1,
+      "z": 976,
+      "chunksGenerated": 120,
+      "x": -512
+    },
+    {
+      "pieces": 146,
+      "castleFlags": 12,
+      "faction": "bolsonarista",
+      "number": 2,
+      "z": -688,
+      "chunksGenerated": 132,
+      "x": 352
+    },
+    {
+      "pieces": 147,
+      "castleFlags": 12,
+      "faction": "bolsonarista",
+      "number": 3,
+      "z": 976,
+      "chunksGenerated": 108,
+      "x": 288
+    },
+    {
+      "pieces": 147,
+      "castleFlags": 12,
+      "faction": "missao",
+      "number": 1,
+      "z": -640,
+      "chunksGenerated": 81,
+      "x": -144
+    },
+    {
+      "pieces": 136,
+      "castleFlags": 12,
+      "faction": "missao",
+      "number": 2,
+      "z": -496,
+      "chunksGenerated": 156,
+      "x": 528
+    },
+    {
+      "pieces": 99,
+      "castleFlags": 12,
+      "faction": "missao",
+      "number": 3,
+      "z": 800,
+      "chunksGenerated": 104,
+      "x": 0
+    },
+    {
+      "pieces": 146,
+      "castleFlags": 12,
+      "faction": "esquerda",
+      "number": 1,
+      "z": -864,
+      "chunksGenerated": 130,
+      "x": -368
+    },
+    {
+      "pieces": 182,
+      "castleFlags": 12,
+      "faction": "esquerda",
+      "number": 2,
+      "z": -224,
+      "chunksGenerated": 132,
+      "x": 784
+    },
+    {
+      "pieces": 102,
+      "castleFlags": 12,
+      "faction": "esquerda",
+      "number": 3,
+      "z": 880,
+      "chunksGenerated": 90,
+      "x": -176
+    },
+    {
+      "pieces": 155,
+      "castleFlags": 12,
+      "faction": "direita",
+      "number": 1,
+      "z": -816,
+      "chunksGenerated": 132,
+      "x": -192
+    },
+    {
+      "pieces": 78,
+      "castleFlags": 12,
+      "faction": "direita",
+      "number": 2,
+      "z": 176,
+      "chunksGenerated": 64,
+      "x": 848
+    },
+    {
+      "pieces": 110,
+      "castleFlags": 12,
+      "faction": "direita",
+      "number": 3,
+      "z": 1024,
+      "chunksGenerated": 121,
+      "x": -304
+    },
+    {
+      "pieces": 130,
+      "castleFlags": 12,
+      "faction": "centro",
+      "number": 1,
+      "z": -992,
+      "chunksGenerated": 121,
+      "x": -176
+    },
+    {
+      "pieces": 117,
+      "castleFlags": 12,
+      "faction": "centro",
+      "number": 2,
+      "z": 352,
+      "chunksGenerated": 99,
+      "x": 928
+    },
+    {
+      "pieces": 103,
+      "castleFlags": 12,
+      "faction": "centro",
+      "number": 3,
+      "z": 1056,
+      "chunksGenerated": 80,
+      "x": -128
+    }
+  ]
+}

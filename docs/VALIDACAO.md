@@ -1,4 +1,14 @@
-# Validação — 0.014.1
+# Validação — 0.014.2
+
+- **126 GameTests com TaCZ e62 sem TaCZ aprovados.** Áudio sem autoplay, clique para pular, parada na morte, comandos/permissões de vila e construção das seis facções. Logs `.tools/audio-village-0142-tests-final.log` e `.tools/audio-village-0142-no-tacz.log`.
+- **16 sementes:**18posições em terra em cada uma e separação mínima176blocos. Semente-42 reproduziu dois pontos oceânicos na versão anterior, corrigidos por busca adicional.
+- **Geração natural em mundo novo-42:**18vilas completas no teste de estrutura/castelo/12estandartes. **Cliente real:**18teleportes enviados pela rede e chegada ao chão; pular falas do Jair/Canalha, morte sem cortar som de outro personagem, fim natural sem autoplay, remoção e saída do mundo. Master0 antes do launch. [Geração](validacao/audio-vilas-0.014.2/geracao-mundo.json) · [Cliente](validacao/audio-vilas-0.014.2/cliente.json).
+- **Build/check/reobf aprovados**, JAR sem fixtures ou TaCZ embutido. `.tools/audio-village-0142-package-final.log`. SHA256 `39671cf9bf9c850142fa248efb42d13a2470d935cc48e099ecc46319f1471f1d`.
+- Cliente normal `run/` aberto, menu confirmado15:34:28, com `-PsilentClient` e registro de silêncio antes da reprodução. Mundo anterior salvo no fechamento normal; volume salvo preservado.
+
+[Explicação das correções, comandos, reprodução e limites](CORRECOES_0.014.2.md). Sem audição nos testes silenciados, cobertura universal de terrenos ou de mods de proteção.
+
+## Histórico — 0.014.1
 
 Nova contribuição de Gabriel integrada com progressão, poderes, vozes e vilas, preservando os commits e as proteções anteriores. [Recursos, correções e limites](INTEGRACAO_0.014.1.md).
 

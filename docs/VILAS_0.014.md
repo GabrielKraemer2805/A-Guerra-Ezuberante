@@ -42,9 +42,11 @@ O sistema planeja **18 vilas de facção**, **3 de cada facção**, em anéis co
 
 ![Chat ao escolher a Missão](preview/vilas-0.014/chat-vilas.png)
 
-- Ao **escolher a facção**, o chat lista as 3 vilas dela, da mais próxima para a mais distante. Clicar numa linha copia `x z`.
+- Ao **escolher a facção**, o chat lista as 3 vilas dela, da mais próxima para a mais distante. Desde a0.014.2, clicar numa linha prepara o comando completo `/ge vilas tp <faccao> <1–3>`; confirme com Enter. Requer comandos ativados ou operador. O servidor procura chão com espaço para o jogador e leva ao mundo principal, sem adivinhar a altura.
 - O **painel K → Facções** mostra as mesmas coordenadas e a distância atual até cada uma.
 - `/ge vilas` repete a lista a qualquer momento. Operadores consultam qualquer facção com `/ge vilas <faccao>`, inclusive pelo console do servidor.
+- Para visitar diretamente, por exemplo: `/ge vilas tp missao 1`. Os números1–3 são estáveis, mesmo que a ordem por distância no chat mude. O teleporte não cria vilas retroativamente em chunks antigos.
+- No comando vanilla, use três coordenadas: `/tp 176 200 480` significa X176, Y200, Z480. Digitar só `/tp 176 480` faz o jogo tentar interpretar números como entidades. Prefira o comando de vila acima para aterrissar no chão.
 - O `/locate structure` do Minecraft 1.20.1 não encontra essas vilas: ele só procura estruturas com os posicionamentos vanilla. Use `/ge vilas`.
 - A disponibilidade depende dos conjuntos de estruturas oferecidos pelo gerador/datapacks do mundo. Quando as vilas de facção não estiverem disponíveis, o chat avisa; a mera existência de coordenadas não comprova uma vila completa em chunks antigos.
 

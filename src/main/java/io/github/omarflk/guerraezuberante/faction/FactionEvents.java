@@ -105,6 +105,16 @@ public final class FactionEvents {
                                 })))));
         // /ge vilas: your faction's villages again; operators can look up any faction's.
         event.getDispatcher().register(Commands.literal("ge").then(Commands.literal("vilas")
+                .then(Commands.literal("tp").requires(source -> source.hasPermission(2))
+                        .then(Commands.argument("faccao", StringArgumentType.word())
+                                .suggests((context, builder) -> SharedSuggestionProvider.suggest(Arrays.stream(Faction.values()).map(Faction::id), builder))
+                                .then(Commands.argument("vila", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, FactionVillages.PER_FACTION))
+                                        .executes(context -> {
+                                            String name = StringArgumentType.getString(context, "faccao");
+                                            Faction faction = Faction.byId(name).orElseThrow(() -> UNKNOWN.create(name));
+                                            return FactionVillages.teleport(context.getSource().getPlayerOrException(), faction,
+                                                    com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(context, "vila"));
+                                        }))))
                 .executes(context -> {
                     var player = context.getSource().getPlayerOrException();
                     var faction = Factions.of(player);

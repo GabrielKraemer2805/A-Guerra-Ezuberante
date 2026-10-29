@@ -37,6 +37,8 @@ minecraft {
         client {
             // Optional isolated workspace for validation, preserving the player's development world.
             workingDirectory project.file(providers.gradleProperty('clientWorkDir').getOrElse('run'))
+            // Process-only silence: keep the author's normal saved volume unchanged.
+            if (project.hasProperty('silentClient')) { property 'guerra.silentClient', 'true' }
             if (providers.gradleProperty('quickPlayWorld').isPresent()) {
                 args '--quickPlaySingleplayer', providers.gradleProperty('quickPlayWorld').get()
             }
@@ -78,6 +80,11 @@ minecraft {
                 property 'guerra.titleTest', 'true'
                 mods { "${mod_id}" { source sourceSets.gameTest } }
             }
+            if (project.hasProperty('characterAudioTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.characterAudioTest', 'true'
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
             if (project.hasProperty('lulaTest')) {
                 args '--width', '1280', '--height', '720'
                 property 'guerra.lulaTest', 'true'
@@ -108,6 +115,10 @@ minecraft {
         server {
             workingDirectory project.file(providers.gradleProperty('serverWorkDir').getOrElse('run-server'))
             args '--nogui'
+            if (project.hasProperty('villageWorldTest')) {
+                property 'guerra.villageWorldTest', 'true'
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
             if (project.hasProperty('arsenalTest')) {
                 property 'guerra.arsenalServerTest', 'true'
                 mods { "${mod_id}" { source sourceSets.gameTest } }

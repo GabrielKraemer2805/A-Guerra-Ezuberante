@@ -52,6 +52,7 @@ public abstract class SpecialDeathEntity extends RetaliatingCharacterEntity {
         super.defineSynchedData();entityData.define(STATE,ALIVE);entityData.define(ELAPSED,0);entityData.define(DURATION,60);
     }
     public final int deathState(){return entityData.get(STATE);}
+    @Override public boolean canPlayCharacterAudio(){return super.canPlayCharacterAudio() && deathState()==ALIVE;}
     public final int deathElapsed(){return entityData.get(ELAPSED);}
     public final int deathDuration(){return entityData.get(DURATION);}
     public final float deathAnimationAge(float partial){return Mth.clamp((deathElapsed()+partial)*60F/deathDuration(),0,60);}

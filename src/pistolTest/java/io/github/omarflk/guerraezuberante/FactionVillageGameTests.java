@@ -39,7 +39,8 @@ import java.util.Map;
 @GameTestHolder(GuerraEzuberanteMod.MOD_ID)
 @PrefixGameTestTemplate(false)
 public final class FactionVillageGameTests {
-    private static final long[] SEEDS = {0L, 42L, 12345L, -987654321L, 0x5EED_BEEFL};
+    private static final long[] SEEDS = {0L, 42L, 12345L, -987654321L, 0x5EED_BEEFL,
+            1L, 2L, 3L, 17L, 123L, 2026L, 20261029L, -1L, -42L, Long.MAX_VALUE, Long.MIN_VALUE};
 
     /** A real overworld biome source for the seed: the GameTest world itself is superflat. */
     private record Overworld(MultiNoiseBiomeSource biomes, RandomState random) {}
@@ -216,6 +217,76 @@ public final class FactionVillageGameTests {
         } finally {
             cleanUp(h, start);
         }
+        h.succeed();
+    }
+
+    @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400)
+    public static void lulistaVillageHasLulaAndWhiteStarFlags(GameTestHelper h) {
+        StructureStart start=generate(h, Faction.LULISTA, new ChunkPos(325,250));
+        try {
+            var castle=castle(h,start);
+            var leaders=h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.LulaEntity.class, area(start.getBoundingBox()));
+            h.assertTrue(leaders.size()==1 && castle.getBoundingBox().isInside(leaders.get(0).blockPosition()), "Lula missing or outside castle");
+            assertFlags(h,Faction.LULISTA,castle.getBoundingBox());
+        } finally { cleanUp(h,start); }
+        h.succeed();
+    }
+
+    @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400)
+    public static void independentVillagesHaveCorrectFlagsAndNoCharacters(GameTestHelper h) {
+        for (Faction faction : new Faction[]{Faction.ESQUERDA,Faction.DIREITA}) {
+            StructureStart start=generate(h,faction,new ChunkPos(faction==Faction.ESQUERDA?350:375,250));
+            try {
+                var castle=castle(h,start);
+                h.assertTrue(h.getLevel().getEntitiesOfClass(RetaliatingCharacterEntity.class,area(start.getBoundingBox())).isEmpty(), "Unexpected faction character");
+                assertFlags(h,faction,castle.getBoundingBox());
+            } finally { cleanUp(h,start); }
+        }
+        h.succeed();
+    }
+
+    @GameTest(template="empty", batch="ge_vilas_commands", timeoutTicks=400)
+    public static void chatCommandsTeleportAllFactionsOntoGroundAndRequireOperator(GameTestHelper h) throws Exception {
+        // Forge FakePlayer's connection deliberately ignores teleport packets. Capture the destination
+        // here; actual movement and acknowledgement are exercised separately by the graphical client.
+        var destination=new java.util.concurrent.atomic.AtomicReference<net.minecraft.world.phys.Vec3>();
+        var destinationLevel=new java.util.concurrent.atomic.AtomicReference<ServerLevel>();
+        var player=new net.minecraftforge.common.util.FakePlayer(h.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "VillageTpTest")) {
+            @Override public void teleportTo(ServerLevel level,double x,double y,double z,float yaw,float pitch) {
+                destination.set(new net.minecraft.world.phys.Vec3(x,y,z)); destinationLevel.set(level);
+            }
+        };
+        var dispatcher=h.getLevel().getServer().getCommands().getDispatcher();
+        try {
+            for(Faction faction: Faction.values()) {
+                var positions=FactionVillages.locate(player.server,faction).orElseThrow();
+                var lines=FactionVillages.describe(player.server,faction,new BlockPos(-350,80,470));
+                h.assertTrue(lines.size()==4, "Not three village links");
+                var visited=new HashSet<Integer>();
+                for(var line:lines.subList(1,4)) {
+                    var click=line.getStyle().getClickEvent();
+                    h.assertTrue(click!=null && click.getAction()==net.minecraft.network.chat.ClickEvent.Action.SUGGEST_COMMAND, "Coordinates are still copied as two numbers");
+                    String command=click.getValue().substring(1);
+                    int number=Integer.parseInt(command.substring(command.lastIndexOf(' ')+1));
+                    h.assertTrue(visited.add(number) && number>=1 && number<=3, "Sorted link has invalid village number");
+                    var parsed=dispatcher.parse(command,player.createCommandSourceStack().withPermission(2).withSuppressedOutput());
+                    h.assertTrue(parsed.getExceptions().isEmpty() && !parsed.getReader().canRead(), "Village link is not a complete command");
+                    try {
+                        dispatcher.execute(command,player.createCommandSourceStack().withPermission(0).withSuppressedOutput());
+                        h.fail("Non-operator could teleport");
+                    } catch(com.mojang.brigadier.exceptions.CommandSyntaxException expected) { }
+                    // Exercise one real destination per faction; all 18 links above are parsed and checked.
+                    if(number!=1) continue;
+                    h.assertTrue(dispatcher.execute(parsed)==1, "Teleport command failed");
+                    h.assertTrue(destinationLevel.get()==player.server.overworld(), "Teleport used the wrong dimension");
+                    BlockPos feet=BlockPos.containing(destination.get());
+                    h.assertTrue(FactionVillages.horizontalDistance(feet,positions.get(number-1))<=12, "Wrong village after distance sorting");
+                    h.assertTrue(feet.getY()<200 && player.fallDistance==0
+                            && destinationLevel.get().getBlockState(feet.below()).isFaceSturdy(destinationLevel.get(),feet.below(),net.minecraft.core.Direction.UP), "Unsafe or guessed teleport height");
+                }
+            }
+        } finally { player.discard(); }
         h.succeed();
     }
 }

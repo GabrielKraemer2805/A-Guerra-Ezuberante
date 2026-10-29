@@ -82,6 +82,9 @@ public final class JairBolsonaroEntity extends SpecialDeathEntity implements Npc
     }
     @Override public boolean isAlliedTo(Entity other){return other instanceof JairBolsonaroEntity || other instanceof FlavioBolsonaroEntity || super.isAlliedTo(other);}
     @Override protected List<ModSounds.VoiceLine> interactionVoices(){return ModSounds.JAIR_INTERACTION_VOICES;}
+    @Override public List<io.github.omarflk.guerraezuberante.audio.MusicTrack> musicTracks(){return io.github.omarflk.guerraezuberante.audio.CharacterAudio.JAIR;}
+    @Override public boolean isInteractionTrack(int index){return index != io.github.omarflk.guerraezuberante.audio.CharacterAudio.JAIR_DAMAGE_TRACK;}
+    @Override public boolean startsAudioOnCombat(){return false;}
     /** "Canalha" only when he actually loses health, about 40% of the time, never over another line. */
     @Override public boolean hurt(net.minecraft.world.damagesource.DamageSource source,float amount){
         float before=getHealth();
@@ -92,7 +95,7 @@ public final class JairBolsonaroEntity extends SpecialDeathEntity implements Npc
     /** Says "Canalha" when the roll (0..1) is below canalha_chance. Public so GameTests can pass a fixed roll. */
     public boolean reactToDamage(float roll){
         if(!isAlive() || isSpeaking() || !ModSounds.JAIR_CANALHA.isAvailable() || roll>=ModConfig.JAIR_CANALHA_CHANCE.get())return false;
-        speak(ModSounds.JAIR_CANALHA);return true;
+        return musicSession().playTrack(io.github.omarflk.guerraezuberante.audio.CharacterAudio.JAIR_DAMAGE_TRACK);
     }
     @Override public boolean greenDeathEnergy(){return true;}
     @Override protected String deathSavePrefix(){return "Jair";}

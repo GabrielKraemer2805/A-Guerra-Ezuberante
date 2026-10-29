@@ -58,6 +58,9 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
 
     protected abstract List<ModSounds.VoiceLine> interactionVoices();
     public List<io.github.omarflk.guerraezuberante.audio.MusicTrack> musicTracks() { return List.of(); }
+    public boolean isInteractionTrack(int index) { return true; }
+    public boolean startsAudioOnCombat() { return true; }
+    public boolean canPlayCharacterAudio() { return isAlive() && !isRemoved(); }
     public final io.github.omarflk.guerraezuberante.audio.EntityMusicSession musicSession() {
         if (musicSession == null) musicSession = new io.github.omarflk.guerraezuberante.audio.EntityMusicSession(this);
         return musicSession;
@@ -176,7 +179,8 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
 
     /** True while a voice line of this character may still be playing (right-click or combat). */
     public final boolean isSpeaking() {
-        return voiceCooldown > 0 || combatAudioCooldown > 0;
+        return (musicSession != null && musicSession.state() == io.github.omarflk.guerraezuberante.audio.EntityMusicSession.State.PLAYING)
+                || voiceCooldown > 0 || combatAudioCooldown > 0;
     }
 
     /** Plays a voice line attached to the character and blocks other lines until it has finished. */

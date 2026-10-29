@@ -1,0 +1,139 @@
+{
+  "deathStopsOnlyOwner": true,
+  "reactionCanBeSkipped": true,
+  "worldExitCleanup": true,
+  "masterVolume": 0,
+  "rightClickSkip": true,
+  "naturalEndNoAutoplay": true,
+  "teleports": [
+    {
+      "faction": "lulista",
+      "x": -943.5,
+      "y": 68.0,
+      "z": 256.5,
+      "number": 1
+    },
+    {
+      "faction": "lulista",
+      "x": 48.5,
+      "y": 64.0,
+      "z": -671.5,
+      "number": 2
+    },
+    {
+      "faction": "lulista",
+      "x": 1072.5,
+      "y": 88.0,
+      "z": 240.5,
+      "number": 3
+    },
+    {
+      "faction": "bolsonarista",
+      "x": -511.5,
+      "y": 67.0,
+      "z": 975.5,
+      "number": 1
+    },
+    {
+      "faction": "bolsonarista",
+      "x": 352.5,
+      "y": 87.0,
+      "z": -687.5,
+      "number": 2
+    },
+    {
+      "faction": "bolsonarista",
+      "x": 288.5,
+      "y": 72.0,
+      "z": 976.7118272269846,
+      "number": 3
+    },
+    {
+      "faction": "missao",
+      "x": -143.5,
+      "y": 78.0,
+      "z": -639.5,
+      "number": 1
+    },
+    {
+      "faction": "missao",
+      "x": 528.5,
+      "y": 77.0,
+      "z": -495.5,
+      "number": 2
+    },
+    {
+      "faction": "missao",
+      "x": 0.5,
+      "y": 67.0,
+      "z": 800.5,
+      "number": 3
+    },
+    {
+      "faction": "esquerda",
+      "x": -367.5,
+      "y": 71.0,
+      "z": -863.5,
+      "number": 1
+    },
+    {
+      "faction": "esquerda",
+      "x": 784.5,
+      "y": 84.0,
+      "z": -223.5,
+      "number": 2
+    },
+    {
+      "faction": "esquerda",
+      "x": -175.5,
+      "y": 71.0,
+      "z": 880.5,
+      "number": 3
+    },
+    {
+      "faction": "direita",
+      "x": -193.5,
+      "y": 73.0,
+      "z": -817.5,
+      "number": 1
+    },
+    {
+      "faction": "direita",
+      "x": 848.5,
+      "y": 71.0,
+      "z": 176.5,
+      "number": 2
+    },
+    {
+      "faction": "direita",
+      "x": -304.5,
+      "y": 69.0,
+      "z": 1023.5,
+      "number": 3
+    },
+    {
+      "faction": "centro",
+      "x": -175.5,
+      "y": 73.0,
+      "z": -991.5,
+      "number": 1
+    },
+    {
+      "faction": "centro",
+      "x": 928.5,
+      "y": 69.0,
+      "z": 352.5,
+      "number": 2
+    },
+    {
+      "faction": "centro",
+      "x": -127.5,
+      "y": 70.0,
+      "z": 1056.5,
+      "number": 3
+    }
+  ],
+  "removalCleanup": true,
+  "passed": true,
+  "teleportCount": 18
+}
