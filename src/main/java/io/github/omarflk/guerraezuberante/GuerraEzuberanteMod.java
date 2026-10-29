@@ -27,6 +27,7 @@ public final class GuerraEzuberanteMod {
         ModItems.REGISTER.register(bus);
         ModCreativeTabs.REGISTER.register(bus);
         ModSounds.REGISTER.register(bus);
+        io.github.omarflk.guerraezuberante.registry.ModWorldgen.register(bus);
         io.github.omarflk.guerraezuberante.registry.ModEffects.REGISTER.register(bus);
         io.github.omarflk.guerraezuberante.registry.ModParticles.REGISTER.register(bus);
         io.github.omarflk.guerraezuberante.pistol.PistolNetwork.register();

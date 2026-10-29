@@ -18,6 +18,16 @@ import java.util.UUID;
 @Mod.EventBusSubscriber(modid = GuerraEzuberanteMod.MOD_ID, value = Dist.CLIENT)
 public final class FactionClient {
     private static boolean selectionRequested;
+    /** x/z pairs of the player's faction villages, as the server sent them. */
+    private static int[] villages = new int[0];
+
+    public static void setVillages(int[] coords) {
+        villages = coords.clone();
+    }
+
+    public static int[] villages() {
+        return villages.clone();
+    }
 
     public static void requestSelection() {
         selectionRequested = true;
@@ -59,6 +69,7 @@ public final class FactionClient {
     @SubscribeEvent
     public static void loggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         selectionRequested = false;
+        villages = new int[0];
         Factions.clearClient();
     }
 

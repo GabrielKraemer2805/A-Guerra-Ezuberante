@@ -146,6 +146,21 @@ public final class ModPanelScreen extends Screen {
                     paragraph(textWidth, remaining > 0 ? "gui.guerra_ezuberante.faction_power_cooldown"
                             : "gui.guerra_ezuberante.faction_power_ready", (remaining + 19) / 20);
                     paragraph(textWidth, "gui.guerra_ezuberante.faction_passive", faction.passive());
+                    int[] villages = FactionClient.villages();
+                    if (villages.length == 0) {
+                        paragraph(textWidth, "gui.guerra_ezuberante.faction_villages_none");
+                    } else {
+                        paragraph(textWidth, "gui.guerra_ezuberante.faction_villages");
+                        java.util.List<int[]> sorted = new java.util.ArrayList<>();
+                        for (int index = 0; index + 1 < villages.length; index += 2) {
+                            int distance = (int) Math.hypot(villages[index] - minecraft.player.getX(), villages[index + 1] - minecraft.player.getZ());
+                            sorted.add(new int[]{villages[index], villages[index + 1], distance});
+                        }
+                        sorted.sort(java.util.Comparator.comparingInt(village -> village[2]));
+                        for (int[] village : sorted) {
+                            paragraph(textWidth, "gui.guerra_ezuberante.faction_village_entry", village[0], village[1], village[2]);
+                        }
+                    }
                     paragraph(textWidth, "gui.guerra_ezuberante.faction_profile_hint", ModKeyBindings.OPEN_PROFILE.getTranslatedKeyMessage());
                 } else {
                     paragraph(textWidth, "gui.guerra_ezuberante.faction_none");

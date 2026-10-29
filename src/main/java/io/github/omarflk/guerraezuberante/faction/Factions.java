@@ -32,6 +32,7 @@ public final class Factions {
         player.server.getPlayerList().broadcastSystemMessage(
                 Component.translatable("faction.guerra_ezuberante.joined", player.getName(), faction.displayName()), false);
         FactionKit.giveOnce(player, faction);
+        io.github.omarflk.guerraezuberante.village.FactionVillages.tell(player, faction);
         return true;
     }
 
@@ -56,6 +57,7 @@ public final class Factions {
         FactionNetwork.broadcast(player.getUUID(), faction);
         FactionPowers.applyPassives(player);
         io.github.omarflk.guerraezuberante.progression.Progression.sync(player);
+        FactionNetwork.sendVillages(player);
     }
 
     static void applyClient(UUID player, Faction faction) {

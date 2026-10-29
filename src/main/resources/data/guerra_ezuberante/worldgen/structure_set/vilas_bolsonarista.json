@@ -1,0 +1,10 @@
+{
+  "structures": [
+    { "structure": "guerra_ezuberante:vila_bolsonarista", "weight": 1 }
+  ],
+  "placement": {
+    "type": "guerra_ezuberante:vilas_faccao",
+    "faction": "bolsonarista",
+    "salt": 20141002
+  }
+}

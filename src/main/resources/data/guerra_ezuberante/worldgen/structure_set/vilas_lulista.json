@@ -1,0 +1,10 @@
+{
+  "structures": [
+    { "structure": "guerra_ezuberante:vila_lulista", "weight": 1 }
+  ],
+  "placement": {
+    "type": "guerra_ezuberante:vilas_faccao",
+    "faction": "lulista",
+    "salt": 20141001
+  }
+}

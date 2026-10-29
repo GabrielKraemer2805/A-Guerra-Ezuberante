@@ -3,7 +3,9 @@ package io.github.omarflk.guerraezuberante.faction;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import io.github.omarflk.guerraezuberante.GuerraEzuberanteMod;
+import io.github.omarflk.guerraezuberante.village.FactionVillages;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.BlockPos;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
@@ -34,6 +36,7 @@ public final class FactionEvents {
         }
         var faction = Factions.of(player);
         FactionNetwork.broadcast(player.getUUID(), faction.orElse(null));
+        FactionNetwork.sendVillages(player);
         if (faction.isEmpty()) {
             FactionNetwork.prompt(player);
         }
@@ -79,6 +82,7 @@ public final class FactionEvents {
                                             for (ServerPlayer target : targets) {
                                                 Factions.assign(target, faction);
                                                 target.sendSystemMessage(Component.translatable("faction.guerra_ezuberante.assigned", faction.displayName()));
+                                                FactionVillages.tell(target, faction);
                                             }
                                             context.getSource().sendSuccess(() -> Component.translatable(
                                                     "commands.guerra_ezuberante.faction.set", targets.size(), faction.displayName()), true);
@@ -99,6 +103,28 @@ public final class FactionEvents {
                                             "commands.guerra_ezuberante.faction.cleared", total), true);
                                     return total;
                                 })))));
+        // /ge vilas: your faction's villages again; operators can look up any faction's.
+        event.getDispatcher().register(Commands.literal("ge").then(Commands.literal("vilas")
+                .executes(context -> {
+                    var player = context.getSource().getPlayerOrException();
+                    var faction = Factions.of(player);
+                    if (faction.isEmpty()) {
+                        context.getSource().sendFailure(Component.translatable("commands.guerra_ezuberante.faction.none"));
+                        return 0;
+                    }
+                    FactionVillages.tell(player, faction.get());
+                    return 1;
+                })
+                .then(Commands.argument("faccao", StringArgumentType.word()).requires(source -> source.hasPermission(2))
+                        .suggests((context, builder) -> SharedSuggestionProvider.suggest(Arrays.stream(Faction.values()).map(Faction::id), builder))
+                        .executes(context -> {
+                            String name = StringArgumentType.getString(context, "faccao");
+                            Faction faction = Faction.byId(name).orElseThrow(() -> UNKNOWN.create(name));
+                            var source = context.getSource();
+                            FactionVillages.describe(source.getServer(), faction, BlockPos.containing(source.getPosition()))
+                                    .forEach(line -> source.sendSuccess(() -> line, false));
+                            return 1;
+                        }))));
     }
 
     private FactionEvents() {}

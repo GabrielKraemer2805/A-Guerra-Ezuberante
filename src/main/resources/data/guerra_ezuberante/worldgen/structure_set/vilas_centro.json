@@ -1,0 +1,10 @@
+{
+  "structures": [
+    { "structure": "guerra_ezuberante:vila_centro", "weight": 1 }
+  ],
+  "placement": {
+    "type": "guerra_ezuberante:vilas_faccao",
+    "faction": "centro",
+    "salt": 20141006
+  }
+}

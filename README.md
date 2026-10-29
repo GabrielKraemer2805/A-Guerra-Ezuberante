@@ -23,7 +23,24 @@ Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pre
 
 📚 **[Guia de prompts](guia-de-prompts/README.md)** — como pedir personagens, poderes, correções e arte, com **[modelos para copiar](guia-de-prompts/MODELOS.md)**, **[requisitos para jogar/desenvolver](guia-de-prompts/REQUISITOS.md)** e **[instruções para modificar o mod](guia-de-prompts/COMO-MODIFICAR.md)**. A pasta tem seu próprio README e pode ser consultada diretamente no GitHub.
 
-> **Estado atual — 0.013.0.** Cada jogador escolhe sua **facção** ao entrar (prefixo colorido no nome; só um operador troca) e ganha **um poder na tecla B**, um passivo e um kit. Agora também **sobe de nível derrotando inimigos**: o **perfil na tecla J** mostra nível, barra de XP e pontos para gastar em **Força, Velocidade, Vida, Força Ideológica e Convicção Ideológica**. A Convicção libera o **2º e o 3º poder** de cada facção. **Fogo amigo continua ativo.** [Nível, status e poderes](docs/PROGRESSAO_0.013.md) · [Facções, poderes e kits](docs/FACCOES_0.012.md).
+> **Estado atual — 0.014.0.** O mundo ganha **3 vilas de cada facção** com castelo, bandeiras e os personagens da facção, que só nascem ali ([Vilas de facção](docs/VILAS_0.014.md)). Cada jogador escolhe sua **facção** ao entrar (prefixo colorido no nome; só um operador troca) e ganha **um poder na tecla B**, um passivo e um kit. Agora também **sobe de nível derrotando inimigos**: o **perfil na tecla J** mostra nível, barra de XP e pontos para gastar em **Força, Velocidade, Vida, Força Ideológica e Convicção Ideológica**. A Convicção libera o **2º e o 3º poder** de cada facção. **Fogo amigo continua ativo.** [Nível, status e poderes](docs/PROGRESSAO_0.013.md) · [Facções, poderes e kits](docs/FACCOES_0.012.md).
+
+## Vilas de facção — 0.014.0
+
+![Castelo da Missão por dentro](docs/preview/vilas-0.014/castelo-missao-interior.png)
+
+Mundos novos ganham **18 vilas**, **3 de cada facção**, entre 350 e 1.000 blocos do centro. Cada uma é uma vila comum no estilo do bioma, tingida com a cor da facção, com estandartes pelas casas, um mastro na praça e **um castelo** com o líder no trono. As vilas são o **único spawn natural** dos personagens, um de cada por vila, e **quem morre não volta**.
+
+| Facção | No castelo | Na vila | Bandeira |
+| --- | --- | --- | --- |
+| Lulista | Lula | — | vermelha com estrela branca |
+| Bolsonarista | Jair | Flávio | verde com o mapa do Brasil em amarelo |
+| Missão | Renan | Arthur | metade amarela, metade preta |
+| Direita | trono vazio | — | azul com cifrão amarelo |
+| Centro | trono vazio | — | cinza |
+| Esquerda | trono vazio | — | vermelha com estrela amarela pequena |
+
+Ao escolher a facção, o chat mostra as coordenadas das 3 vilas dela (clique copia). Elas também ficam no **painel K → Facções** e em `/ge vilas`. Mundos criados antes da 0.014 só ganham vila em áreas ainda não exploradas. Detalhes em [docs/VILAS_0.014.md](docs/VILAS_0.014.md).
 
 ## Vozes do Jair — 0.013.1
 
