@@ -1,5 +1,12 @@
 # Contexto de trabalho — Guerra Ezuberante
 
+## Manual para IAs colaboradoras (29/10/2026)
+
+- Autor solicitou um único Markdown completo para os amigos entregarem às IAs deles. Criado `guia-de-prompts/guerra-ezuberante/SKILL.md`, transportável como anexo e com frontmatter de skill, referenciado no README principal e no guia de prompts.
+- Fotografia da0.014.2: arquitetura, regras de negócio de todos os domínios implementados, NPCs, facções/kits/passivos, progressão/poderes, persistência/tropas, armas, áudio, vilas/TP, skins/UV/animação, testes reais, comandos, contribuições e limites. Catálogo das118configurações extraído de `ModConfig.java`, com defaults/intervalos.
+- Distingue ideias antigas de estado atual; autorizações de Git/EULA não são transferidas aos amigos pelo documento. Preserva silêncio obrigatório, mundos isolados e entrega normal silenciosa. Apenas documentação, sem nova versão de código nem reinício do Minecraft.
+- Validação documental: catálogo integral comparado com as118definições, frontmatter/nome/descrição conferidos,18blocos de código fechados,19âncoras internas e links locais verificados. `quick_validate.py` da skill-creator não pôde executar porque Python não está instalado neste ambiente; conferências equivalentes de estrutura feitas em PowerShell. Sem alegar nova execução de testes de gameplay.
+
 ## Correções atuais — 0.014.2 (29/10/2026)
 
 - Autor relatou repetição contínua de gravações, áudio do Jair sobrevivendo à morte e botão direito sem pular; também pediu testes adicionais das vilas e explicou que o erro era “No entity was found” ao usar TP. [Entrega e comandos](docs/CORRECOES_0.014.2.md).

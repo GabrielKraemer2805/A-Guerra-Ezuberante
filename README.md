@@ -23,6 +23,8 @@ Este README reúne o design do jogo, as tecnologias propostas, a arquitetura pre
 
 📚 **[Guia de prompts](guia-de-prompts/README.md)** — como pedir personagens, poderes, correções e arte, com **[modelos para copiar](guia-de-prompts/MODELOS.md)**, **[requisitos para jogar/desenvolver](guia-de-prompts/REQUISITOS.md)** e **[instruções para modificar o mod](guia-de-prompts/COMO-MODIFICAR.md)**. A pasta tem seu próprio README e pode ser consultada diretamente no GitHub.
 
+🤖 **[Manual completo para IAs colaboradoras — SKILL.md](guia-de-prompts/guerra-ezuberante/SKILL.md)** — um único arquivo para seus amigos anexarem às IAs deles, com regras de negócio, arquitetura, testes, criação de skins, áudio, vilas e contribuição.
+
 > **Estado atual — 0.014.2.** Progressão, perfil **J**, cinco atributos, doze poderes novos, vozes do Jair e vilas com castelos vieram da contribuição de **[GabrielKraemer2805](https://github.com/GabrielKraemer2805)**. As correções atuais encerram gravações sem repetição automática, permitem pular as falas do Jair e param seu áudio na morte. Clicar nas coordenadas prepara `/ge vilas tp <faccao> <1–3>`, com altura calculada no chão; uma busca adicional evita posições no oceano quando a busca inicial falha. **126 testes com TaCZ,62 sem TaCZ,16 sementes e18 teleportes reais aprovados.** **B** usa o poder selecionado; **K** abre o painel. [Correções e testes](docs/CORRECOES_0.014.2.md) · [Integração](docs/INTEGRACAO_0.014.1.md) · [Progressão](docs/PROGRESSAO_0.013.md) · [Vilas](docs/VILAS_0.014.md).
 
 ## Vilas de facção — 0.014.0

@@ -2,8 +2,11 @@
 
 Este guia ajuda a transformar uma ideia em uma mudança que possa ser implementada, testada e revisada. Você pode escrever de forma informal: o que faz diferença é explicar o resultado esperado, os limites e como conferir se ficou certo.
 
+**Para entregar o contexto completo a outra IA:** envie o arquivo único [SKILL.md — manual completo do mod](guerra-ezuberante/SKILL.md). Ele reúne regras de negócio, arquitetura, personagens, poderes, testes, skins, áudio, vilas, fluxo de contribuição e as 118 configurações da versão0.014.2. Inclui uma mensagem pronta para acompanhar o anexo e pode ser usado como skill em ferramentas compatíveis.
+
 | Quero… | Onde começar |
 | --- | --- |
+| Dar todo o contexto do mod à IA de um colaborador | [Manual completo em um único SKILL.md](guerra-ezuberante/SKILL.md) |
 | Pedir um personagem, habilidade, correção ou arte | [Modelos de prompts para copiar](MODELOS.md) |
 | Instalar e jogar o mod | [Requisitos e instalação](REQUISITOS.md#para-jogar) |
 | Preparar outro computador para desenvolver | [Ambiente de desenvolvimento](REQUISITOS.md#para-desenvolver) |
