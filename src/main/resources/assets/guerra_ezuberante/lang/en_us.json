@@ -267,6 +267,10 @@
     "subtitles.guerra_ezuberante.jair.canalha":  "Jair — recording: canalha",
     "subtitles.guerra_ezuberante.jair.eu_nao_te":  "Jair — recording: eu não te",
     "subtitles.guerra_ezuberante.jair.popcorn":  "Jair — recording: popcorn",
+    "subtitles.guerra_ezuberante.boulos.o_po":  "Boulos — recording: o pó",
+    "subtitles.guerra_ezuberante.haddad.taxad":  "Haddad — recording: Taxad",
+    "subtitles.guerra_ezuberante.haddad.tapinhas":  "Haddad — recording: tapinhas",
+    "subtitles.guerra_ezuberante.haddad.perdeu_ne_seu_tonto":  "Haddad — recording: perdeu né seu tonto",
     "subtitles.guerra_ezuberante.batalha.renan_santos":  "Missão village battle music",
     "entity.guerra_ezuberante.haddad":  "Haddad",
     "entity.guerra_ezuberante.guilherme_boulos":  "Guilherme Boulos",
@@ -278,7 +282,7 @@
     "gui.guerra_ezuberante.character_tab.7":  "Haddad",
     "gui.guerra_ezuberante.character_tab.8":  "Boulos",
     "gui.guerra_ezuberante.haddad_details":  "Default health: 30 HP. Lulista faction, Lula's ally. Patrols the Lulista village like an iron golem and returns to the square if he strays. Defends it: attacks hostile mobs (except creepers) and players of other factions who come close.",
-    "gui.guerra_ezuberante.haddad_combat":  "Face slaps: 3 slaps in a row, 3 damage each; every slap that takes health paralyses the target for 3 s (no walking or jumping). 10 s cooldown; punches between combos.",
+    "gui.guerra_ezuberante.haddad_combat":  "Face slaps: 3 slaps in a row, 3 damage each; every slap that takes health paralyses the target for 3 s (no walking or jumping). 10 s cooldown; punches between combos. When hurt he plays “tapinhas”; below 20% health, “perdeu né seu tonto”.",
     "gui.guerra_ezuberante.boulos_details":  "Default health: 60 HP and 6 armor. Lulista faction, Lula's ally. Patrols and defends the Lulista village like Haddad.",
-    "gui.guerra_ezuberante.boulos_combat":  "Melee tank: 5-damage punches, hard to push. No special power yet."
+    "gui.guerra_ezuberante.boulos_combat":  "Melee tank: 5-damage punches, hard to push. No special power yet. When hurt, 40% chance to play “o pó”."
 }

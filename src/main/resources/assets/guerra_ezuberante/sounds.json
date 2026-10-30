@@ -196,6 +196,46 @@
                                ],
                     "subtitle":  "subtitles.guerra_ezuberante.jair.popcorn"
                 },
+    "boulos.o_po":  {
+                    "sounds":  [
+                                   {
+                                       "attenuation_distance":  32,
+                                       "name":  "guerra_ezuberante:boulos/o_po",
+                                       "stream":  true
+                                   }
+                               ],
+                    "subtitle":  "subtitles.guerra_ezuberante.boulos.o_po"
+                },
+    "haddad.taxad":  {
+                    "sounds":  [
+                                   {
+                                       "attenuation_distance":  32,
+                                       "name":  "guerra_ezuberante:haddad/taxad",
+                                       "stream":  true
+                                   }
+                               ],
+                    "subtitle":  "subtitles.guerra_ezuberante.haddad.taxad"
+                },
+    "haddad.tapinhas":  {
+                    "sounds":  [
+                                   {
+                                       "attenuation_distance":  32,
+                                       "name":  "guerra_ezuberante:haddad/tapinhas",
+                                       "stream":  true
+                                   }
+                               ],
+                    "subtitle":  "subtitles.guerra_ezuberante.haddad.tapinhas"
+                },
+    "haddad.perdeu_ne_seu_tonto":  {
+                    "sounds":  [
+                                   {
+                                       "attenuation_distance":  32,
+                                       "name":  "guerra_ezuberante:haddad/perdeu_ne_seu_tonto",
+                                       "stream":  true
+                                   }
+                               ],
+                    "subtitle":  "subtitles.guerra_ezuberante.haddad.perdeu_ne_seu_tonto"
+                },
     "batalha.renan_santos":  {
                                  "subtitle":  "subtitles.guerra_ezuberante.batalha.renan_santos",
                                  "sounds":  [

@@ -1,11 +1,14 @@
 package io.github.omarflk.guerraezuberante.entity;
 
+import io.github.omarflk.guerraezuberante.audio.CharacterAudio;
+import io.github.omarflk.guerraezuberante.audio.MusicTrack;
 import io.github.omarflk.guerraezuberante.config.ModConfig;
 import io.github.omarflk.guerraezuberante.registry.ModEffects;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
@@ -17,6 +20,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
 
 import java.util.EnumSet;
+import java.util.List;
 
 /**
  * Haddad: a combo of slaps in the face. Each slap is a separate hit of {@link ModConfig#SLAP_DAMAGE} and, when it really
@@ -45,6 +49,32 @@ public final class HaddadEntity extends LulistaAllyEntity {
     }
 
     @Override protected float getStandingEyeHeight(Pose pose, EntityDimensions size) { return 1.62F; }
+
+    @Override public List<MusicTrack> musicTracks() { return CharacterAudio.HADDAD; }
+
+    /** Right-click only plays "Taxad"; the other two tracks are damage lines. */
+    @Override public boolean isInteractionTrack(int index) { return index == 0; }
+
+    /** Nothing plays by itself when a fight starts. */
+    @Override public boolean startsAudioOnCombat() { return false; }
+
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        float before = getHealth();
+        boolean accepted = super.hurt(source, amount);
+        if (accepted && !level().isClientSide && getHealth() < before) { reactToDamage(random.nextFloat()); }
+        return accepted;
+    }
+
+    /**
+     * Damage line when the roll (0..1) is below damage_voice_chance, never over another line: "tapinhas", or
+     * "perdeu né seu tonto" once health is below low_health_voice_fraction. Public so GameTests can pass a fixed roll.
+     */
+    public boolean reactToDamage(float roll) {
+        if (!isAlive() || isSpeaking() || roll >= ModConfig.HADDAD_DAMAGE_VOICE_CHANCE.get()) { return false; }
+        boolean low = getHealth() < getMaxHealth() * ModConfig.HADDAD_LOW_HEALTH_FRACTION.get();
+        return musicSession().playTrack(low ? CharacterAudio.HADDAD_LOW_HEALTH_TRACK : CharacterAudio.HADDAD_DAMAGE_TRACK);
+    }
 
     /** Movement and normal punches stop while slapping. */
     @Override public boolean isActionLocked() { return slapsLeft > 0 || slapImpactAt >= 0; }

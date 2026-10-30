@@ -20,7 +20,7 @@ public final class ModConfig {
     public static final ForgeConfigSpec.IntValue FISSURE_COOLDOWN;
     public static final ForgeConfigSpec.BooleanValue FISSURE_BLOCK_DAMAGE;
     public static final ForgeConfigSpec.DoubleValue FISSURE_FINAL_RADIUS;
-    public static final ForgeConfigSpec.DoubleValue HADDAD_HEALTH,HADDAD_MELEE,SLAP_DAMAGE,BOULOS_HEALTH,BOULOS_MELEE,BOULOS_ARMOR;
+    public static final ForgeConfigSpec.DoubleValue HADDAD_HEALTH,HADDAD_MELEE,SLAP_DAMAGE,HADDAD_DAMAGE_VOICE_CHANCE,HADDAD_LOW_HEALTH_FRACTION,BOULOS_HEALTH,BOULOS_MELEE,BOULOS_ARMOR,BOULOS_PO_CHANCE;
     public static final ForgeConfigSpec.IntValue SLAP_COUNT,SLAP_PARALYSIS_TICKS,SLAP_COOLDOWN;
     public static final ForgeConfigSpec.BooleanValue RIVALRY_ENABLED;
     public static final ForgeConfigSpec.DoubleValue RIVALRY_RANGE;
@@ -112,11 +112,17 @@ public final class ModConfig {
         SLAP_PARALYSIS_TICKS=builder.comment("Paralysis after each slap that really hurts: no walking, no jumping.")
                 .defineInRange("slap_paralysis_ticks",60,0,1200);
         SLAP_COOLDOWN=builder.comment("From the start of one slap combo to the next.").defineInRange("slap_cooldown_ticks",200,40,72000);
+        HADDAD_DAMAGE_VOICE_CHANCE=builder.comment("Chance of a damage line each time Haddad takes damage (never over another line).")
+                .defineInRange("damage_voice_chance",1D,0D,1D);
+        HADDAD_LOW_HEALTH_FRACTION=builder.comment("Below this fraction of max health the damage line becomes \"perdeu né seu tonto\".")
+                .defineInRange("low_health_voice_fraction",.2D,0D,1D);
         builder.pop();
         builder.push("boulos");
         BOULOS_HEALTH=builder.defineInRange("max_health",60D,1D,1024D);
         BOULOS_MELEE=builder.defineInRange("melee_damage",5D,0D,100D);
         BOULOS_ARMOR=builder.defineInRange("armor",6D,0D,30D);
+        BOULOS_PO_CHANCE=builder.comment("Chance of playing \"o pó\" each time Boulos takes damage (never over itself).")
+                .defineInRange("po_chance",.4D,0D,1D);
         builder.pop();
         builder.comment("Characters of different factions (Lula, Jair, Renan, Arthur, Haddad...) attack each other on sight;",
                 "characters of the same faction are allies. Players are not affected.").push("faction_rivalry");

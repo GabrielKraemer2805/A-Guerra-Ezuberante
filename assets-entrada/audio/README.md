@@ -5,11 +5,14 @@ Originais são preservados e ignorados pelo Git. As entradas padrão são separa
 - `renan/`: Me Respeita, risadinha e phonk.
 - `arthur/`: nove MP3s recebidos, sete gravações únicas.
 - `jair/`: Canalha, Eu não te e Popcorn (`.mpeg`, MP3 com capa).
+- `boulos/`: `o_po.wav`; `haddad/`: `taxad.wav`, `tapinhas.wav` e `perdeu_ne_seu_tonto.wav`. Trechos já cortados dos originais em `audios/` (comandos em [docs/AUDIOS.md](../../docs/AUDIOS.md)).
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tools/convert_audio.ps1 -Character renan
 powershell -ExecutionPolicy Bypass -File tools/convert_audio.ps1 -Character arthur
 powershell -ExecutionPolicy Bypass -File tools/convert_audio.ps1 -Character jair
+powershell -ExecutionPolicy Bypass -File tools/convert_audio.ps1 -Character boulos
+powershell -ExecutionPolicy Bypass -File tools/convert_audio.ps1 -Character haddad
 ```
 
 O conversor aceita MP3, MPEG, WAV, M4A e OGG, descarta capas embutidas, preserva as gravações completas e detecta duplicatas por SHA-256. Não há cortes nem mudança de velocidade. Os MP3s soltos da primeira versão continuam preservados; o padrão atual usa as subpastas.

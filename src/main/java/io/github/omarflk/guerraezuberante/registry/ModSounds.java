@@ -35,6 +35,10 @@ public final class ModSounds {
     public static final RegistryObject<SoundEvent> JAIR_CANALHA_EVENT = register("jair.canalha");
     public static final RegistryObject<SoundEvent> JAIR_EU_NAO_TE = register("jair.eu_nao_te");
     public static final RegistryObject<SoundEvent> JAIR_POPCORN = register("jair.popcorn");
+    public static final RegistryObject<SoundEvent> BOULOS_O_PO_EVENT = register("boulos.o_po");
+    public static final RegistryObject<SoundEvent> HADDAD_TAXAD_EVENT = register("haddad.taxad");
+    public static final RegistryObject<SoundEvent> HADDAD_TAPINHAS_EVENT = register("haddad.tapinhas");
+    public static final RegistryObject<SoundEvent> HADDAD_PERDEU_EVENT = register("haddad.perdeu_ne_seu_tonto");
     /** Background music, looped while a player stands inside a Missão village (one folder per politician in "audios batalha"). */
     public static final RegistryObject<SoundEvent> BATTLE_RENAN = register("batalha.renan_santos");
 
@@ -83,6 +87,14 @@ public final class ModSounds {
             new VoiceLine(JAIR_POPCORN, "jair", "popcorn", 890));
     public static final List<VoiceLine> JAIR_VOICES = List.of(JAIR_CANALHA,
             JAIR_INTERACTION_VOICES.get(0), JAIR_INTERACTION_VOICES.get(1));
+
+    // Excerpts chosen by the collaborator: Boulos 0–7 s and Haddad 34–45 s of the received MP3s.
+    public static final VoiceLine BOULOS_O_PO = new VoiceLine(BOULOS_O_PO_EVENT, "boulos", "o_po", 140);
+    public static final VoiceLine HADDAD_TAXAD = new VoiceLine(HADDAD_TAXAD_EVENT, "haddad", "taxad", 220);
+    // Haddad's damage lines, 5–8 s and 8–11 s of the Pavanato video; only on damage, never on right-click.
+    public static final VoiceLine HADDAD_TAPINHAS = new VoiceLine(HADDAD_TAPINHAS_EVENT, "haddad", "tapinhas", 60);
+    public static final VoiceLine HADDAD_PERDEU = new VoiceLine(HADDAD_PERDEU_EVENT, "haddad", "perdeu_ne_seu_tonto", 60);
+    public static final List<VoiceLine> HADDAD_VOICES = List.of(HADDAD_TAXAD, HADDAD_TAPINHAS, HADDAD_PERDEU);
 
     // Author selected the full recording; its 11-second cooldown exceeds the 9.98-second audio.
     public static final List<VoiceLine> ARTHUR_REACTIONS = List.of(ARTHUR_VOICES.get(0));

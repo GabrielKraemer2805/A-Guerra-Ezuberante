@@ -1,5 +1,14 @@
 # Contexto de trabalho — Guerra Ezuberante
 
+## Áudios do Boulos e do Haddad — 0.015.4 (30/10/2026)
+
+- Pedido do colaborador Giovanni (GitHub Jhovial), cuja atribuição é só os áudios de Boulos e Haddad. Branch `feat/audios-haddad-boulos` a partir da main do Gabriel (`80e4bde`, 0.015.3), único lugar onde os dois existem; entrega por fork `Jhovial/A-Guerra-Ezuberante` e pull request para o Omar, que deve integrar antes o trabalho do Gabriel.
+- Trechos pedidos pelo colaborador, cortados de vídeos maiores (exceção à regra de gravação inteira): Boulos “o pó” 0–7 s; Haddad “Taxad” 34–45 s, “tapinhas” 5–8 s e “perdeu né seu tonto” 8–11 s do vídeo do Pavanato. Originais em `audios/{boulos,haddad}/`; corte em WAV PCM em `assets-entrada/audio/`, conversão pelo `tools/convert_audio.ps1` (agora aceita `boulos`/`haddad`). OGG Vorbis mono 44.100 Hz; 140/220/60/60 ticks medidos. Origem, hashes, volumes e comandos em `docs/AUDIOS.md`.
+- Decisões do colaborador: Boulos no botão direito e, com 40% de chance (`[boulos] po_chance`), ao receber dano. Haddad: botão direito só Taxad; cada dano toca “tapinhas” e, com menos de 20% da vida, “perdeu né seu tonto” no lugar (`[haddad] damage_voice_chance` 1, `low_health_voice_fraction` 0,2). Nenhum dos dois toca só por entrar em combate.
+- Mesmo caminho de Lula/Jair: `CharacterAudio.BOULOS`/`HADDAD` no `EntityMusicSession`; reação a dano igual ao Canalha (só com perda real de vida, nunca por cima de outra fala; clique pode pular). `isInteractionTrack` deixa só Taxad no clique. Painel K lista as falas; legendas pt_br/en_us.
+- Validação: build/check aprovados; **144 GameTests com TaCZ** (2 novos em `CharacterAudioGameTests`: gatilhos, chance, não sobrepor, troca abaixo de 20%, fim natural e morte). Sem TaCZ, a primeira rodada reaproveitou o `run-gametest/world` da rodada com TaCZ e `lulistaVillageHasLulaAndWhiteStarFlags` falhou com “13 petistas among 15 villagers”: o teste gera de novo a vila no mesmo chunk (325, 250) e conta aldeões que sobraram da rodada anterior (na rodada com TaCZ, em mundo novo, eram 15 de 15). Mundo reaproveitado preservado como `run-gametest/world-reaproveitado-tacz-depois-sem-tacz`. **Sem TaCZ em mundo novo: 80 GameTests aprovados** (vila lulista com 11 petistas entre 11 aldeões), confirmando que a falha vinha do mundo reaproveitado, não dos áudios. Para comparar contagens, apagar ou renomear `run-gametest/world` entre as rodadas com e sem TaCZ.
+- Limites: áudio validado por estado/eventos em GameTest, sem audição; volumes mantidos como recebidos (o pó e Taxad mais baixos que Lula/Jair).
+
 ## XP de rivais e ovo de petista variado — 0.015.3 (30/10/2026)
 
 - Pedido do colaborador (0.015.2 aprovada, enviada e juntada na main do fork em `d15c000`): matar personagens especiais (não villagers) de outra facção dá mais XP — ex.: Bolsonarista que mata Haddad ganha mais que o normal; o líder (Lula) dá 4×. E o ovo de petista deve gerar todas as variedades, não só uma.

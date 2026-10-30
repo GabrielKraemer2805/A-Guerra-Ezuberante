@@ -1,7 +1,7 @@
 ﻿param(
     [string]$InputDirectory,
     [string]$FFmpegPath,
-    [ValidateSet('renan', 'arthur', 'jair')][string]$Character = 'renan'
+    [ValidateSet('renan', 'arthur', 'jair', 'boulos', 'haddad')][string]$Character = 'renan'
 )
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot

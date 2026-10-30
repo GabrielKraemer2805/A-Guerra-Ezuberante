@@ -58,11 +58,38 @@ Recebidos em `assets-entrada/audio/jair/` como `.mpeg` (MP3 estéreo 48 kHz com 
 - Desde a0.014.2, o botão direito interrompe a gravação anterior e inicia outra, sem sobrepor. As durações medidas dos OGGs são131/1066/848ticks para Canalha/Eu não te/Popcorn; os cooldowns acima descrevem a implementação antiga.
 - O mod passa a empacotar **3 OGGs a mais** (evento `guerra_ezuberante:jair.*`, streaming, legendas "Jair — gravação: …"). O painel K → Personagens → Jair lista as três.
 
+## Boulos e Haddad — 0.015.4
+
+Trechos escolhidos pelo colaborador Giovanni (Jhovial) de dois vídeos maiores, ambos MP3 estéreo 44.100 Hz. Diferente das outras falas, **aqui há corte, a pedido**; dentro do trecho não há mudança de velocidade, volume ou fade. Originais preservados em `audios/boulos/` e `audios/haddad/` (ignorados pelo Git).
+
+| Original | Duração original | SHA-256 | Trecho | OGG | Uso |
+| --- | --- | --- | --- | --- | --- |
+| NOVO HIT - BOULOS E O PÓ 🤣🤧 - B006 CANAIS.mp3 | 83,98 s | `79ce30da…add14d8` | 0–7 s | `sounds/boulos/o_po.ogg`, 7,000 s = 140 ticks | Botão direito; **ao receber dano**, 40% de chance (`[boulos] po_chance`), nunca por cima dela mesma. Não toca só por entrar em combate |
+| Músicas famosas são adaptadas em meme para Taxad assista - Poder360.mp3 | 105,06 s | `bb874fe2…234058d` | 34–45 s | `sounds/haddad/taxad.ogg`, 11,000 s = 220 ticks | **Só botão direito** (a única faixa de interação do Haddad) |
+| Após provocação, Haddad dá tapinhas no rosto de Pavanato - Metrópoles.mp3 | 16,77 s | `5c828251…e278e55` | 5–8 s | `sounds/haddad/tapinhas.ogg`, 3,000 s = 60 ticks | **Ao receber dano**, com vida em 20% ou mais (`[haddad] damage_voice_chance`, padrão 1 = sempre) |
+| (mesmo arquivo) | — | — | 8–11 s | `sounds/haddad/perdeu_ne_seu_tonto.ogg`, 3,000 s = 60 ticks | **Ao receber dano com menos de 20% da vida** (`[haddad] low_health_voice_fraction` 0,2), no lugar de "tapinhas" |
+
+- Os dois usam o mesmo canal vinculado de Lula/Jair (`CharacterAudio.BOULOS`/`HADDAD`): clique pula/reinicia, fim natural fica em silêncio, morte e remoção param o som. Com uma única faixa de interação, o clique reinicia a mesma gravação.
+- Falas de dano (o pó, tapinhas, perdeu né seu tonto) seguem a regra do Canalha: só quando o dano tira vida, nunca por cima de outra fala do mesmo personagem; o clique pode interrompê-las. A faixa de vida é conferida depois do dano.
+- Volume medido (média/pico): o pó −20,3/−4,3 dB, Taxad −22,9/−3,7 dB, tapinhas −12,6/−1,9 dB, perdeu né seu tonto −14,7/−2,0 dB. o pó e Taxad ficam mais baixos que Lula/Jair (−11 a −18 dB de média). Mantidos como recebidos.
+- Eventos `guerra_ezuberante:boulos.o_po` e `guerra_ezuberante:haddad.{taxad,tapinhas,perdeu_ne_seu_tonto}`, streaming, atenuação 32 blocos, legendas "Boulos — gravação: o pó" e "Haddad — gravação: …". O painel K → Personagens → Haddad/Boulos lista cada uma.
+
+O corte gera um WAV PCM sem perdas na pasta de entrada, e o conversor do projeto faz o OGG mono:
+
+```powershell
+ffmpeg -i "audios/boulos/NOVO HIT - BOULOS E O PÓ 🤣🤧 - B006 CANAIS.mp3" -ss 0 -to 7 -vn -map_metadata -1 -c:a pcm_s16le assets-entrada/audio/boulos/o_po.wav
+ffmpeg -i "audios/haddad/Músicas famosas são adaptadas em meme para Taxad assista - Poder360.mp3" -ss 34 -to 45 -vn -map_metadata -1 -c:a pcm_s16le assets-entrada/audio/haddad/taxad.wav
+ffmpeg -i "audios/haddad/Após provocação, Haddad dá tapinhas no rosto de Pavanato - Metrópoles.mp3" -ss 5 -to 8 -vn -map_metadata -1 -c:a pcm_s16le assets-entrada/audio/haddad/tapinhas.wav
+ffmpeg -i "audios/haddad/Após provocação, Haddad dá tapinhas no rosto de Pavanato - Metrópoles.mp3" -ss 8 -to 11 -vn -map_metadata -1 -c:a pcm_s16le assets-entrada/audio/haddad/perdeu_ne_seu_tonto.wav
+```
+
 ## Conversão
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/convert_audio.ps1 -Character renan
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/convert_audio.ps1 -Character arthur
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/convert_audio.ps1 -Character boulos
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/convert_audio.ps1 -Character haddad
 ```
 
 O script aceita `-InputDirectory` e `-FFmpegPath`. O parâmetro `-Character` escolhe a subpasta de entrada e de saída. Os MP3s soltos da primeira versão continuam preservados, mas a entrada padrão agora é separada por personagem.

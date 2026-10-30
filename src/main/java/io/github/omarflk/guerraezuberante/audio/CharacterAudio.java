@@ -20,5 +20,11 @@ public final class CharacterAudio {
             track("arthur.e_vagabundo_sim",200), track("arthur.ficou_ofendidinho",332),
             track("arthur.limpa_o_cu_com_a_linuga",281), track("arthur.parar_de_mamat",264),
             track("arthur.privatizar_tudo",334), track("arthur.sao_faceis_pq_sao_pobres",158), track("arthur.so_deusa",189));
+    // Excerpts the collaborator cut from longer videos; durations measured on the OGG.
+    public static final List<MusicTrack> BOULOS = List.of(track("boulos.o_po",140));
+    // Taxad on right-click; tapinhas on damage, replaced by "perdeu né seu tonto" below low_health_voice_fraction.
+    public static final int HADDAD_DAMAGE_TRACK = 1, HADDAD_LOW_HEALTH_TRACK = 2;
+    public static final List<MusicTrack> HADDAD = List.of(
+            track("haddad.taxad",220), track("haddad.tapinhas",60), track("haddad.perdeu_ne_seu_tonto",60));
     private CharacterAudio() {}
 }

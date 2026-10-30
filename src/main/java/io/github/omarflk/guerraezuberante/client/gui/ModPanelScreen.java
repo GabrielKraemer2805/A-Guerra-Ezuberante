@@ -119,7 +119,8 @@ public final class ModPanelScreen extends Screen {
                 paragraph(textWidth, "gui.guerra_ezuberante." + character + "_details");
                 List<ModSounds.VoiceLine> voices = characterSelected == 0 ? java.util.List.of(ModSounds.RENAN_VOICES.get(0), ModSounds.RENAN_PHONK, ModSounds.RENAN_VOICES.get(1))
                         : characterSelected == 1 || characterSelected == 2 ? ModSounds.ARTHUR_VOICES : characterSelected == 4 ? ModSounds.LULA_VOICES
-                        : characterSelected == 5 ? ModSounds.JAIR_VOICES : List.of();
+                        : characterSelected == 5 ? ModSounds.JAIR_VOICES : characterSelected == 7 ? ModSounds.HADDAD_VOICES
+                        : characterSelected == 8 ? List.of(ModSounds.BOULOS_O_PO) : List.of();
                 for (ModSounds.VoiceLine voice : voices) {
                     paragraph(textWidth, "gui.guerra_ezuberante.voice_entry",
                             Component.translatable(voice.subtitleKey()),
