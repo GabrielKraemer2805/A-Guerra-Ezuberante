@@ -62,6 +62,7 @@ public final class FactionVillageStructure extends Structure {
             case LULISTA -> ModEntities.LULA;
             case BOLSONARISTA -> ModEntities.JAIR_BOLSONARO;
             case MISSAO -> ModEntities.RENAN_SANTOS;
+            case ESQUERDA -> ModEntities.JONES_MANOEL;
             default -> null;
         };
         return Optional.ofNullable(type).map(Supplier::get);
@@ -73,6 +74,7 @@ public final class FactionVillageStructure extends Structure {
             case LULISTA -> List.of(ModEntities.HADDAD.get(), ModEntities.BOULOS.get(), ModEntities.DILMA.get());
             case BOLSONARISTA -> List.of(ModEntities.FLAVIO_BOLSONARO.get());
             case MISSAO -> List.of(ModEntities.ARTHUR_INVOCADOR.get());
+            case ESQUERDA -> List.of(ModEntities.TABATA_AMARAL.get(), ModEntities.MARINA_SILVA.get(), ModEntities.CIRO_GOMES.get());
             default -> List.of();
         };
     }
@@ -149,10 +151,12 @@ public final class FactionVillageStructure extends Structure {
                 spawn(level, chunkBox, type, gate.outside(), entity -> ((io.github.omarflk.guerraezuberante.entity.DilmaEntity) entity).setCastle(gate));
                 continue;
             }
-            int offset = index % 2 == 0 ? 3 : -3;
-            spawn(level, chunkBox, type, center.offset(offset, 0, -offset));
+            // Corners of the square, a different one each, so no two characters share a spot.
+            int x = index % 2 == 0 ? 3 : -3, z = index % 4 < 2 ? -x : x;
+            spawn(level, chunkBox, type, center.offset(x, 0, z));
         }
-        if (faction == Faction.LULISTA) { Petistas.convertVillagers(level, chunkBox, chunk); }
+        var villagerType = io.github.omarflk.guerraezuberante.registry.ModVillagers.type(faction);
+        if (villagerType != null) { Petistas.convertVillagers(level, chunkBox, chunk, villagerType); }
     }
 
     private static boolean isHouse(StructurePiece piece) {
@@ -218,7 +222,7 @@ public final class FactionVillageStructure extends Structure {
         var entity = type.create(level.getLevel());
         if (entity == null) { return; }
         entity.moveTo(pos.getX() + .5, pos.getY(), pos.getZ() + .5, yaw, 0);
-        if (entity instanceof io.github.omarflk.guerraezuberante.entity.LulistaAllyEntity ally) { ally.setHome(pos); }
+        if (entity instanceof io.github.omarflk.guerraezuberante.entity.VillageAllyEntity ally) { ally.setHome(pos); }
         setup.accept(entity);
         if (entity instanceof Mob mob) {
             mob.setPersistenceRequired();

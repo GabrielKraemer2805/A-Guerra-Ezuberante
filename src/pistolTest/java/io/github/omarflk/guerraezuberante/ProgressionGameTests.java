@@ -7,6 +7,7 @@ import io.github.omarflk.guerraezuberante.entity.MeteorProjectile;
 import io.github.omarflk.guerraezuberante.entity.YellowBookProjectile;
 import io.github.omarflk.guerraezuberante.faction.*;
 import io.github.omarflk.guerraezuberante.progression.Progression;
+import io.github.omarflk.guerraezuberante.progression.SkillTree;
 import io.github.omarflk.guerraezuberante.progression.Stat;
 import io.github.omarflk.guerraezuberante.registry.ModEffects;
 import io.github.omarflk.guerraezuberante.registry.ModEntities;
@@ -72,10 +73,13 @@ public final class ProgressionGameTests {
         pig.setNoAi(true); pig.moveTo(at.x, at.y, at.z, 0, 0); h.getLevel().addFreshEntity(pig);
         return pig;
     }
-    /** Level 30 and Conviction 10: every power slot unlocked. */
+    /** Level 30, Conviction 10 and the cheapest tree path to the three powers (Recarga nodes: no damage change). */
     private static void unlockAll(ServerPlayer player) {
         Progression.addXp(player, 1_000_000);
         for (int i = 0; i < 10; i++) Progression.spend(player, Stat.CONVICCAO);
+        for (var node : new SkillTree.Node[]{SkillTree.Node.P1_RECARGA, SkillTree.Node.P2, SkillTree.Node.P2_RECARGA, SkillTree.Node.P3}) {
+            SkillTree.buy(player, node);
+        }
     }
     private static boolean near(float actual, double expected) { return Math.abs(actual - expected) < 1e-3; }
     /** Runs the cleanup even when an assertion fails, so a failed test cannot leave players or mobs for the next batches. */
@@ -119,22 +123,53 @@ public final class ProgressionGameTests {
         h.assertTrue(player.getAttributeValue(Attributes.ATTACK_DAMAGE) == attack && player.getMaxHealth() == health && Progression.level(player) == 1, "Reset left bonuses");
         Factions.clear(player); h.succeed();
     }
-    @GameTest(template="empty") public static void convictionUnlocksPowersAndShortensCooldown(GameTestHelper h) {
-        var player = fake(h, "ConvictionQA");
+    @GameTest(template="empty") public static void treeBuysPowersWithConvictionPoints(GameTestHelper h) {
+        var player = fake(h, "TreeQA");
         Factions.assign(player, Faction.CENTRO);
-        h.assertTrue(Progression.unlockedPowers(player) == 1 && !Progression.select(player, 1), "Second power selectable without Conviction");
+        h.assertTrue(Progression.unlockedPowers(player) == 1 && !Progression.select(player, 1), "Second power selectable without the tree");
         h.assertTrue(!FactionPowers.use(player, 1) && FactionPowers.remainingCooldown(player, 1) == 0, "Locked power fired or spent cooldown");
         Progression.addXp(player, 1_000_000);
         for (int i = 0; i < 5; i++) Progression.spend(player, Stat.CONVICCAO);
-        h.assertTrue(Progression.unlockedPowers(player) == 2 && Progression.select(player, 1) && Progression.selectedPower(player) == 1, "Conviction 5 did not unlock the 2nd power");
-        h.assertTrue(!Progression.select(player, 2), "Third power selectable at Conviction 5");
+        h.assertTrue(SkillTree.available(player) == 5 && Progression.unlockedPowers(player) == 1, "Conviction should give points, not powers");
+        h.assertTrue(!SkillTree.buy(player, SkillTree.Node.P2), "2nd power bought before upgrading the 1st");
+        h.assertTrue(SkillTree.buy(player, SkillTree.Node.P1_RECARGA) && SkillTree.buy(player, SkillTree.Node.P2)
+                && SkillTree.available(player) == 2, "Path to the 2nd power failed or cost wrong");
+        h.assertTrue(!SkillTree.buy(player, SkillTree.Node.P2), "Bought the same node twice");
+        h.assertTrue(Progression.unlockedPowers(player) == 2 && Progression.select(player, 1) && Progression.selectedPower(player) == 1, "2nd power not usable after buying it");
+        h.assertTrue(!SkillTree.buy(player, SkillTree.Node.P3) && !SkillTree.buy(player, SkillTree.Node.CLASSE), "3rd power or class node without a 2nd power upgrade");
+        h.assertTrue(SkillTree.buy(player, SkillTree.Node.P2_POTENCIA) && SkillTree.available(player) == 1, "Potência II failed");
+        h.assertTrue(!SkillTree.buy(player, SkillTree.Node.P3), "3rd power bought without enough points");
         for (int i = 0; i < 5; i++) Progression.spend(player, Stat.CONVICCAO);
-        h.assertTrue(Progression.unlockedPowers(player) == 3 && Progression.scaledCooldown(player, 600) == 480, "Conviction 10: 3 powers and -20% cooldown");
+        h.assertTrue(SkillTree.buy(player, SkillTree.Node.P3) && SkillTree.available(player) == 3 && Progression.unlockedPowers(player) == 3, "3rd power failed");
+        h.assertTrue(Progression.scaledCooldown(player, 600) == 480 && Progression.scaledCooldown(player, 0, 600) == 384
+                && Progression.scaledCooldown(player, 1, 600) == 480, "Conviction 10 (-20%) and Recarga I (-20%) wrong");
+        h.assertTrue(Math.abs(Progression.powerScale(player, 1) - 1.2) < 1e-9 && Math.abs(Progression.powerScale(player, 0) - 1) < 1e-9, "Potência II should be x1.2 on slot 1 only");
         h.assertTrue(FactionPowers.use(player) && FactionPowers.remainingCooldown(player, 1) == 480
                 && FactionPowers.remainingCooldown(player, 0) == 0, "B did not use the selected slot with its own cooldown");
         Progression.reset(player);
-        h.assertTrue(Progression.selectedPower(player) == 0, "Selection survived losing the unlock");
+        h.assertTrue(Progression.selectedPower(player) == 0 && SkillTree.spent(player) == 0 && Progression.unlockedPowers(player) == 1, "Reset left the tree");
         Factions.clear(player); h.succeed();
+    }
+    @GameTest(template="empty") public static void olderPlayersKeepTheirPowersAfterTheTree(GameTestHelper h) {
+        var player = fake(h, "LegacyTreeQA");
+        Factions.assign(player, Faction.MISSAO);
+        Progression.addXp(player, 1_000_000);
+        for (int i = 0; i < 10; i++) Progression.spend(player, Stat.CONVICCAO);
+        SkillTree.migrate(player);
+        h.assertTrue(Progression.unlockedPowers(player) == 3 && SkillTree.available(player) == 3, "Conviction 10 from 0.016 should keep the 3 powers and 3 points");
+        Progression.reset(player); Progression.addXp(player, 1_000_000);
+        for (int i = 0; i < 6; i++) Progression.spend(player, Stat.CONVICCAO);
+        SkillTree.migrate(player);
+        h.assertTrue(Progression.unlockedPowers(player) == 1 && SkillTree.available(player) == 6, "After a reset the points must stay free to spend");
+        var older = fake(h, "LegacyTreeQA2");
+        Factions.assign(older, Faction.MISSAO);
+        Progression.addXp(older, 1_000_000);
+        for (int i = 0; i < 6; i++) Progression.spend(older, Stat.CONVICCAO);
+        SkillTree.migrate(older);
+        h.assertTrue(Progression.unlockedPowers(older) == 2 && SkillTree.available(older) == 3, "Conviction 6 should keep the 2nd power");
+        SkillTree.migrate(older);
+        h.assertTrue(SkillTree.available(older) == 3, "Migration ran twice");
+        Progression.reset(player); Progression.reset(older); Factions.clear(player); Factions.clear(older); h.succeed();
     }
     @GameTest(template="empty") public static void killXpForEachKindOfVictim(GameTestHelper h) {
         var killer = fake(h, "KillerQA"); var ally = fake(h, "AllyQA"); var rival = fake(h, "RivalQA");

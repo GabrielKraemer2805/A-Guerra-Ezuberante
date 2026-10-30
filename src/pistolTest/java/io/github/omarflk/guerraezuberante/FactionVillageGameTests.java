@@ -250,9 +250,35 @@ public final class FactionVillageGameTests {
     }
 
     @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400)
+    public static void esquerdaVillageHasJonesInCastleAlliesOutsideAndComunistas(GameTestHelper h) {
+        StructureStart start=generate(h, Faction.ESQUERDA, new ChunkPos(350,250));
+        try {
+            var castle=castle(h,start);
+            var level=h.getLevel();
+            var jones=level.getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.JonesManoelEntity.class, area(start.getBoundingBox()));
+            h.assertTrue(jones.size()==1 && castle.getBoundingBox().isInside(jones.get(0).blockPosition()), "Jones missing or outside the castle");
+            var allies=level.getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.EsquerdaAllyEntity.class, area(start.getBoundingBox()));
+            var kinds=allies.stream().map(ally -> ally.getType()).distinct().toList();
+            h.assertTrue(allies.size()==3 && kinds.size()==3, allies.size()+" allies of "+kinds.size()+" kinds");
+            for (var ally : allies) {
+                h.assertTrue(ally.home()!=null && ally.isPersistenceRequired() && !castle.getBoundingBox().isInside(ally.blockPosition()), ally+" without home, despawns or in the castle");
+            }
+            h.assertTrue(allies.stream().map(ally -> ally.blockPosition().atY(0)).distinct().count()==3, "Two allies on the same spot");
+            var villagers=level.getEntitiesOfClass(net.minecraft.world.entity.npc.Villager.class, area(start.getBoundingBox()));
+            var comunistas=villagers.stream().filter(io.github.omarflk.guerraezuberante.registry.ModVillagers::isComunista).toList();
+            h.assertTrue(!villagers.isEmpty() && comunistas.size()==villagers.size(), comunistas.size()+" comunistas among "+villagers.size()+" villagers");
+            h.assertTrue(allies.get(0).isAlliedTo(comunistas.get(0)) && jones.get(0).isAlliedTo(comunistas.get(0)) && jones.get(0).isAlliedTo(allies.get(0)),
+                    "Comunistas and allies are not on Jones' side");
+            assertFlags(h,Faction.ESQUERDA,castle.getBoundingBox());
+            System.out.println("ESQUERDA_VILLAGE comunistas="+comunistas.size());
+        } finally { cleanUp(h,start); }
+        h.succeed();
+    }
+
+    @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400)
     public static void independentVillagesHaveCorrectFlagsAndNoCharacters(GameTestHelper h) {
-        for (Faction faction : new Faction[]{Faction.ESQUERDA,Faction.DIREITA}) {
-            StructureStart start=generate(h,faction,new ChunkPos(faction==Faction.ESQUERDA?350:375,250));
+        for (Faction faction : new Faction[]{Faction.DIREITA}) {
+            StructureStart start=generate(h,faction,new ChunkPos(375,250));
             try {
                 var castle=castle(h,start);
                 h.assertTrue(h.getLevel().getEntitiesOfClass(RetaliatingCharacterEntity.class,area(start.getBoundingBox())).isEmpty(), "Unexpected faction character");

@@ -54,6 +54,7 @@ public final class ArthurSummoning {
                         AABB box = unit.getBoundingBox();
                         if (!level.noCollision(unit, box) || !level.getEntities(unit, box).isEmpty()) { continue; }
                         unit.bindTo(owner, created * 2, lifetimeTicks);
+                        io.github.omarflk.guerraezuberante.progression.PlayerClasses.boostSummon(owner, unit);
                         if (level.addFreshEntity(unit)) {
                             if (owner instanceof net.minecraft.server.level.ServerPlayer) {
                                 ledger.registerPlayer(owner.getUUID(), unit.getUUID(), unit.getPlayerSummonToken(),

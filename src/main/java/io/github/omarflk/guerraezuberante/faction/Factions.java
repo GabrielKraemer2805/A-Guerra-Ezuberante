@@ -33,6 +33,7 @@ public final class Factions {
                 Component.translatable("faction.guerra_ezuberante.joined", player.getName(), faction.displayName()), false);
         FactionKit.giveOnce(player, faction);
         io.github.omarflk.guerraezuberante.village.FactionVillages.tell(player, faction);
+        io.github.omarflk.guerraezuberante.progression.PlayerClasses.promptIfMissing(player);
         return true;
     }
 

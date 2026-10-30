@@ -45,6 +45,20 @@ public final class ModConfig {
     public static final ForgeConfigSpec.DoubleValue STOMP_DAMAGE,STOMP_RADIUS,FAZ_O_L_DAMAGE,FAZ_O_L_RADIUS,GRAVEDIGGER_DAMAGE,METEOR_DAMAGE,
             METEOR_RADIUS,BOOK_DAMAGE,STRIKE_RADIUS,LEAP_DAMAGE,PUSH_DAMAGE,PUSH_RADIUS,DRAIN_AMOUNT,DRAIN_RADIUS;
     public static final ForgeConfigSpec.BooleanValue FAZ_O_L_BREAK_BLOCKS,GRAVEDIGGER_BREAK_BLOCKS;
+    public static final ForgeConfigSpec.DoubleValue JONES_HEALTH,JONES_EXPLOSION_POWER,JONES_RISE,JONES_LIVE_RADIUS,JONES_FREEZE_RANGE,
+            TABATA_HEALTH,TABATA_SHIELD_ABSORPTION,TABATA_SHIELD_TRIGGER,MARINA_HEALTH,MARINA_VANISH_HEALTH,MARINA_ROOTS_RADIUS,
+            CIRO_HEALTH,CIRO_MELEE,CIRO_TEMPER_RADIUS,CIRO_PARIS_HEALTH;
+    public static final ForgeConfigSpec.BooleanValue JONES_EXPLOSION_ENABLED,JONES_BLOCK_DAMAGE;
+    public static final ForgeConfigSpec.IntValue JONES_DEATH_TICKS,JONES_LIVE_COOLDOWN,JONES_LIVE_TICKS,JONES_FREEZE_COOLDOWN,JONES_FREEZE_TICKS,
+            JONES_COMMITTEE_COOLDOWN,JONES_COMMITTEE_COUNT,TABATA_TURNCOAT_COOLDOWN,TABATA_TURNCOAT_TICKS,TABATA_SHIELD_COOLDOWN,
+            MARINA_VANISH_COOLDOWN,MARINA_VANISH_TICKS,MARINA_ROOTS_COOLDOWN,MARINA_ROOTS_TICKS,CIRO_TEMPER_COOLDOWN,CIRO_TEMPER_TICKS,
+            CIRO_PARIS_COOLDOWN,CIRO_PARIS_TICKS;
+    public static final ForgeConfigSpec.IntValue FREE_CLASS_CHANGES,SUPORTE_REGEN_DELAY,SUPORTE_REGEN_INTERVAL,CHARGE_COOLDOWN,TAUNT_COOLDOWN,
+            TAUNT_RESISTANCE_TICKS,GUARD_COOLDOWN,GUARD_LIFETIME,QUICK_RELOAD_COOLDOWN,CLASS_HEAL_COOLDOWN,TREE_POINTS_PER_CONVICTION,
+            MORAL_POWER_USE,MORAL_KILL;
+    public static final ForgeConfigSpec.DoubleValue COMBATENTE_HEALTH,COMBATENTE_ATTACK,TANQUE_ARMOR,TANQUE_TOUGHNESS,TANQUE_KNOCKBACK,
+            INVOCADOR_SPEED,INVOCADOR_SUMMON_BONUS,ESPECIALISTA_COOLDOWN,ESPECIALISTA_POWER,SUPORTE_HEALTH,CHARGE_DAMAGE,CHARGE_STRENGTH,
+            TAUNT_RADIUS,CLASS_HEAL_AMOUNT,CLASS_HEAL_RADIUS,NODE_POWER_BONUS,NODE_COOLDOWN_REDUCTION,NODE_CLASS_COOLDOWN_REDUCTION;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -209,10 +223,11 @@ public final class ModConfig {
         HEALTH_PER_POINT=builder.defineInRange("health_bonus_per_point",1D,0D,20D);
         IDEOLOGY_PER_POINT=builder.comment("Power damage (or duration, for powers without damage) per point.").defineInRange("ideological_strength_per_point",.05D,0D,1D);
         CONVICTION_PER_POINT=builder.comment("Cooldown reduction per point.").defineInRange("conviction_cooldown_reduction_per_point",.02D,0D,.09D);
-        CONVICTION_SECOND_POWER=builder.defineInRange("conviction_for_second_power",5,0,50);
+        CONVICTION_SECOND_POWER=builder.comment("Since 0.017 the powers are bought in the skill tree; these two only migrate older players once.")
+                .defineInRange("conviction_for_second_power",5,0,50);
         CONVICTION_THIRD_POWER=builder.defineInRange("conviction_for_third_power",10,0,50);
         builder.pop();
-        builder.comment("Second and third faction powers, unlocked by Ideological Conviction.").push("conviction_powers");
+        builder.comment("Second and third faction powers, bought in the skill tree.").push("conviction_powers");
         STOMP_COOLDOWN=builder.defineInRange("lulista_fim_da_escala_cooldown_ticks",400,20,72000);
         STOMP_DAMAGE=builder.defineInRange("lulista_fim_da_escala_damage",6D,0D,100D);
         STOMP_RADIUS=builder.defineInRange("lulista_fim_da_escala_radius",6D,1D,16D);
@@ -253,6 +268,97 @@ public final class ModConfig {
         DRAIN_COOLDOWN=builder.defineInRange("centro_toma_la_da_ca_cooldown_ticks",600,20,72000);
         DRAIN_AMOUNT=builder.defineInRange("centro_toma_la_da_ca_drain_per_target",4D,0D,40D);
         DRAIN_RADIUS=builder.defineInRange("centro_toma_la_da_ca_radius",6D,1D,16D);
+        builder.pop();
+        builder.comment("Esquerda Independente characters: Jones Manoel (leader, in the castle), Tabata Amaral, Marina Silva and Ciro Gomes.")
+                .push("esquerda_independente");
+        JONES_HEALTH=builder.defineInRange("jones_max_health",300D,1D,1024D);
+        JONES_EXPLOSION_ENABLED=builder.define("jones_death_explosion_enabled",true);
+        JONES_EXPLOSION_POWER=builder.defineInRange("jones_death_explosion_power",7D,0D,16D);
+        JONES_DEATH_TICKS=builder.defineInRange("jones_death_animation_ticks",60,20,200);
+        JONES_RISE=builder.defineInRange("jones_death_rise_blocks",2D,0D,8D);
+        JONES_BLOCK_DAMAGE=builder.define("jones_death_explosion_block_damage",true);
+        JONES_LIVE_COOLDOWN=builder.comment("Live de 3 horas: stands still lecturing; enemies around get Slowness II and Weakness.")
+                .defineInRange("jones_live_cooldown_ticks",400,20,72000);
+        JONES_LIVE_TICKS=builder.defineInRange("jones_live_ticks",60,20,400);
+        JONES_LIVE_RADIUS=builder.defineInRange("jones_live_radius",8D,1D,32D);
+        JONES_FREEZE_COOLDOWN=builder.comment("Inverno Siberiano: the target freezes in place (Paralisado and frost) for a while.")
+                .defineInRange("jones_freeze_cooldown_ticks",300,20,72000);
+        JONES_FREEZE_TICKS=builder.defineInRange("jones_freeze_ticks",80,10,600);
+        JONES_FREEZE_RANGE=builder.defineInRange("jones_freeze_range",12D,2D,32D);
+        JONES_COMMITTEE_COOLDOWN=builder.comment("Comitê Central: below half health, comrades (Manifestantes) come to his side.")
+                .defineInRange("jones_committee_cooldown_ticks",900,20,72000);
+        JONES_COMMITTEE_COUNT=builder.defineInRange("jones_committee_count",3,1,20);
+        TABATA_HEALTH=builder.defineInRange("tabata_max_health",30D,1D,1024D);
+        TABATA_TURNCOAT_COOLDOWN=builder.comment("Virar o voto: an enemy mob changes sides and fights its own allies for a while.")
+                .defineInRange("tabata_turncoat_cooldown_ticks",400,20,72000);
+        TABATA_TURNCOAT_TICKS=builder.defineInRange("tabata_turncoat_ticks",120,20,1200);
+        TABATA_SHIELD_COOLDOWN=builder.comment("Voto de consciência: a heavy hit gives her extra absorption health.")
+                .defineInRange("tabata_shield_cooldown_ticks",600,20,72000);
+        TABATA_SHIELD_ABSORPTION=builder.defineInRange("tabata_shield_absorption",8D,0D,100D);
+        TABATA_SHIELD_TRIGGER=builder.comment("Damage of a single hit that counts as heavy.").defineInRange("tabata_shield_trigger_damage",4D,0D,100D);
+        MARINA_HEALTH=builder.defineInRange("marina_max_health",30D,1D,1024D);
+        MARINA_VANISH_COOLDOWN=builder.comment("Sumiço de 4 anos: low on health she turns invisible, drops the fight and heals.")
+                .defineInRange("marina_vanish_cooldown_ticks",1200,20,72000);
+        MARINA_VANISH_TICKS=builder.defineInRange("marina_vanish_ticks",160,20,1200);
+        MARINA_VANISH_HEALTH=builder.comment("Fraction of her health below which she vanishes.").defineInRange("marina_vanish_health_fraction",.4D,0D,1D);
+        MARINA_ROOTS_COOLDOWN=builder.comment("Raízes da Amazônia: vines hold the enemies around her (Paralisado).")
+                .defineInRange("marina_roots_cooldown_ticks",300,20,72000);
+        MARINA_ROOTS_TICKS=builder.defineInRange("marina_roots_ticks",60,10,600);
+        MARINA_ROOTS_RADIUS=builder.defineInRange("marina_roots_radius",5D,1D,16D);
+        CIRO_HEALTH=builder.defineInRange("ciro_max_health",40D,1D,1024D);
+        CIRO_MELEE=builder.defineInRange("ciro_melee_damage",5D,0D,100D);
+        CIRO_TEMPER_COOLDOWN=builder.comment("Pavio curto: when hit he blows up: Strength II, Speed and a push wave.")
+                .defineInRange("ciro_temper_cooldown_ticks",240,20,72000);
+        CIRO_TEMPER_TICKS=builder.defineInRange("ciro_temper_ticks",100,20,1200);
+        CIRO_TEMPER_RADIUS=builder.defineInRange("ciro_temper_radius",4D,1D,16D);
+        CIRO_PARIS_COOLDOWN=builder.comment("Vou pra Paris: low on health he leaves the fight, vanishes and comes back later.")
+                .defineInRange("ciro_paris_cooldown_ticks",2400,20,72000);
+        CIRO_PARIS_TICKS=builder.defineInRange("ciro_paris_ticks",600,20,6000);
+        CIRO_PARIS_HEALTH=builder.comment("Fraction of his health below which he leaves.").defineInRange("ciro_paris_health_fraction",.3D,0D,1D);
+        builder.pop();
+        builder.comment("Playable classes, chosen after the faction. They only add to the vanilla player, never take away.",
+                "Each class has a skill on Shift + right click with an empty main hand.").push("classes");
+        FREE_CLASS_CHANGES=builder.comment("Changes a player may make after the first choice; after that only an operator (/ge classe).")
+                .defineInRange("free_class_changes",1,0,10);
+        COMBATENTE_HEALTH=builder.defineInRange("combatente_health_bonus",4D,0D,40D);
+        COMBATENTE_ATTACK=builder.defineInRange("combatente_attack_damage_bonus",1.5D,0D,20D);
+        TANQUE_ARMOR=builder.defineInRange("tanque_armor_bonus",6D,0D,30D);
+        TANQUE_TOUGHNESS=builder.defineInRange("tanque_armor_toughness_bonus",2D,0D,20D);
+        TANQUE_KNOCKBACK=builder.defineInRange("tanque_knockback_resistance",.3D,0D,1D);
+        INVOCADOR_SPEED=builder.comment("Fraction of base movement speed; 0.1 = +10%.").defineInRange("invocador_speed_bonus",.1D,0D,1D);
+        INVOCADOR_SUMMON_BONUS=builder.comment("Extra health and lifetime of the player's own troops; 0.25 = +25%.")
+                .defineInRange("invocador_summon_bonus",.25D,0D,4D);
+        ESPECIALISTA_COOLDOWN=builder.comment("Faction power cooldown reduction; 0.15 = -15%.").defineInRange("especialista_cooldown_reduction",.15D,0D,.9D);
+        ESPECIALISTA_POWER=builder.comment("Extra power damage (or duration), on top of Ideological Strength.").defineInRange("especialista_power_bonus",.1D,0D,4D);
+        SUPORTE_HEALTH=builder.defineInRange("suporte_health_bonus",2D,0D,40D);
+        SUPORTE_REGEN_DELAY=builder.comment("Ticks without taking damage before the Suporte regeneration starts.")
+                .defineInRange("suporte_regen_delay_ticks",200,20,6000);
+        SUPORTE_REGEN_INTERVAL=builder.defineInRange("suporte_regen_interval_ticks",100,20,6000);
+        CHARGE_COOLDOWN=builder.defineInRange("combatente_investida_cooldown_ticks",240,20,72000);
+        CHARGE_DAMAGE=builder.defineInRange("combatente_investida_damage",6D,0D,100D);
+        CHARGE_STRENGTH=builder.comment("Horizontal launch speed of the charge (about 6 blocks with the default).")
+                .defineInRange("combatente_investida_strength",1.6D,.2D,5D);
+        TAUNT_COOLDOWN=builder.defineInRange("tanque_provocacao_cooldown_ticks",400,20,72000);
+        TAUNT_RADIUS=builder.defineInRange("tanque_provocacao_radius",8D,1D,32D);
+        TAUNT_RESISTANCE_TICKS=builder.defineInRange("tanque_provocacao_resistance_ticks",100,0,1200);
+        GUARD_COOLDOWN=builder.defineInRange("invocador_guarda_costas_cooldown_ticks",600,20,72000);
+        GUARD_LIFETIME=builder.defineInRange("invocador_guarda_costas_lifetime_ticks",600,20,6000);
+        QUICK_RELOAD_COOLDOWN=builder.defineInRange("especialista_recarga_rapida_cooldown_ticks",1800,20,72000);
+        CLASS_HEAL_COOLDOWN=builder.defineInRange("suporte_cura_cooldown_ticks",400,20,72000);
+        CLASS_HEAL_AMOUNT=builder.defineInRange("suporte_cura_amount",6D,0D,100D);
+        CLASS_HEAL_RADIUS=builder.defineInRange("suporte_cura_radius",6D,1D,32D);
+        builder.pop();
+        builder.comment("Skill tree (second tab of J). Ideological Conviction gives the points; the 2nd and 3rd powers are bought here.").push("skill_tree");
+        TREE_POINTS_PER_CONVICTION=builder.defineInRange("points_per_conviction",1,1,10);
+        NODE_POWER_BONUS=builder.comment("Potência nodes: extra damage (or duration) of that power.").defineInRange("power_node_bonus",.2D,0D,4D);
+        NODE_COOLDOWN_REDUCTION=builder.comment("Recarga nodes: cooldown reduction of that power.").defineInRange("cooldown_node_reduction",.2D,0D,.9D);
+        NODE_CLASS_COOLDOWN_REDUCTION=builder.comment("Classe aprimorada: cooldown reduction of the class skill.").defineInRange("class_node_cooldown_reduction",.35D,0D,.9D);
+        builder.pop();
+        builder.comment("Moral bar (J): Esquerda, Lulismo, Centro, Missão, Direita, Bolsonarismo. Everyone starts in the Centro.").push("moral");
+        MORAL_POWER_USE=builder.comment("Each faction power used pulls the bar this much toward the player's own faction.")
+                .defineInRange("power_use_pull",1,0,100);
+        MORAL_KILL=builder.comment("Each kill of a player or character of a faction pushes the bar this much away from that faction.")
+                .defineInRange("kill_push",4,0,100);
         builder.pop();
         SPEC = builder.build();
     }

@@ -30,6 +30,11 @@ public final class ClientModEvents {
         event.registerEntityRenderer(ModEntities.DILMA.get(), io.github.omarflk.guerraezuberante.client.renderer.DilmaRenderer::new);
         event.registerEntityRenderer(ModEntities.MANDIOCA.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 1.0F, false));
         event.registerEntityRenderer(ModEntities.PETISTA.get(), io.github.omarflk.guerraezuberante.client.renderer.PetistaRenderer::new);
+        event.registerEntityRenderer(ModEntities.COMUNISTA.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.PetistaRenderer<>(c, io.github.omarflk.guerraezuberante.client.renderer.PetistaRenderer.COMUNISTAS));
+        event.registerEntityRenderer(ModEntities.JONES_MANOEL.get(), io.github.omarflk.guerraezuberante.client.renderer.JonesManoelRenderer::new);
+        event.registerEntityRenderer(ModEntities.TABATA_AMARAL.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "tabata_amaral", 1));
+        event.registerEntityRenderer(ModEntities.MARINA_SILVA.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "marina_silva", 1));
+        event.registerEntityRenderer(ModEntities.CIRO_GOMES.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "ciro_gomes", 1));
         event.registerEntityRenderer(net.minecraft.world.entity.EntityType.VILLAGER, io.github.omarflk.guerraezuberante.client.renderer.VillagerOrPetistaRenderer::new);
         event.registerEntityRenderer(ModEntities.BEAN.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context,.65F,false));
         event.registerEntityRenderer(ModEntities.RENAN_SANTOS.get(), RenanRenderer::new);

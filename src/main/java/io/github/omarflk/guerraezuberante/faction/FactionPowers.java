@@ -91,6 +91,18 @@ public final class FactionPowers {
         return (int) Math.max(0, data(player).getLong(readyAtKey(slot)) - now(player));
     }
 
+    /** Especialista's Recarga rápida: one slot is ready again. */
+    public static void clearCooldown(ServerPlayer player, int slot) {
+        data(player).remove(readyAtKey(slot));
+        Progression.sync(player);
+    }
+
+    /** Ticks since the player last took damage; very large when never hurt. */
+    public static long ticksSinceHurt(ServerPlayer player) {
+        CompoundTag data = data(player);
+        return data.contains(LAST_HURT) ? now(player) - data.getLong(LAST_HURT) : Long.MAX_VALUE;
+    }
+
     /** Makes every power usable again immediately; used by GameTests. */
     public static void resetCooldown(ServerPlayer player) {
         for (int slot = 0; slot < Progression.POWER_SLOTS; slot++) { data(player).remove(readyAtKey(slot)); }
@@ -117,8 +129,7 @@ public final class FactionPowers {
             return false;
         }
         if (!Progression.isUnlocked(player, slot)) {
-            player.displayClientMessage(Component.translatable("power.guerra_ezuberante.locked",
-                    faction.get().powerName(slot), Progression.convictionFor(slot)), true);
+            player.displayClientMessage(Component.translatable("power.guerra_ezuberante.locked", faction.get().powerName(slot)), true);
             return false;
         }
         Component power = faction.get().powerName(slot);
@@ -136,7 +147,8 @@ public final class FactionPowers {
             case CENTRO -> switchStance(player);
         };
         if (fired) {
-            data(player).putLong(readyAtKey(slot), now(player) + Progression.scaledCooldown(player, cooldown(faction.get(), slot)));
+            data(player).putLong(readyAtKey(slot), now(player) + Progression.scaledCooldown(player, slot, cooldown(faction.get(), slot)));
+            io.github.omarflk.guerraezuberante.progression.Morality.powerUsed(player);
             Progression.sync(player);
         }
         return fired;
@@ -144,7 +156,7 @@ public final class FactionPowers {
 
     private static boolean beanVolley(ServerPlayer player) {
         int count = ModConfig.BEAN_VOLLEY_COUNT.get();
-        float damage = (float) (ModConfig.BEAN_VOLLEY_DAMAGE.get() * Progression.powerScale(player));
+        float damage = (float) (ModConfig.BEAN_VOLLEY_DAMAGE.get() * Progression.powerScale(player, 0));
         for (int index = 0; index < count; index++) {
             BeanProjectile bean = new BeanProjectile(player.level(), player, damage);
             bean.shootFromRotation(player, player.getXRot(), player.getYRot() + (index - (count - 1) / 2.0F) * 10.0F, 0, 1.2F, 1.0F);
@@ -155,7 +167,7 @@ public final class FactionPowers {
     }
 
     private static boolean rachadinha(ServerPlayer player) {
-        if (Rachadinha.activate(player, ModConfig.PLAYER_FISSURE_RANGE.get(), (float) (ModConfig.PLAYER_FISSURE_DAMAGE.get() * Progression.powerScale(player))) == null) {
+        if (Rachadinha.activate(player, ModConfig.PLAYER_FISSURE_RANGE.get(), (float) (ModConfig.PLAYER_FISSURE_DAMAGE.get() * Progression.powerScale(player, 0))) == null) {
             player.displayClientMessage(Component.translatable("power.guerra_ezuberante.no_ground"), true);
             return false;
         }
@@ -168,8 +180,9 @@ public final class FactionPowers {
             player.displayClientMessage(Component.translatable("power.guerra_ezuberante.troops_full"), true);
             return false;
         }
-        if (ArthurSummoning.spawnFighters(player.serverLevel(), player, missing,
-                (int) Math.round(ModConfig.PLAYER_TROOPS_LIFETIME.get() * Progression.powerScale(player))) == 0) {
+        int lifetime = io.github.omarflk.guerraezuberante.progression.PlayerClasses.summonLifetime(player,
+                (int) Math.round(ModConfig.PLAYER_TROOPS_LIFETIME.get() * Progression.powerScale(player, 0)));
+        if (ArthurSummoning.spawnFighters(player.serverLevel(), player, missing, lifetime) == 0) {
             player.displayClientMessage(Component.translatable("power.guerra_ezuberante.no_space"), true);
             return false;
         }
@@ -184,7 +197,7 @@ public final class FactionPowers {
         targets.addAll(player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius),
                 other -> other.isAlive() && !other.isSpectator() && other.distanceToSqr(player) <= radius * radius));
         for (Player target : targets) {
-            target.addEffect(new MobEffectInstance(MobEffects.REGENERATION, (int) Math.round(ModConfig.GROUP_HEAL_TICKS.get() * Progression.powerScale(player)), 1), player);
+            target.addEffect(new MobEffectInstance(MobEffects.REGENERATION, (int) Math.round(ModConfig.GROUP_HEAL_TICKS.get() * Progression.powerScale(player, 0)), 1), player);
             player.serverLevel().sendParticles(ParticleTypes.HEART, target.getX(), target.getY() + 2.1, target.getZ(), 4, .4, .2, .4, 0);
         }
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, .8F, 1.4F);
@@ -198,7 +211,7 @@ public final class FactionPowers {
         player.setDeltaMovement(push.x, Math.max(player.getDeltaMovement().y, .3), push.z);
         player.hurtMarked = true;
         player.fallDistance = 0;
-        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, (int) Math.round(ModConfig.DASH_BUFF_TICKS.get() * Progression.powerScale(player)), 0));
+        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, (int) Math.round(ModConfig.DASH_BUFF_TICKS.get() * Progression.powerScale(player, 0)), 0));
         player.serverLevel().sendParticles(ParticleTypes.CLOUD, player.getX(), player.getY() + .2, player.getZ(), 12, .3, .1, .3, .05);
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1, .8F);
         return true;

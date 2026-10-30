@@ -18,6 +18,7 @@ public final class CharacterAnimationController extends AnimationController<Reta
     private long lastAttack = Long.MIN_VALUE;
     private long lastShot = Long.MIN_VALUE;
     private long lastWind = Long.MIN_VALUE;
+    private long lastCast = Long.MIN_VALUE;
     private final RetaliatingCharacterEntity entity;
     private float partialTick;
 
@@ -42,6 +43,13 @@ public final class CharacterAnimationController extends AnimationController<Reta
             else if(renan.isRifleAiming() && renan.rifleAimAge(partialTick)<RenanSantosEntity.PREPARE_TICKS) animation="rifle_prepare";
             else if(state.isMoving()) animation="rifle_walk";
             else animation=renan.isRifleAiming()?"rifle_aim":"rifle_idle";
+        } else if (entity instanceof JonesManoelEntity jones && jones.liveAge(partialTick) < jones.liveLength()) {
+            // The lecture: the cast gestures over and over.
+            if (lastCast != jones.liveToken()) { forceAnimationReset(); lastCast = jones.liveToken(); }
+            animation = "cast";
+        } else if (entity instanceof EsquerdaAllyEntity ally && ally.castAge(partialTick) < EsquerdaAllyEntity.CAST_LENGTH) {
+            if (lastCast != ally.castToken()) { forceAnimationReset(); lastCast = ally.castToken(); }
+            animation = "cast";
         } else if (entity instanceof DilmaEntity dilma && dilma.windAge(partialTick) < DilmaEntity.WIND_CAST) {
             if (lastWind != dilma.windToken()) { forceAnimationReset(); lastWind = dilma.windToken(); }
             animation = "estocar_vento";
@@ -79,6 +87,12 @@ public final class CharacterAnimationController extends AnimationController<Reta
         }
         if (entity instanceof DilmaEntity dilma && dilma.windAge(partialTick) < DilmaEntity.WIND_CAST) {
             return Math.max(0, dilma.windAge(partialTick));
+        }
+        if (entity instanceof JonesManoelEntity jones && jones.liveAge(partialTick) < jones.liveLength()) {
+            return Math.max(0, jones.liveAge(partialTick)) % 20;
+        }
+        if (entity instanceof EsquerdaAllyEntity ally && ally.castAge(partialTick) < EsquerdaAllyEntity.CAST_LENGTH) {
+            return Math.max(0, Math.min(19.999, ally.castAge(partialTick)));
         }
         if (entity.attackAnimationAge(partialTick) < RetaliatingCharacterEntity.ATTACK_LENGTH) {
             return Math.max(0, entity.attackAnimationAge(partialTick));

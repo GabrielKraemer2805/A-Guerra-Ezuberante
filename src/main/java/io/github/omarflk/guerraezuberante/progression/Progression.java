@@ -5,7 +5,6 @@ import io.github.omarflk.guerraezuberante.GuerraEzuberanteMod;
 import io.github.omarflk.guerraezuberante.config.ModConfig;
 import io.github.omarflk.guerraezuberante.entity.RetaliatingCharacterEntity;
 import io.github.omarflk.guerraezuberante.entity.SpecialDeathEntity;
-import io.github.omarflk.guerraezuberante.faction.Faction;
 import io.github.omarflk.guerraezuberante.faction.FactionNetwork;
 import io.github.omarflk.guerraezuberante.faction.Factions;
 import io.github.omarflk.guerraezuberante.summon.OwnedSummon;
@@ -56,7 +55,7 @@ public final class Progression {
     private record PendingKill(LivingDeathEvent event, ServerPlayer killer, int xp) {}
     private static final Map<UUID, PendingKill> PENDING_KILLS = new ConcurrentHashMap<>();
 
-    private static CompoundTag data(Player player) {
+    static CompoundTag data(Player player) {
         CompoundTag persisted = player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
         CompoundTag data = persisted.getCompound(DATA);
         persisted.put(DATA, data);
@@ -103,34 +102,19 @@ public final class Progression {
         stats.putInt(stat.id(), current + 1);
         data(player).put(STATS, stats);
         applyStats(player);
-        if (stat == Stat.CONVICCAO && unlockedPowers(player) > unlockedPowers(current)) {
-            Faction faction = Factions.of(player).orElse(null);
-            if (faction != null) {
-                player.sendSystemMessage(Component.translatable("progression.guerra_ezuberante.power_unlocked",
-                        faction.powerName(unlockedPowers(player) - 1)));
-                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, .7F, 1);
-            }
-        }
         sync(player);
         return true;
     }
 
+    /** How many power slots are usable: the first one plus those bought in the skill tree. */
     public static int unlockedPowers(Player player) {
-        return unlockedPowers(stat(player, Stat.CONVICCAO));
-    }
-
-    private static int unlockedPowers(int conviction) {
-        return 1 + (conviction >= ModConfig.CONVICTION_SECOND_POWER.get() ? 1 : 0)
-                + (conviction >= ModConfig.CONVICTION_THIRD_POWER.get() ? 1 : 0);
+        int unlocked = 0;
+        for (int slot = 0; slot < POWER_SLOTS; slot++) { if (isUnlocked(player, slot)) { unlocked++; } }
+        return unlocked;
     }
 
     public static boolean isUnlocked(Player player, int slot) {
-        return slot >= 0 && slot < unlockedPowers(player);
-    }
-
-    /** Conviction needed for a power slot; slot 0 is always free. */
-    public static int convictionFor(int slot) {
-        return slot == 0 ? 0 : slot == 1 ? ModConfig.CONVICTION_SECOND_POWER.get() : ModConfig.CONVICTION_THIRD_POWER.get();
+        return slot >= 0 && slot < POWER_SLOTS && SkillTree.powerUnlocked(player, slot);
     }
 
     /** The power the B key uses. Falls back to the first one if the selection is no longer unlocked. */
@@ -148,14 +132,25 @@ public final class Progression {
         return true;
     }
 
-    /** Ideological Strength: multiplies power damage, or the duration of powers without damage. */
+    /** Ideological Strength (and the Especialista class): multiplies power damage, or the duration of powers without damage. */
     public static double powerScale(Player player) {
-        return 1 + ModConfig.IDEOLOGY_PER_POINT.get() * stat(player, Stat.FORCA_IDEOLOGICA);
+        return (1 + ModConfig.IDEOLOGY_PER_POINT.get() * stat(player, Stat.FORCA_IDEOLOGICA)) * PlayerClasses.powerFactor(player);
     }
 
-    /** Ideological Conviction shortens every power cooldown. */
+    /** {@link #powerScale(Player)} plus the Potência node of that power in the skill tree. */
+    public static double powerScale(Player player, int slot) {
+        return powerScale(player) * SkillTree.powerFactor(player, slot);
+    }
+
+    /** Ideological Conviction (and the Especialista class) shortens every power cooldown. */
     public static int scaledCooldown(Player player, int ticks) {
-        double factor = Math.max(.1, 1 - ModConfig.CONVICTION_PER_POINT.get() * stat(player, Stat.CONVICCAO));
+        return scaledCooldown(player, -1, ticks);
+    }
+
+    /** {@link #scaledCooldown(Player, int)} plus the Recarga node of that power slot; -1 for no slot. */
+    public static int scaledCooldown(Player player, int slot, int ticks) {
+        double factor = Math.max(.1, 1 - ModConfig.CONVICTION_PER_POINT.get() * stat(player, Stat.CONVICCAO))
+                * PlayerClasses.cooldownFactor(player) * (slot < 0 ? 1 : SkillTree.cooldownFactor(player, slot));
         return Math.max(20, (int) Math.round(ticks * factor));
     }
 
@@ -192,17 +187,19 @@ public final class Progression {
         return gained;
     }
 
-    /** Operator reset: level 1, no XP, no points spent, first power selected. */
+    /** Operator reset: level 1, no XP, no points spent, empty skill tree, first power selected. Class and moral bar stay. */
     public static void reset(ServerPlayer player) {
         CompoundTag persisted = player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
         persisted.remove(DATA);
         player.getPersistentData().put(Player.PERSISTED_NBT_TAG, persisted);
+        SkillTree.markMigrated(player);
         applyStats(player);
         sync(player);
     }
 
     /** Stat bonuses are transient modifiers re-synced from the saved points, so they never stack. */
     public static void applyStats(ServerPlayer player) {
+        PlayerClasses.applyAttributes(player);
         modifier(player, Attributes.ATTACK_DAMAGE, STRENGTH_ID, ModConfig.STRENGTH_PER_POINT.get() * stat(player, Stat.FORCA), AttributeModifier.Operation.ADDITION);
         modifier(player, Attributes.MOVEMENT_SPEED, SPEED_ID, ModConfig.SPEED_PER_POINT.get() * stat(player, Stat.VELOCIDADE), AttributeModifier.Operation.MULTIPLY_BASE);
         modifier(player, Attributes.MAX_HEALTH, HEALTH_ID, ModConfig.HEALTH_PER_POINT.get() * stat(player, Stat.VIDA), AttributeModifier.Operation.ADDITION);
@@ -297,7 +294,10 @@ public final class Progression {
             victim.getPersistentData().putBoolean(XP_AWARDED, true);
             var online = pending.killer().server.getPlayerList().getPlayer(pending.killer().getUUID());
             ServerPlayer killer = online != null ? online : pending.killer();
-            if (!killer.isRemoved() && !killer.isSpectator()) { addXp(killer, pending.xp()); }
+            if (!killer.isRemoved() && !killer.isSpectator()) {
+                addXp(killer, pending.xp());
+                Morality.killed(killer, victim);
+            }
         }
     }
 
@@ -312,7 +312,7 @@ public final class Progression {
 
     @SubscribeEvent
     public static void login(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) { applyStats(player); sync(player); }
+        if (event.getEntity() instanceof ServerPlayer player) { SkillTree.migrate(player); applyStats(player); sync(player); }
     }
 
     @SubscribeEvent

@@ -35,6 +35,22 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.MandiocaProjectile>> MANDIOCA = REGISTER.register(
             "mandioca", () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.MandiocaProjectile>of(io.github.omarflk.guerraezuberante.entity.MandiocaProjectile::new, MobCategory.MISC)
                     .sized(.3F,.3F).clientTrackingRange(8).updateInterval(1).build(GuerraEzuberanteMod.MOD_ID+":mandioca"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.JonesManoelEntity>> JONES_MANOEL = REGISTER.register(
+            "jones_manoel", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.JonesManoelEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":jones_manoel"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.TabataAmaralEntity>> TABATA_AMARAL = REGISTER.register(
+            "tabata_amaral", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.TabataAmaralEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":tabata_amaral"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.MarinaSilvaEntity>> MARINA_SILVA = REGISTER.register(
+            "marina_silva", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.MarinaSilvaEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":marina_silva"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.CiroGomesEntity>> CIRO_GOMES = REGISTER.register(
+            "ciro_gomes", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.CiroGomesEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":ciro_gomes"));
+    /** Spawn egg of the Esquerda Independente villagers; same size and tracking as the vanilla villager. */
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.ComunistaEntity>> COMUNISTA = REGISTER.register(
+            "comunista", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.ComunistaEntity::new, MobCategory.MISC)
+                    .sized(.6F,1.95F).clientTrackingRange(10).build(GuerraEzuberanteMod.MOD_ID+":comunista"));
     /** Same size and tracking as the vanilla villager. */
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.PetistaEntity>> PETISTA = REGISTER.register(
             "petista", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.PetistaEntity::new, MobCategory.MISC)

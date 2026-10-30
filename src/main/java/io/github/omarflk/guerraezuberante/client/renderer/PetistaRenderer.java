@@ -12,34 +12,60 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import java.util.Map;
 
 /**
- * Petistas look like players (classic 64x64 skins with overlays). The skin follows the job, like the vanilla
- * profession clothes: six skins for groups of professions; modded professions use the mason/unemployed skin.
+ * Faction villagers look like players (classic 64x64 skins with overlays). The skin follows the job, like the vanilla
+ * profession clothes: petistas have six skins for groups of professions, comunistas four; modded professions use the
+ * set's default skin.
  */
 public final class PetistaRenderer<T extends Villager> extends HumanoidMobRenderer<T, PlayerModel<T>> {
-    private static final Map<VillagerProfession, Integer> SKIN_BY_PROFESSION = Map.ofEntries(
+    /** Skin index per profession, the fallback index, and the textures. */
+    public record SkinSet(Map<VillagerProfession, Integer> byProfession, int fallback, ResourceLocation[] skins) {
+        static SkinSet of(String folder, int count, int fallback, Map<VillagerProfession, Integer> byProfession) {
+            ResourceLocation[] skins = new ResourceLocation[count];
+            for (int index = 0; index < count; index++) {
+                skins[index] = new ResourceLocation(GuerraEzuberanteMod.MOD_ID, "textures/entity/" + folder + "/" + folder + "_" + index + ".png");
+            }
+            return new SkinSet(byProfession, fallback, skins);
+        }
+
+        public int skin(VillagerProfession profession) {
+            return byProfession.getOrDefault(profession, fallback);
+        }
+    }
+
+    public static final SkinSet PETISTAS = SkinSet.of("petista", 6, 4, Map.ofEntries(
             Map.entry(VillagerProfession.FARMER, 0), Map.entry(VillagerProfession.SHEPHERD, 0), Map.entry(VillagerProfession.FISHERMAN, 0),
             Map.entry(VillagerProfession.LIBRARIAN, 1), Map.entry(VillagerProfession.CARTOGRAPHER, 1), Map.entry(VillagerProfession.CLERIC, 1),
             Map.entry(VillagerProfession.ARMORER, 2), Map.entry(VillagerProfession.WEAPONSMITH, 2), Map.entry(VillagerProfession.TOOLSMITH, 2),
             Map.entry(VillagerProfession.BUTCHER, 3), Map.entry(VillagerProfession.LEATHERWORKER, 3), Map.entry(VillagerProfession.FLETCHER, 3),
             Map.entry(VillagerProfession.MASON, 4), Map.entry(VillagerProfession.NONE, 4),
-            Map.entry(VillagerProfession.NITWIT, 5));
-    private static final ResourceLocation[] SKINS = new ResourceLocation[6];
-    static {
-        for (int index = 0; index < SKINS.length; index++) {
-            SKINS[index] = new ResourceLocation(GuerraEzuberanteMod.MOD_ID, "textures/entity/petista/petista_" + index + ".png");
-        }
-    }
+            Map.entry(VillagerProfession.NITWIT, 5)));
+    /** Petista 4, cachorro comunista, venom comunista and Ednaldo comunista, in that order. */
+    public static final SkinSet COMUNISTAS = SkinSet.of("comunista", 4, 1, Map.ofEntries(
+            Map.entry(VillagerProfession.FARMER, 0), Map.entry(VillagerProfession.SHEPHERD, 0), Map.entry(VillagerProfession.FISHERMAN, 0),
+            Map.entry(VillagerProfession.BUTCHER, 0),
+            Map.entry(VillagerProfession.NITWIT, 1), Map.entry(VillagerProfession.NONE, 1), Map.entry(VillagerProfession.LEATHERWORKER, 1),
+            Map.entry(VillagerProfession.FLETCHER, 1),
+            Map.entry(VillagerProfession.ARMORER, 2), Map.entry(VillagerProfession.WEAPONSMITH, 2), Map.entry(VillagerProfession.TOOLSMITH, 2),
+            Map.entry(VillagerProfession.MASON, 2),
+            Map.entry(VillagerProfession.LIBRARIAN, 3), Map.entry(VillagerProfession.CARTOGRAPHER, 3), Map.entry(VillagerProfession.CLERIC, 3)));
+
+    private final SkinSet skins;
 
     public PetistaRenderer(EntityRendererProvider.Context context) {
+        this(context, PETISTAS);
+    }
+
+    public PetistaRenderer(EntityRendererProvider.Context context, SkinSet skins) {
         super(context, new PlayerModel<>(context.bakeLayer(ModelLayers.PLAYER), false), .5F);
+        this.skins = skins;
     }
 
     public static int skin(VillagerProfession profession) {
-        return SKIN_BY_PROFESSION.getOrDefault(profession, 4);
+        return PETISTAS.skin(profession);
     }
 
     @Override
     public ResourceLocation getTextureLocation(T villager) {
-        return SKINS[skin(villager.getVillagerData().getProfession())];
+        return skins.skins()[skins.skin(villager.getVillagerData().getProfession())];
     }
 }

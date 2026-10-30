@@ -2,8 +2,10 @@ package io.github.omarflk.guerraezuberante.village;
 
 import io.github.omarflk.guerraezuberante.GuerraEzuberanteMod;
 import io.github.omarflk.guerraezuberante.registry.ModVillagers;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ProtoChunk;
@@ -13,7 +15,10 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-/** The villagers of a Lulista village are petistas, and so are the children of a petista. */
+/**
+ * The villagers of a faction village get the faction's villager type (petistas in the Lulista villages, comunistas in
+ * the Esquerda Independente ones), and so do the children of such a villager.
+ */
 @Mod.EventBusSubscriber(modid = GuerraEzuberanteMod.MOD_ID)
 public final class Petistas {
     /**
@@ -21,8 +26,8 @@ public final class Petistas {
      * entity data of the chunk being generated, so only their villager type is changed; when a structure is placed
      * into a loaded world (/place, GameTests) they are already real entities.
      */
-    static void convertVillagers(WorldGenLevel level, BoundingBox chunkBox, ChunkPos chunk) {
-        String type = ModVillagers.PETISTA.getId().toString();
+    static void convertVillagers(WorldGenLevel level, BoundingBox chunkBox, ChunkPos chunk, VillagerType villagerType) {
+        String type = BuiltInRegistries.VILLAGER_TYPE.getKey(villagerType).toString();
         if (level.getChunk(chunk.x, chunk.z) instanceof ProtoChunk proto) {
             for (CompoundTag entity : proto.getEntities()) {
                 if ("minecraft:villager".equals(entity.getString("id"))) {
@@ -33,24 +38,26 @@ public final class Petistas {
             }
         }
         if (level instanceof net.minecraft.server.level.ServerLevel) {
-            level.getEntitiesOfClass(Villager.class, AABB.of(chunkBox)).forEach(ModVillagers::makePetista);
+            level.getEntitiesOfClass(Villager.class, AABB.of(chunkBox))
+                    .forEach(villager -> villager.setVillagerData(villager.getVillagerData().setType(villagerType)));
         }
     }
 
     /**
      * Vanilla picks the baby's type from the biome or a parent, and villager breeding (VillagerMakeLove) fires no Forge
      * baby event. The baby is created on its parent, which has just been given a positive breeding cooldown age, so a
-     * new baby villager standing on such a petista adult is that petista's child.
+     * new baby villager standing on such a faction adult is that adult's child.
      */
     @SubscribeEvent
     public static void baby(EntityJoinLevelEvent event) {
         if (event.getLevel().isClientSide || event.loadedFromDisk() || !(event.getEntity() instanceof Villager child)
-                || !child.isBaby() || ModVillagers.isPetista(child)) {
+                || !child.isBaby() || ModVillagers.faction(child) != null) {
             return;
         }
-        boolean petistaParent = !event.getLevel().getEntitiesOfClass(Villager.class, child.getBoundingBox().inflate(.5),
-                parent -> parent != child && !parent.isBaby() && parent.getAge() > 0 && ModVillagers.isPetista(parent)).isEmpty();
-        if (petistaParent) { ModVillagers.makePetista(child); }
+        event.getLevel().getEntitiesOfClass(Villager.class, child.getBoundingBox().inflate(.5),
+                        parent -> parent != child && !parent.isBaby() && parent.getAge() > 0 && ModVillagers.faction(parent) != null)
+                .stream().findFirst()
+                .ifPresent(parent -> child.setVillagerData(child.getVillagerData().setType(parent.getVillagerData().getType())));
     }
 
     private Petistas() {}

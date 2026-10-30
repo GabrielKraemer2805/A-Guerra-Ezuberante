@@ -165,11 +165,25 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
     @Override
     public boolean isAlliedTo(Entity other) {
         return faction() != null && other instanceof RetaliatingCharacterEntity character && character.faction() == faction()
-                || faction() == Faction.LULISTA && (other instanceof PetistaEntity
-                || other instanceof Villager villager && ModVillagers.isPetista(villager))
+                || faction() == Faction.LULISTA && other instanceof PetistaEntity
+                || faction() == Faction.ESQUERDA && other instanceof ComunistaEntity
+                || faction() != null && other instanceof Villager villager && ModVillagers.faction(villager) == faction()
                 || faction() != null && other instanceof ManifestanteEntity crowd && crowd.getOwner() instanceof RetaliatingCharacterEntity leader
                 && leader.faction() == faction()
                 || super.isAlliedTo(other);
+    }
+
+    /**
+     * Enemies within the radius for an area power: the current target, hostile mobs (not creepers), rival characters,
+     * players of another faction and any mob aiming at this character. Allies, villagers and animals are spared.
+     */
+    public List<LivingEntity> hostilesAround(double radius) {
+        return level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(radius),
+                other -> other.distanceToSqr(this) <= radius * radius && isValidAggressor(other)
+                        && (other == getTarget() || other instanceof net.minecraft.world.entity.monster.Enemy && !(other instanceof net.minecraft.world.entity.monster.Creeper)
+                        || isRival(other) || other instanceof net.minecraft.world.entity.Mob mob && mob.getTarget() == this
+                        || other instanceof Player player && faction() != null && io.github.omarflk.guerraezuberante.faction.Factions.of(player)
+                                .filter(faction -> faction != faction()).isPresent()));
     }
 
     protected boolean isValidAggressor(LivingEntity attacker) {

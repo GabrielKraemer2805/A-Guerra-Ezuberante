@@ -79,7 +79,7 @@ public final class ConvictionPowers {
 
     /** Returns true when the power fired. Refusals (no space, no targets) never start the cooldown. */
     public static boolean fire(ServerPlayer player, Faction faction, int slot) {
-        double scale = Progression.powerScale(player);
+        double scale = Progression.powerScale(player, slot);
         return switch (faction) {
             case LULISTA -> slot == 1 ? endOfShift(player, scale) : fazOL(player, scale);
             case BOLSONARISTA -> slot == 1 ? athlete(player, scale) : notAGravedigger(player, scale);
@@ -315,6 +315,12 @@ public final class ConvictionPowers {
 
     /** Places up to {@code missing} Manifestantes for the owner on safe ground 2 to 6 blocks around it; returns how many. */
     public static int spawnProtesters(ServerLevel level, LivingEntity owner, int missing, double scale) {
+        return spawnProtesters(level, owner, missing, scale, ModConfig.PROTEST_LIFETIME.get());
+    }
+
+    /** Same, with a lifetime of its own (the Invocador bodyguard). The Invocador class adds health and lifetime. */
+    public static int spawnProtesters(ServerLevel level, LivingEntity owner, int missing, double scale, int lifetimeTicks) {
+        int lifetime = io.github.omarflk.guerraezuberante.progression.PlayerClasses.summonLifetime(owner, lifetimeTicks);
         int created = 0;
         BlockPos center = owner.blockPosition();
         search:
@@ -330,7 +336,8 @@ public final class ConvictionPowers {
                     if (zombie == null) { continue; }
                     zombie.moveTo(pos.getX() + .5, pos.getY(), pos.getZ() + .5, owner.getYRot(), 0);
                     if (!level.noCollision(zombie, zombie.getBoundingBox()) || !level.getEntities(zombie, zombie.getBoundingBox()).isEmpty()) { continue; }
-                    zombie.bindTo(owner, ModConfig.PROTEST_LIFETIME.get(), scale);
+                    zombie.bindTo(owner, lifetime, scale);
+                    io.github.omarflk.guerraezuberante.progression.PlayerClasses.boostSummon(owner, zombie);
                     if (level.addFreshEntity(zombie) && ++created >= missing) { break search; }
                     break;
                 }

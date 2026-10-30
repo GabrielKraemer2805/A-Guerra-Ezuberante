@@ -25,6 +25,16 @@ public final class ModItems {
     public static final RegistryObject<Item> MANDIOCA = REGISTER.register("mandioca", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> PETISTA_SPAWN_EGG = REGISTER.register("petista_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.PETISTA,0xD8262E,0xF4E04D,new Item.Properties()));
+    public static final RegistryObject<Item> JONES_SPAWN_EGG = REGISTER.register("jones_manoel_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.JONES_MANOEL,0xC1121F,0x2B2118,new Item.Properties()));
+    public static final RegistryObject<Item> TABATA_SPAWN_EGG = REGISTER.register("tabata_amaral_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.TABATA_AMARAL,0x1D3557,0xF1C27D,new Item.Properties()));
+    public static final RegistryObject<Item> MARINA_SPAWN_EGG = REGISTER.register("marina_silva_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.MARINA_SILVA,0x2D6A4F,0xE9E4D4,new Item.Properties()));
+    public static final RegistryObject<Item> CIRO_SPAWN_EGG = REGISTER.register("ciro_gomes_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.CIRO_GOMES,0x3A3FBF,0xDADADA,new Item.Properties()));
+    public static final RegistryObject<Item> COMUNISTA_SPAWN_EGG = REGISTER.register("comunista_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.COMUNISTA,0xD00000,0xFFD60A,new Item.Properties()));
     public static final RegistryObject<Item> BEAN = REGISTER.register("semente_feijao", () -> new Item(new Item.Properties()));
     /** Sprites for the "Faz o L" and "O Livro Amarelo" projectiles; not in the creative tab. */
     public static final RegistryObject<Item> FAZ_O_L = REGISTER.register("faz_o_l", () -> new Item(new Item.Properties()));

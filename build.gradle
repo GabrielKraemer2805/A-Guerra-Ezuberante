@@ -75,6 +75,16 @@ minecraft {
                 if (project.hasProperty('renanObserver')) { property 'guerra.renanObserver', 'true' }
                 mods { "${mod_id}" { source sourceSets.gameTest } }
             }
+            if (project.hasProperty('esquerdaTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.esquerdaTest', 'true'
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
+            if (project.hasProperty('classTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.classTest', 'true'
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
             if (project.hasProperty('titleTest')) {
                 args '--width', '1280', '--height', '720'
                 property 'guerra.titleTest', 'true'

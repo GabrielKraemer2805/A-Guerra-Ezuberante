@@ -35,12 +35,18 @@ public final class FactionRivalryGameTests {
     @BeforeBatch(batch = "ge_rivalidade") public static void enable(ServerLevel level) { ModConfig.RIVALRY_ENABLED.set(true); }
     @AfterBatch(batch = "ge_rivalidade") public static void disable(ServerLevel level) { ModConfig.RIVALRY_ENABLED.set(false); }
 
+    /**
+     * Open air, far above the caves: lower down, with more test batches, the arena landed in a cave where monsters wandered in
+     * and the village allies (who defend against hostile mobs) went after them instead of the rival.
+     */
     private static Vec3 arena(GameTestHelper h) {
-        var p = h.absolutePos(new BlockPos(3, 40, 3));
+        var p = h.absolutePos(new BlockPos(3, 210, 3));
         for (int x = -7; x <= 7; x++) for (int z = -10; z <= 12; z++) {
             h.getLevel().setBlockAndUpdate(p.offset(x, -1, z), Blocks.STONE.defaultBlockState());
             for (int y = 0; y < 4; y++) h.getLevel().setBlockAndUpdate(p.offset(x, y, z), Blocks.AIR.defaultBlockState());
         }
+        h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.monster.Monster.class, new net.minecraft.world.phys.AABB(p).inflate(20))
+                .forEach(Entity::discard);
         return Vec3.atBottomCenterOf(p);
     }
 

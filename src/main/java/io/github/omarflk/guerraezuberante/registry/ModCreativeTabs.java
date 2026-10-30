@@ -25,6 +25,11 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.BOULOS_SPAWN_EGG.get());
                         output.accept(ModItems.DILMA_SPAWN_EGG.get());
                         output.accept(ModItems.PETISTA_SPAWN_EGG.get());
+                        output.accept(ModItems.JONES_SPAWN_EGG.get());
+                        output.accept(ModItems.TABATA_SPAWN_EGG.get());
+                        output.accept(ModItems.MARINA_SPAWN_EGG.get());
+                        output.accept(ModItems.CIRO_SPAWN_EGG.get());
+                        output.accept(ModItems.COMUNISTA_SPAWN_EGG.get());
                         output.accept(ModItems.JAIR_SPAWN_EGG.get());
                         output.accept(ModItems.FLAVIO_SPAWN_EGG.get());
                         output.accept(ModItems.BEAN.get());

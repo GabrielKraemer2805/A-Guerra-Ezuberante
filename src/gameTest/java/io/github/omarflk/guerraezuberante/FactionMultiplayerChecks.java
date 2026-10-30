@@ -205,6 +205,9 @@ public final class FactionMultiplayerChecks {
             if(stage>=9 && stage<=15 && observer()){require(Factions.of(mc.player).orElse(null)==Faction.ESQUERDA,"Reconnect lost faction");clientResults.put("reconnectedWithoutChoice",true);capture("after-reconnect");}
             if(stage==13 && !observer() && Factions.of(mc.player).orElse(null)==Faction.MISSAO && ProgressionClient.level()==30 && requested.add(13)){
                 mc.setScreen(new ProfileScreen());for(int i=0;i<10;i++)FactionNetwork.spendPoint(Stat.CONVICCAO);FactionNetwork.spendPoint(Stat.FORCA_IDEOLOGICA);
+                for(var node:new io.github.omarflk.guerraezuberante.progression.SkillTree.Node[]{io.github.omarflk.guerraezuberante.progression.SkillTree.Node.P1_RECARGA,
+                        io.github.omarflk.guerraezuberante.progression.SkillTree.Node.P2,io.github.omarflk.guerraezuberante.progression.SkillTree.Node.P2_RECARGA,
+                        io.github.omarflk.guerraezuberante.progression.SkillTree.Node.P3})FactionNetwork.buyNode(node);
             }
             if(stage==13 && !observer() && ProgressionClient.unlocked()==3 && ProgressionClient.points()==18){clientResults.put("profilePackets",true);capture("profile-unlocked");}
             if(!observer() && (stage==14 || stage==15 || stage==16 || stage==18) && !requested.contains(stage)){

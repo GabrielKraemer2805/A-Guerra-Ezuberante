@@ -1,7 +1,11 @@
 package io.github.omarflk.guerraezuberante.faction;
 
 import io.github.omarflk.guerraezuberante.GuerraEzuberanteMod;
+import io.github.omarflk.guerraezuberante.progression.Morality;
+import io.github.omarflk.guerraezuberante.progression.PlayerClass;
+import io.github.omarflk.guerraezuberante.progression.PlayerClasses;
 import io.github.omarflk.guerraezuberante.progression.Progression;
+import io.github.omarflk.guerraezuberante.progression.SkillTree;
 import io.github.omarflk.guerraezuberante.progression.Stat;
 import io.github.omarflk.guerraezuberante.village.FactionVillages;
 import net.minecraft.network.chat.Component;
@@ -16,8 +20,11 @@ import java.util.UUID;
 
 /** The client only asks to join; the server decides and then tells everyone. */
 public final class FactionNetwork {
-    /** 2: per-slot cooldowns, the J profile, spending points and choosing the B power (0.013). 3: faction villages (0.014). 4: village music (0.014.3). */
-    private static final String VERSION = "4";
+    /**
+     * 2: per-slot cooldowns, the J profile, spending points and choosing the B power (0.013). 3: faction villages (0.014).
+     * 4: village music (0.014.3). 5: classes, skill tree and moral bar (0.017).
+     */
+    private static final String VERSION = "5";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(GuerraEzuberanteMod.MOD_ID, "faction"), () -> VERSION, VERSION::equals, VERSION::equals);
     /** ordinal -1 means "no faction". */
@@ -25,15 +32,23 @@ public final class FactionNetwork {
     public record Prompt() {}
     public record Choose(int ordinal) {}
     public record UsePower() {}
-    /** Everything the J profile shows; sent on login and on every change. Cooldowns in ticks, one per power slot. */
+    /**
+     * Everything the J profile shows; sent on login and on every change. Cooldowns in ticks, one per power slot.
+     * playerClass is -1 without a class; nodes is a bit mask of the skill tree nodes bought.
+     */
     public record Profile(int level, int maxLevel, int xp, int xpToNext, int points, int[] stats, int statMax,
-                          int selected, int unlocked, int[] cooldowns) {}
+                          int selected, int unlocked, int[] cooldowns, int playerClass, int classChanges, int classCooldown,
+                          int treePoints, int nodes, int moral) {}
     public record SpendPoint(int stat) {}
     public record SelectPower(int slot) {}
     /** Village centres of the player's faction as x/z pairs; empty without a faction or in a world without villages. */
     public record Villages(int[] coords) {}
     /** Ordinal of the faction village whose music should loop now; -1 stops it. */
     public record VillageMusic(int ordinal) {}
+    public record ClassPrompt() {}
+    public record ChooseClass(int ordinal) {}
+    public record UseClassSkill() {}
+    public record BuyNode(int node) {}
 
     public static void register() {
         CHANNEL.messageBuilder(Sync.class, 0, NetworkDirection.PLAY_TO_CLIENT)
@@ -81,10 +96,13 @@ public final class FactionNetwork {
                     buffer.writeVarInt(packet.xpToNext()); buffer.writeVarInt(packet.points()); buffer.writeVarIntArray(packet.stats());
                     buffer.writeVarInt(packet.statMax()); buffer.writeVarInt(packet.selected()); buffer.writeVarInt(packet.unlocked());
                     buffer.writeVarIntArray(packet.cooldowns());
+                    buffer.writeVarInt(packet.playerClass() + 1); buffer.writeVarInt(packet.classChanges()); buffer.writeVarInt(packet.classCooldown());
+                    buffer.writeVarInt(packet.treePoints()); buffer.writeVarInt(packet.nodes()); buffer.writeInt(packet.moral());
                 })
                 .decoder(buffer -> new Profile(buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt(),
                         buffer.readVarInt(), buffer.readVarIntArray(Stat.values().length), buffer.readVarInt(), buffer.readVarInt(),
-                        buffer.readVarInt(), buffer.readVarIntArray(Progression.POWER_SLOTS)))
+                        buffer.readVarInt(), buffer.readVarIntArray(Progression.POWER_SLOTS), buffer.readVarInt() - 1, buffer.readVarInt(),
+                        buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt(), buffer.readInt()))
                 .consumerMainThread((packet, context) -> {
                     DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
                             io.github.omarflk.guerraezuberante.client.ProgressionClient.apply(packet));
@@ -122,6 +140,39 @@ public final class FactionNetwork {
                             io.github.omarflk.guerraezuberante.client.VillageMusicClient.set(packet.ordinal()));
                     context.get().setPacketHandled(true);
                 }).add();
+        CHANNEL.messageBuilder(ClassPrompt.class, 9, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder((packet, buffer) -> {})
+                .decoder(buffer -> new ClassPrompt())
+                .consumerMainThread((packet, context) -> {
+                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> io.github.omarflk.guerraezuberante.client.ClassClient::requestSelection);
+                    context.get().setPacketHandled(true);
+                }).add();
+        CHANNEL.messageBuilder(ChooseClass.class, 10, NetworkDirection.PLAY_TO_SERVER)
+                .encoder((packet, buffer) -> buffer.writeVarInt(packet.ordinal()))
+                .decoder(buffer -> new ChooseClass(buffer.readVarInt()))
+                .consumerMainThread((packet, context) -> {
+                    ServerPlayer player = context.get().getSender();
+                    if (player != null && Factions.of(player).isPresent()) {
+                        PlayerClass.byOrdinal(packet.ordinal()).ifPresent(value -> PlayerClasses.choose(player, value));
+                    }
+                    context.get().setPacketHandled(true);
+                }).add();
+        CHANNEL.messageBuilder(UseClassSkill.class, 11, NetworkDirection.PLAY_TO_SERVER)
+                .encoder((packet, buffer) -> {})
+                .decoder(buffer -> new UseClassSkill())
+                .consumerMainThread((packet, context) -> {
+                    ServerPlayer player = context.get().getSender();
+                    if (player != null) { PlayerClasses.useSkill(player); }
+                    context.get().setPacketHandled(true);
+                }).add();
+        CHANNEL.messageBuilder(BuyNode.class, 12, NetworkDirection.PLAY_TO_SERVER)
+                .encoder((packet, buffer) -> buffer.writeVarInt(packet.node()))
+                .decoder(buffer -> new BuyNode(buffer.readVarInt()))
+                .consumerMainThread((packet, context) -> {
+                    ServerPlayer player = context.get().getSender();
+                    if (player != null) { SkillTree.Node.byOrdinal(packet.node()).ifPresent(node -> SkillTree.buy(player, node)); }
+                    context.get().setPacketHandled(true);
+                }).add();
     }
 
     /** Skips connections that are not open (disconnecting players, GameTest mock players). */
@@ -137,9 +188,12 @@ public final class FactionNetwork {
         int[] cooldowns = new int[Progression.POWER_SLOTS];
         for (int slot = 0; slot < cooldowns.length; slot++) { cooldowns[slot] = FactionPowers.remainingCooldown(player, slot); }
         int level = Progression.level(player);
+        var playerClass = PlayerClasses.of(player);
         send(player, new Profile(level, Progression.maxLevel(), Progression.xp(player), Progression.xpToNext(level),
                 Progression.availablePoints(player), stats, io.github.omarflk.guerraezuberante.config.ModConfig.STAT_MAX.get(),
-                Progression.selectedPower(player), Progression.unlockedPowers(player), cooldowns));
+                Progression.selectedPower(player), Progression.unlockedPowers(player), cooldowns,
+                playerClass.map(Enum::ordinal).orElse(-1), PlayerClasses.changesLeft(player), PlayerClasses.remainingSkillCooldown(player),
+                SkillTree.available(player), SkillTree.Node.mask(node -> SkillTree.owns(player, node)), Morality.moral(player)));
     }
 
     public static void sendVillages(ServerPlayer player) {
@@ -179,6 +233,22 @@ public final class FactionNetwork {
 
     public static void prompt(ServerPlayer player) {
         send(player, new Prompt());
+    }
+
+    public static void promptClass(ServerPlayer player) {
+        send(player, new ClassPrompt());
+    }
+
+    public static void chooseClass(PlayerClass value) {
+        CHANNEL.sendToServer(new ChooseClass(value.ordinal()));
+    }
+
+    public static void useClassSkill() {
+        CHANNEL.sendToServer(new UseClassSkill());
+    }
+
+    public static void buyNode(SkillTree.Node node) {
+        CHANNEL.sendToServer(new BuyNode(node.ordinal()));
     }
 
     public static void choose(Faction faction) {

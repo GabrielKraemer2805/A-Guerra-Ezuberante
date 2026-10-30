@@ -43,6 +43,11 @@ public final class GuerraEzuberanteMod {
         event.put(ModEntities.DILMA.get(), io.github.omarflk.guerraezuberante.entity.DilmaEntity.createAttributes().build());
         event.put(ModEntities.BOULOS.get(), io.github.omarflk.guerraezuberante.entity.BoulosEntity.createAttributes().build());
         event.put(ModEntities.PETISTA.get(), net.minecraft.world.entity.npc.Villager.createAttributes().build());
+        event.put(ModEntities.JONES_MANOEL.get(), io.github.omarflk.guerraezuberante.entity.JonesManoelEntity.createAttributes().build());
+        event.put(ModEntities.TABATA_AMARAL.get(), io.github.omarflk.guerraezuberante.entity.TabataAmaralEntity.createAttributes().build());
+        event.put(ModEntities.MARINA_SILVA.get(), io.github.omarflk.guerraezuberante.entity.MarinaSilvaEntity.createAttributes().build());
+        event.put(ModEntities.CIRO_GOMES.get(), io.github.omarflk.guerraezuberante.entity.CiroGomesEntity.createAttributes().build());
+        event.put(ModEntities.COMUNISTA.get(), net.minecraft.world.entity.npc.Villager.createAttributes().build());
         event.put(ModEntities.JAIR_BOLSONARO.get(),io.github.omarflk.guerraezuberante.entity.JairBolsonaroEntity.createAttributes().build());
         event.put(ModEntities.FLAVIO_BOLSONARO.get(),io.github.omarflk.guerraezuberante.entity.FlavioBolsonaroEntity.createAttributes().build());
         event.put(ModEntities.RENAN_SANTOS.get(), RenanSantosEntity.createAttributes().build());
