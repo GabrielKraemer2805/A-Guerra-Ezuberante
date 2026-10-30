@@ -167,6 +167,8 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
         return faction() != null && other instanceof RetaliatingCharacterEntity character && character.faction() == faction()
                 || faction() == Faction.LULISTA && (other instanceof PetistaEntity
                 || other instanceof Villager villager && ModVillagers.isPetista(villager))
+                || faction() != null && other instanceof ManifestanteEntity crowd && crowd.getOwner() instanceof RetaliatingCharacterEntity leader
+                && leader.faction() == faction()
                 || super.isAlliedTo(other);
     }
 

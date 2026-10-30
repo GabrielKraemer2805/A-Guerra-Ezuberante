@@ -10,17 +10,20 @@ public final class LulaAnimationController extends AnimationController<LulaEntit
             "idle",RawAnimation.begin().thenLoop("animation.guerra.lula_idle"),
             "walk",RawAnimation.begin().thenLoop("animation.guerra.lula_walk"),
             "attack",RawAnimation.begin().thenPlay("animation.guerra.lula_attack_bean"),
+            "faz_o_l",RawAnimation.begin().thenPlay("animation.guerra.lula_faz_o_l"),
             "hurt",RawAnimation.begin().thenPlay("animation.guerra.lula_hurt"),
             "death",RawAnimation.begin().thenPlayAndHold("animation.guerra.lula_death"));
     private final LulaEntity owner;
     private float partial;
-    private long lastThrow=Long.MIN_VALUE;
+    private long lastThrow=Long.MIN_VALUE,lastFazOL=Long.MIN_VALUE;
     private boolean deathStarted;
     public LulaAnimationController(LulaEntity entity){super(entity,"lula_body",2,state->PlayState.CONTINUE);owner=entity;}
     @Override protected PlayState handleAnimationState(AnimationState<LulaEntity> state){
         partial=state.getPartialTick();String clip;
         if(owner.isActionLocked()){
             if(!deathStarted){forceAnimationReset();setTransitionLength(0);deathStarted=true;}clip="death";
+        }else if(owner.fazOLAge(partial)<LulaEntity.FAZ_O_L_LENGTH){
+            if(lastFazOL!=owner.fazOLToken()){forceAnimationReset();lastFazOL=owner.fazOLToken();}clip="faz_o_l";
         }else if(owner.throwAge(partial)<LulaEntity.THROW_LENGTH){
             if(lastThrow!=owner.throwToken()){forceAnimationReset();lastThrow=owner.throwToken();}clip="attack";
         }else if(owner.hurtTime>0)clip="hurt";
@@ -31,6 +34,7 @@ public final class LulaAnimationController extends AnimationController<LulaEntit
         double normal=super.adjustTick(tick);
         if(getAnimationState()!=State.RUNNING || owner==null)return normal;
         if(owner.isActionLocked())return Math.min(59.999,owner.deathAnimationAge(partial));
+        if(owner.fazOLAge(partial)<LulaEntity.FAZ_O_L_LENGTH)return Math.max(0,owner.fazOLAge(partial));
         if(owner.throwAge(partial)<LulaEntity.THROW_LENGTH)return Math.max(0,owner.throwAge(partial));
         if(owner.hurtTime>0)return Math.min(9.999,10-owner.hurtTime+partial);
         return normal;

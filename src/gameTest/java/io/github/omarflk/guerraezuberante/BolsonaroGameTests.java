@@ -53,11 +53,17 @@ public final class BolsonaroGameTests {
             catch(ReflectiveOperationException ex){throw new RuntimeException(ex);}
         }
     }
+    /**
+     * Covers Jair's whole summon ring (5 blocks) and is closed by walls and a ceiling: depending on the test order the
+     * arena sits underground next to a natural lava cave, whose lava flowed in and killed a summoned Flávio.
+     */
     private static Vec3 arena(GameTestHelper h,int height){
         var p=h.absolutePos(new BlockPos(3,height,3));
-        for(int x=-4;x<=8;x++)for(int z=-4;z<=16;z++){
+        for(int x=-8;x<=9;x++)for(int z=-8;z<=17;z++){
+            boolean wall=x==-8 || x==9 || z==-8 || z==17;
             for(int y=-3;y<0;y++)h.getLevel().setBlockAndUpdate(p.offset(x,y,z),Blocks.STONE.defaultBlockState());
-            for(int y=0;y<6;y++)h.getLevel().setBlockAndUpdate(p.offset(x,y,z),Blocks.AIR.defaultBlockState());
+            for(int y=0;y<6;y++)h.getLevel().setBlockAndUpdate(p.offset(x,y,z),(wall?Blocks.STONE:Blocks.AIR).defaultBlockState());
+            h.getLevel().setBlockAndUpdate(p.offset(x,6,z),Blocks.STONE.defaultBlockState());
         }
         return Vec3.atBottomCenterOf(p);
     }

@@ -102,7 +102,7 @@
     "entity.guerra_ezuberante.semente_feijao":  "Bean seed",
     "gui.guerra_ezuberante.lula_details":  "Default health: 300 HP, matching the Wither. Red boss bar: Lula. Neutral until provoked. Articulated belly and original skin.",
     "item.guerra_ezuberante.lula_spawn_egg":  "Lula Spawn Egg",
-    "gui.guerra_ezuberante.lula_combat":  "Physical bean: 6 damage every 2 s. Death: turns red, rises 2 blocks and curls for 3 s before exploding. Power 7; configurable block damage.",
+    "gui.guerra_ezuberante.lula_combat":  "Physical bean: 6 damage every 2 s. Every 10 hits taken, 50% chance to answer with a Faz o L; every 7, 30% chance to call a Manifestação. Death: turns red, rises 2 blocks and curls for 3 s before exploding. Power 7; configurable block damage.",
     "gui.guerra_ezuberante.character_tab.5":  "Jair",
     "gui.guerra_ezuberante.jair_details":  "Default health: 300 HP, matching the Wither. Green boss bar: Jair Bolsonaro. Bolsonarista faction. Neutral until provoked. Native TaCZ Glock 17; unarmed fallback without TaCZ.",
     "item.guerra_ezuberante.jair_bolsonaro_spawn_egg":  "Jair Bolsonaro Spawn Egg",

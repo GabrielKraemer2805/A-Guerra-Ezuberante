@@ -60,6 +60,13 @@ public final class GenerateLulaAssets {
         rot("left_arm",.9,k(0,-2,0,5),k(.25,-18,0,14),k(.55,-22,0,14),k(.9,-2,0,5));
         GenerateGeckoAssets.finish("lula_attack_bean",.9,false);
         GenerateGeckoAssets.begin();
+        // Faz o L: the right arm shoots straight forward toward the target, holds, then comes back.
+        rot("body",.9,k(0,4,0,0),k(.1,8,-8,0),k(.6,8,-8,0),k(.9,4,0,0));
+        rot("right_arm",.9,k(0,-5,0,-5),k(.1,-92,-6,-2),k(.6,-90,-6,-2),k(.9,-5,0,-5));
+        rot("right_forearm",.9,k(0,0,0,0),k(.1,-4,0,0),k(.6,-4,0,0),k(.9,0,0,0));
+        rot("left_arm",.9,k(0,-2,0,5),k(.1,14,0,10),k(.6,14,0,10),k(.9,-2,0,5));
+        GenerateGeckoAssets.finish("lula_faz_o_l",.9,false);
+        GenerateGeckoAssets.begin();
         rot("body",.5,k(0,4,0,0),k(.1,-8,0,-5),k(.5,4,0,0));
         rot("head",.5,k(0,0,0,0),k(.1,-8,0,4),k(.5,0,0,0));
         GenerateGeckoAssets.finish("lula_hurt",.5,false);
@@ -93,5 +100,5 @@ public final class GenerateLulaAssets {
         GenerateGeckoAssets.write("models/item/semente_feijao.json",GenerateGeckoAssets.map("parent","minecraft:item/generated","textures",GenerateGeckoAssets.map("layer0","guerra_ezuberante:item/semente_feijao")));
         GenerateGeckoAssets.write("models/item/lula_spawn_egg.json",GenerateGeckoAssets.map("parent","minecraft:item/template_spawn_egg"));
     }
-    public static void main(String[] args)throws Exception{model();animate();bean();System.out.println("Generated Lula: 15 bones, original 64x64 UV, stepped belly, five clips and original 16x16 bean.");}
+    public static void main(String[] args)throws Exception{model();animate();bean();System.out.println("Generated Lula: 15 bones, original 64x64 UV, stepped belly, six clips and original 16x16 bean.");}
 }

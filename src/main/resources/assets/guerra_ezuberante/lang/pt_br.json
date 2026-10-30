@@ -102,7 +102,7 @@
     "entity.guerra_ezuberante.semente_feijao":  "Semente de feijão",
     "gui.guerra_ezuberante.lula_details":  "Vida padrão: 300 HP, igual ao Wither. Barra de boss vermelha: Lula. Neutro até ser provocado. Barriga articulada e skin original.",
     "item.guerra_ezuberante.lula_spawn_egg":  "Ovo — Lula",
-    "gui.guerra_ezuberante.lula_combat":  "Feijão físico: 6 de dano a cada 2 s. Morte: fica vermelho, levita 2 blocos e se contrai por 3 s antes de explodir. Potência 7; dano a blocos configurável.",
+    "gui.guerra_ezuberante.lula_combat":  "Feijão físico: 6 de dano a cada 2 s. A cada 10 golpes recebidos, 50% de chance de revidar com um Faz o L; a cada 7, 30% de chance de chamar uma Manifestação. Morte: fica vermelho, levita 2 blocos e se contrai por 3 s antes de explodir. Potência 7; dano a blocos configurável.",
     "gui.guerra_ezuberante.character_tab.5":  "Jair",
     "gui.guerra_ezuberante.jair_details":  "Vida padrão: 300 HP, igual ao Wither. Barra de boss verde: Jair Bolsonaro. Facção Bolsonarista. Neutro até ser provocado. Glock 17 nativa do TaCZ; sem TaCZ, luta desarmado.",
     "item.guerra_ezuberante.jair_bolsonaro_spawn_egg":  "Ovo — Jair Bolsonaro",

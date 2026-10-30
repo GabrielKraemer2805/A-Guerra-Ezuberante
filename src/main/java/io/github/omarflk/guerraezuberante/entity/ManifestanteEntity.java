@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -23,7 +24,8 @@ import java.util.EnumSet;
 import java.util.UUID;
 
 /**
- * Esquerda "Manifestando": a red zombie that behaves like a tamed wolf. It follows its owner, attacks whoever
+ * Esquerda "Manifestando" (and Lula's "Manifestação"): a red zombie that behaves like a tamed wolf.
+ * The owner is a player or a mod character; a character's allies are the crowd's allies too. It follows its owner, attacks whoever
  * hurt the owner or whatever the owner attacked, and never targets the owner's faction. Never saved, never
  * burns, never converts villagers, drops nothing and vanishes when its time is up or its owner is gone.
  */
@@ -43,7 +45,7 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
                 .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE, 0D);
     }
 
-    public void bindTo(Player owner, int lifetimeTicks, double damageScale) {
+    public void bindTo(LivingEntity owner, int lifetimeTicks, double damageScale) {
         ownerId = owner.getUUID();
         lifeTicks = lifetimeTicks;
         var attack = getAttribute(Attributes.ATTACK_DAMAGE);
@@ -53,8 +55,11 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
     @Override
     public UUID getOwnerId() { return ownerId; }
 
-    public Player getOwner() {
-        return ownerId == null ? null : level().getPlayerByUUID(ownerId);
+    public LivingEntity getOwner() {
+        if (ownerId == null) { return null; }
+        Player player = level().getPlayerByUUID(ownerId);
+        if (player != null) { return player; }
+        return level() instanceof ServerLevel server && server.getEntity(ownerId) instanceof LivingEntity owner ? owner : null;
     }
 
     @Override
@@ -69,7 +74,7 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
             @Override public void start() { recalc = 0; }
             @Override public void stop() { getNavigation().stop(); }
             @Override public void tick() {
-                Player owner = getOwner();
+                LivingEntity owner = getOwner();
                 if (owner != null && --recalc <= 0) {
                     recalc = 10;
                     if (distanceToSqr(owner) > 24 * 24) {
@@ -87,7 +92,8 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
     }
 
     /** Wolf rules: defend the owner first, otherwise join whatever the owner attacked in the last 5 seconds. */
-    private LivingEntity ownerCombatTarget(Player owner) {
+    private LivingEntity ownerCombatTarget(LivingEntity owner) {
+        if (owner instanceof Mob mob && mob.getTarget() != null && canAttack(mob.getTarget())) { return mob.getTarget(); }
         LivingEntity attacker = owner.getLastHurtByMob();
         if (attacker != null && canAttack(attacker)) { return attacker; }
         LivingEntity attacked = owner.getLastHurtMob();
@@ -96,11 +102,12 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
 
     @Override
     public boolean canAttack(LivingEntity target) {
-        Player owner = getOwner();
+        LivingEntity owner = getOwner();
         if (owner == null || target == owner || target instanceof OwnedSummon summon && ownerId.equals(summon.getOwnerId())) {
             return false;
         }
-        if (target instanceof Player player && PowerTargets.sameFaction(owner, player)) {
+        if (owner instanceof Player player ? target instanceof Player other && PowerTargets.sameFaction(player, other)
+                : owner.isAlliedTo(target)) {
             return false;
         }
         return super.canAttack(target) && PowerTargets.anyone(owner, target);
@@ -117,8 +124,10 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
                 || entity instanceof OwnedSummon summon && ownerId.equals(summon.getOwnerId()))) {
             return true;
         }
-        Player owner = getOwner();
-        return owner != null && entity instanceof Player player && PowerTargets.sameFaction(owner, player) || super.isAlliedTo(entity);
+        LivingEntity owner = getOwner();
+        if (owner != null && !(owner instanceof Player) && owner.isAlliedTo(entity)) { return true; }
+        return owner instanceof Player player && entity instanceof Player other && PowerTargets.sameFaction(player, other)
+                || super.isAlliedTo(entity);
     }
 
     @Override
@@ -130,8 +139,9 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
         }
         if (--lifeTicks <= 0) { vanish(server); return; }
         if (tickCount % 10 != 0) { return; }
-        Player owner = getOwner();
-        if (owner == null || !owner.isAlive() || owner.isSpectator()) { vanish(server); return; }
+        LivingEntity owner = getOwner();
+        if (owner == null || !owner.isAlive() || owner.isSpectator()
+                || owner instanceof SpecialDeathEntity boss && boss.deathState() != SpecialDeathEntity.ALIVE) { vanish(server); return; }
         LivingEntity target = getTarget();
         if (target != null && (!target.isAlive() || !canAttack(target))) { setTarget(null); }
         LivingEntity wanted = ownerCombatTarget(owner);

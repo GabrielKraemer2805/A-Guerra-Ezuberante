@@ -1,5 +1,18 @@
 # Contexto de trabalho — Guerra Ezuberante
 
+## Poderes novos do boss Lula — 0.015.5 (30/10/2026)
+
+- Antes: a 0.015.4 do colaborador Giovanni Mendes (fork Jhovial, áudios de Boulos e Haddad, PR #1 no repositório do Omar) foi trazida sem alteração para a branch `feat/audios-haddad-boulos` do fork e aprovada no jogo. Esta versão parte dela, na branch `feat/lula-poderes`.
+- Pedido: além dos feijões, Lula ganha o **Faz o L** (50% de chance a cada 10 golpes recebidos) e a **Manifestação**, poder da Esquerda (30% de chance a cada 7 golpes recebidos).
+- `LulaEntity.hurt` conta golpes que realmente tiraram vida de um agressor válido (`LulaHitsTaken`, salvo). No múltiplo de `[lula] faz_o_l_every_hits` (10), sorteia `faz_o_l_chance` (0,5) e lança o L direto no agressor, se o vê. No múltiplo de `manifestacao_every_hits` (7), sorteia `manifestacao_chance` (0,3) e chama Manifestantes até completar `esquerda_manifestando_zombies` (10), com a duração do poder do jogador. Os dois podem acontecer no mesmo golpe (70º).
+- `FazOLProjectile` aceita um personagem como dono: mesmo dano/raio/explosão do poder do jogador, poupa aliados do Lula (Haddad, Boulos, petistas, a própria multidão), jogador sobrevivente de outra facção perde itens como no poder. Explode os blocos ao redor como a morte do Lula (pedido do colaborador no primeiro teste), com `[lula] faz_o_l_breaks_blocks` (padrão ligado; o castelo também pode ser atingido) e `mobGriefing`. Não explode se o Lula estiver morrendo.
+- Pose: ao lançar o L, o Lula vira o corpo para o alvo e estica o braço direito para a frente (clipe novo `lula_faz_o_l`, 0,9 s, gerado por `tools/GenerateLulaAssets.java`; `FAZ_O_L_START` sincronizado, separado do arremesso de feijão). Validador do Lula exige seis clipes.
+- Primeiro teste no jogo: L aprovado; a Manifestação não apareceu. Sem erro no log e com configuração carregada (`manifestacao_chance` 0,3): com 30% a cada 7 golpes, a chance de não sair nenhuma em 28 golpes é 0,7⁴ ≈ 24%.
+- `ManifestanteEntity` aceita dono jogador ou personagem: com o Lula, ataca o alvo dele e quem o agrediu, é aliado de quem é aliado do Lula (Haddad/Boulos não os atacam) e some quando o Lula começa a morrer. `ConvictionPowers.spawnProtesters` é compartilhado com o poder do jogador.
+- Painel K: texto de combate do Lula cita os dois poderes.
+- Teste antigo corrigido: o novo lote `ge_lula_explosao` mudou a ordem dos lotes e `firstCombatSummonCooldownCapAndOwnerCleanup` (Jair) deixou de ser o primeiro; nessa posição a arena fica no subsolo ao lado de uma caverna de lava, a lava entrou e matou um Flávio invocado (4 invocações em vez de 3, confirmado por diagnóstico temporário). A arena de `BolsonaroGameTests` agora cobre todo o anel de invocação do Jair (5 blocos) e é fechada por paredes e teto.
+- Validação: build aprovado; **148 GameTests com TaCZ e 84 sem TaCZ aprovados**. Novos: L acerta o agressor, poupa petista e o próprio Lula e vira o Lula para o alvo; L explode o chão (lote próprio `ge_lula_explosao`); L só no 10º golpe; Manifestação só no 7º com 10 manifestantes que lutam pelo Lula, sem atacar lulistas e sem serem atacados pelo Haddad.
+
 ## Áudios do Boulos e do Haddad — 0.015.4 (30/10/2026)
 
 - Pedido do colaborador Giovanni (GitHub Jhovial), cuja atribuição é só os áudios de Boulos e Haddad. Branch `feat/audios-haddad-boulos` a partir da main do Gabriel (`80e4bde`, 0.015.3), único lugar onde os dois existem; entrega por fork `Jhovial/A-Guerra-Ezuberante` e pull request para o Omar, que deve integrar antes o trabalho do Gabriel.

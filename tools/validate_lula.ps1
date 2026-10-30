@@ -16,8 +16,8 @@ foreach($bone in $model.bones){foreach($cube in $bone.cubes){foreach($face in $c
  Require ($start -ge 0 -and $start -le 64 -and $end -ge 0 -and $end -le 64) "UV outside skin: $($bone.name)"
 }}}}
 $animation=Get-Content (Join-Path $assets 'animations/lula.animation.json') -Raw -Encoding UTF8|ConvertFrom-Json
-foreach($name in @('idle','walk','attack_bean','hurt','death')){Require ($null -ne $animation.animations.PSObject.Properties["animation.guerra.lula_$name"]) "Missing clip: $name"}
+foreach($name in @('idle','walk','attack_bean','faz_o_l','hurt','death')){Require ($null -ne $animation.animations.PSObject.Properties["animation.guerra.lula_$name"]) "Missing clip: $name"}
 Require ($animation.animations.'animation.guerra.lula_death'.animation_length -eq 3) 'Death animation must last 3 s.'
 $bean=[IO.File]::ReadAllBytes((Join-Path $assets 'textures/item/semente_feijao.png'))
 Require ([BitConverter]::ToString($bean,16,8) -eq '00-00-00-10-00-00-00-10') 'Bean sprite must be 16x16.'
-Write-Host 'OK: Lula original skin, belly, UV, five animations, three-second death and bean sprite.'
+Write-Host 'OK: Lula original skin, belly, UV, six animations, three-second death and bean sprite.'

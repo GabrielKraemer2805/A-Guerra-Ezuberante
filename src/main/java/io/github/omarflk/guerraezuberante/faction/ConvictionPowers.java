@@ -293,9 +293,9 @@ public final class ConvictionPowers {
 
     // ---------------------------------------------------------------- Esquerda
 
-    public static List<ManifestanteEntity> protesters(ServerPlayer player) {
-        return player.serverLevel().getEntitiesOfClass(ManifestanteEntity.class, player.getBoundingBox().inflate(64),
-                zombie -> player.getUUID().equals(zombie.getOwnerId()));
+    public static List<ManifestanteEntity> protesters(LivingEntity owner) {
+        return owner.level().getEntitiesOfClass(ManifestanteEntity.class, owner.getBoundingBox().inflate(64),
+                zombie -> owner.getUUID().equals(zombie.getOwnerId()));
     }
 
     private static boolean protest(ServerPlayer player, double scale) {
@@ -304,9 +304,19 @@ public final class ConvictionPowers {
             player.displayClientMessage(Component.translatable("power.guerra_ezuberante.protest_full"), true);
             return false;
         }
-        ServerLevel level = player.serverLevel();
+        if (spawnProtesters(player.serverLevel(), player, missing, scale) == 0) {
+            player.displayClientMessage(Component.translatable("power.guerra_ezuberante.no_space"), true);
+            return false;
+        }
+        sound(player, SoundEvents.ZOMBIE_AMBIENT, 1.2F, .7F);
+        sound(player, SoundEvents.RAID_HORN.value(), .4F, 1.4F);
+        return true;
+    }
+
+    /** Places up to {@code missing} Manifestantes for the owner on safe ground 2 to 6 blocks around it; returns how many. */
+    public static int spawnProtesters(ServerLevel level, LivingEntity owner, int missing, double scale) {
         int created = 0;
-        BlockPos center = player.blockPosition();
+        BlockPos center = owner.blockPosition();
         search:
         // From 2 blocks out, so the crowd does not spawn on top of the player and block the view.
         for (int radius = 2; radius <= 6; radius++) {
@@ -318,21 +328,15 @@ public final class ConvictionPowers {
                     if (!ArthurSummoning.isSafe(level, pos)) { continue; }
                     var zombie = ModEntities.MANIFESTANTE.get().create(level);
                     if (zombie == null) { continue; }
-                    zombie.moveTo(pos.getX() + .5, pos.getY(), pos.getZ() + .5, player.getYRot(), 0);
+                    zombie.moveTo(pos.getX() + .5, pos.getY(), pos.getZ() + .5, owner.getYRot(), 0);
                     if (!level.noCollision(zombie, zombie.getBoundingBox()) || !level.getEntities(zombie, zombie.getBoundingBox()).isEmpty()) { continue; }
-                    zombie.bindTo(player, ModConfig.PROTEST_LIFETIME.get(), scale);
+                    zombie.bindTo(owner, ModConfig.PROTEST_LIFETIME.get(), scale);
                     if (level.addFreshEntity(zombie) && ++created >= missing) { break search; }
                     break;
                 }
             }
         }
-        if (created == 0) {
-            player.displayClientMessage(Component.translatable("power.guerra_ezuberante.no_space"), true);
-            return false;
-        }
-        sound(player, SoundEvents.ZOMBIE_AMBIENT, 1.2F, .7F);
-        sound(player, SoundEvents.RAID_HORN.value(), .4F, 1.4F);
-        return true;
+        return created;
     }
 
     private static boolean generalStrike(ServerPlayer player, double scale) {

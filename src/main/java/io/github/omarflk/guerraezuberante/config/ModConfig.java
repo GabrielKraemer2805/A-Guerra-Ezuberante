@@ -12,7 +12,9 @@ public final class ModConfig {
     public static final ForgeConfigSpec.IntValue CHARACTER_AUDIO_SESSION, CHARACTER_AUDIO_GRACE;
     public static final ForgeConfigSpec.DoubleValue LULA_HEALTH, LULA_EXPLOSION_POWER, LULA_RISE;
     public static final ForgeConfigSpec.BooleanValue LULA_EXPLOSION_ENABLED, LULA_BLOCK_DAMAGE;
-    public static final ForgeConfigSpec.IntValue LULA_DEATH_TICKS;
+    public static final ForgeConfigSpec.IntValue LULA_DEATH_TICKS,LULA_FAZ_O_L_HITS,LULA_PROTEST_HITS;
+    public static final ForgeConfigSpec.DoubleValue LULA_FAZ_O_L_CHANCE,LULA_PROTEST_CHANCE;
+    public static final ForgeConfigSpec.BooleanValue LULA_FAZ_O_L_BREAK_BLOCKS;
     public static final ForgeConfigSpec.DoubleValue JAIR_HEALTH,JAIR_SPEED,JAIR_MELEE,JAIR_EXPLOSION_POWER,JAIR_RISE,JAIR_CANALHA_CHANCE;
     public static final ForgeConfigSpec.IntValue JAIR_DEATH_TICKS,JAIR_SUMMON_COUNT,JAIR_SUMMON_COOLDOWN,JAIR_MAX_SUMMONS;
     public static final ForgeConfigSpec.BooleanValue JAIR_EXPLOSION_ENABLED,JAIR_BLOCK_DAMAGE,JAIR_SUMMON_ENABLED;
@@ -75,6 +77,15 @@ public final class ModConfig {
         LULA_RISE = builder.defineInRange("death_rise_blocks", 2D, 0D, 8D);
         LULA_BLOCK_DAMAGE = builder.comment("Also respects mobGriefing and Forge explosion protection events.")
                 .define("death_explosion_block_damage", true);
+        LULA_FAZ_O_L_HITS = builder.comment("Every this many hits Lula takes, he may throw a Faz o L at the attacker.",
+                "Damage and radius are the player power's: [faction_powers] lulista_faz_o_l_damage/radius.").defineInRange("faz_o_l_every_hits", 10, 1, 100);
+        LULA_FAZ_O_L_CHANCE = builder.defineInRange("faz_o_l_chance", .5D, 0D, 1D);
+        LULA_FAZ_O_L_BREAK_BLOCKS = builder.comment("The blast breaks blocks like Lula's death explosion, his castle included. Also respects mobGriefing.")
+                .define("faz_o_l_breaks_blocks", true);
+        LULA_PROTEST_HITS = builder.comment("Every this many hits Lula takes, he may call a Manifestacao (Manifestantes on his side).",
+                "Count and lifetime are the Esquerda power's: [faction_powers] esquerda_manifestando_zombies/lifetime_ticks.")
+                .defineInRange("manifestacao_every_hits", 7, 1, 100);
+        LULA_PROTEST_CHANCE = builder.defineInRange("manifestacao_chance", .3D, 0D, 1D);
         builder.pop();
         builder.push("jair");
         JAIR_HEALTH=builder.defineInRange("max_health",300D,1D,1024D);
