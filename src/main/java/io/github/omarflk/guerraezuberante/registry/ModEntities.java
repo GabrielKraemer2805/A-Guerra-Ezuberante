@@ -29,6 +29,12 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.BoulosEntity>> BOULOS = REGISTER.register(
             "guilherme_boulos", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.BoulosEntity::new, MobCategory.CREATURE)
                     .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":guilherme_boulos"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.DilmaEntity>> DILMA = REGISTER.register(
+            "dilma", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.DilmaEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":dilma"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.MandiocaProjectile>> MANDIOCA = REGISTER.register(
+            "mandioca", () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.MandiocaProjectile>of(io.github.omarflk.guerraezuberante.entity.MandiocaProjectile::new, MobCategory.MISC)
+                    .sized(.3F,.3F).clientTrackingRange(8).updateInterval(1).build(GuerraEzuberanteMod.MOD_ID+":mandioca"));
     /** Same size and tracking as the vanilla villager. */
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.PetistaEntity>> PETISTA = REGISTER.register(
             "petista", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.PetistaEntity::new, MobCategory.MISC)

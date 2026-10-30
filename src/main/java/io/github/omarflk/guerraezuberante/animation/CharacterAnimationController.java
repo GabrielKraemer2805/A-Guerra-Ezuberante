@@ -9,7 +9,7 @@ public final class CharacterAnimationController extends AnimationController<Reta
     private static final java.util.Map<String, RawAnimation> CLIPS = new java.util.HashMap<>();
     static {
         for (String name : java.util.List.of("idle", "walk", "punch_left", "punch_right", "sword_attack", "cast", "hurt", "ukrainian_emerge",
-                "rifle_idle", "rifle_prepare", "rifle_aim", "rifle_walk", "rifle_fire", "rifle_hurt")) {
+                "rifle_idle", "rifle_prepare", "rifle_aim", "rifle_walk", "rifle_fire", "rifle_hurt", "mandioca_throw", "estocar_vento")) {
             var animation = RawAnimation.begin();
             CLIPS.put(name, java.util.Set.of("idle","walk","rifle_idle","rifle_aim","rifle_walk").contains(name)
                     ? animation.thenLoop("animation.guerra." + name) : animation.thenPlay("animation.guerra." + name));
@@ -17,6 +17,7 @@ public final class CharacterAnimationController extends AnimationController<Reta
     }
     private long lastAttack = Long.MIN_VALUE;
     private long lastShot = Long.MIN_VALUE;
+    private long lastWind = Long.MIN_VALUE;
     private final RetaliatingCharacterEntity entity;
     private float partialTick;
 
@@ -41,12 +42,15 @@ public final class CharacterAnimationController extends AnimationController<Reta
             else if(renan.isRifleAiming() && renan.rifleAimAge(partialTick)<RenanSantosEntity.PREPARE_TICKS) animation="rifle_prepare";
             else if(state.isMoving()) animation="rifle_walk";
             else animation=renan.isRifleAiming()?"rifle_aim":"rifle_idle";
+        } else if (entity instanceof DilmaEntity dilma && dilma.windAge(partialTick) < DilmaEntity.WIND_CAST) {
+            if (lastWind != dilma.windToken()) { forceAnimationReset(); lastWind = dilma.windToken(); }
+            animation = "estocar_vento";
         } else if (entity.attackAnimationAge(partialTick) < RetaliatingCharacterEntity.ATTACK_LENGTH) {
             if (lastAttack != entity.attackAnimationToken()) {
                 forceAnimationReset();
                 lastAttack = entity.attackAnimationToken();
             }
-            animation = !entity.getMainHandItem().isEmpty() ? "sword_attack"
+            animation = entity instanceof DilmaEntity ? "mandioca_throw" : !entity.getMainHandItem().isEmpty() ? "sword_attack"
                     : entity.isLeftPunch() ? "punch_left" : "punch_right";
         } else if (entity.hurtTime > 0) {
             animation = "hurt";
@@ -72,6 +76,9 @@ public final class CharacterAnimationController extends AnimationController<Reta
             if(entity.hurtTime>0)return Math.min(9.999,10-entity.hurtTime+partialTick);
             if(renan.isRifleAiming() && renan.rifleAimAge(partialTick)<12)return Math.max(0,renan.rifleAimAge(partialTick));
             return normal;
+        }
+        if (entity instanceof DilmaEntity dilma && dilma.windAge(partialTick) < DilmaEntity.WIND_CAST) {
+            return Math.max(0, dilma.windAge(partialTick));
         }
         if (entity.attackAnimationAge(partialTick) < RetaliatingCharacterEntity.ATTACK_LENGTH) {
             return Math.max(0, entity.attackAnimationAge(partialTick));

@@ -20,6 +20,9 @@ public final class ModItems {
             () -> new ForgeSpawnEggItem(ModEntities.HADDAD,0x1D2A44,0xB71C26,new Item.Properties()));
     public static final RegistryObject<Item> BOULOS_SPAWN_EGG = REGISTER.register("guilherme_boulos_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.BOULOS,0xB71C26,0x1F3FA8,new Item.Properties()));
+    public static final RegistryObject<Item> DILMA_SPAWN_EGG = REGISTER.register("dilma_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.DILMA,0xC8102E,0x2E7D32,new Item.Properties()));
+    public static final RegistryObject<Item> MANDIOCA = REGISTER.register("mandioca", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> PETISTA_SPAWN_EGG = REGISTER.register("petista_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.PETISTA,0xD8262E,0xF4E04D,new Item.Properties()));
     public static final RegistryObject<Item> BEAN = REGISTER.register("semente_feijao", () -> new Item(new Item.Properties()));

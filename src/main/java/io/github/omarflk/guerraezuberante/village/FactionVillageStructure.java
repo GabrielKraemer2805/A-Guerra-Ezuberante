@@ -70,7 +70,7 @@ public final class FactionVillageStructure extends Structure {
     /** The other characters, one each, around the village square. */
     public static List<EntityType<?>> members(Faction faction) {
         return switch (faction) {
-            case LULISTA -> List.of(ModEntities.HADDAD.get(), ModEntities.BOULOS.get());
+            case LULISTA -> List.of(ModEntities.HADDAD.get(), ModEntities.BOULOS.get(), ModEntities.DILMA.get());
             case BOLSONARISTA -> List.of(ModEntities.FLAVIO_BOLSONARO.get());
             case MISSAO -> List.of(ModEntities.ARTHUR_INVOCADOR.get());
             default -> List.of();

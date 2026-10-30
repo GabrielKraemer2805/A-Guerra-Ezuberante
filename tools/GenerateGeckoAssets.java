@@ -140,6 +140,30 @@ public final class GenerateGeckoAssets {
             rot(side+"_shin",2.2,new double[][]{key(0,0,0,0),key(.8,0,0,0),key(1.4,95,0,0),key(1.75,65,0,0),key(1.9,15,0,0),key(2.2,0,0,0)});
         }
         finish("ukrainian_emerge",2.2,false);
+        // Dilma: an overhand throw for each mandioca burst, released at tick 5 like the punches.
+        begin();
+        rot("body",.6,new double[][]{key(0,0,0,0),key(.15,-4,-14,0),key(.25,8,14,0),key(.6,0,0,0)});
+        rot("right_arm",.6,new double[][]{key(0,0,0,0),key(.15,-160,-10,-12),key(.25,-70,0,-6),key(.4,-40,0,-6),key(.6,0,0,0)});
+        rot("right_forearm",.6,new double[][]{key(0,0,0,0),key(.15,-60,0,0),key(.25,-5,0,0),key(.6,0,0,0)});
+        rot("left_arm",.6,new double[][]{key(0,0,0,0),key(.15,-30,0,12),key(.4,-30,0,12),key(.6,0,0,0)});
+        finish("mandioca_throw",.6,false);
+        // Dilma's "Estocar vento": both arms straight ahead, hands drawing circles, the right one clockwise and the
+        // left one counter-clockwise (three turns), for the whole 2 s cast.
+        begin();
+        double windIn=.25,windOut=1.75,turns=3;
+        for(String side:List.of("right","left")) {
+            int sign=side.equals("right")?1:-1;
+            channel(side+"_arm","rotation",2,t->{
+                double reach=t<windIn?t/windIn:t>windOut?Math.max(0,(2-t)/(2-windOut)):1;
+                double circle=t<windIn+.15?(t-windIn<0?0:(t-windIn)/.15):t>windOut-.15?Math.max(0,(windOut-t)/.15):1;
+                double angle=sign*2*Math.PI*turns*Math.max(0,Math.min(1,(t-windIn)/(windOut-windIn)));
+                return vec(-86*reach+16*circle*Math.sin(angle),16*circle*(Math.cos(angle)-1)*sign,-4*sign*reach);
+            });
+            rot(side+"_forearm",2,new double[][]{key(0,0,0,0),key(windIn,-6,0,0),key(windOut,-6,0,0),key(2,0,0,0)});
+        }
+        rot("body",2,new double[][]{key(0,0,0,0),key(windIn,6,0,0),key(windOut,6,0,0),key(2,0,0,0)});
+        rot("head",2,new double[][]{key(0,0,0,0),key(windIn,-6,0,0),key(windOut,-6,0,0),key(2,0,0,0)});
+        finish("estocar_vento",2,false);
         // Rifle posture is owned by the Renan-only clips. Shared model/UV and old clips remain intact.
         for(String name:List.of("rifle_idle","rifle_prepare","rifle_aim","rifle_walk","rifle_fire","rifle_hurt")) {
             begin();

@@ -25,6 +25,8 @@ public final class ModConfig {
     public static final ForgeConfigSpec.DoubleValue HADDAD_HEALTH,HADDAD_MELEE,SLAP_DAMAGE,HADDAD_DAMAGE_VOICE_CHANCE,HADDAD_LOW_HEALTH_FRACTION,BOULOS_HEALTH,BOULOS_MELEE,BOULOS_ARMOR,BOULOS_PO_CHANCE;
     public static final ForgeConfigSpec.IntValue SLAP_COUNT,SLAP_PARALYSIS_TICKS,SLAP_COOLDOWN;
     public static final ForgeConfigSpec.BooleanValue RIVALRY_ENABLED;
+    public static final ForgeConfigSpec.DoubleValue DILMA_HEALTH,MANDIOCA_DAMAGE,WIND_RANGE,WIND_PUSH,SEM_AR_DAMAGE;
+    public static final ForgeConfigSpec.IntValue MANDIOCA_COUNT,MANDIOCA_INTERVAL,WIND_COOLDOWN,WIND_BREATHLESS_TICKS;
     public static final ForgeConfigSpec.DoubleValue RIVALRY_RANGE;
     public static final ForgeConfigSpec.IntValue BALANCE_REVISION;
     public static final ForgeConfigSpec.BooleanValue FACTION_KIT_ENABLED;
@@ -134,6 +136,18 @@ public final class ModConfig {
         BOULOS_ARMOR=builder.defineInRange("armor",6D,0D,30D);
         BOULOS_PO_CHANCE=builder.comment("Chance of playing \"o pó\" each time Boulos takes damage (never over itself).")
                 .defineInRange("po_chance",.4D,0D,1D);
+        builder.pop();
+        builder.comment("Dilma, Lulista ally who fights from a distance: mandioca bursts and Estocar vento.").push("dilma");
+        DILMA_HEALTH=builder.defineInRange("max_health",40D,1D,1024D);
+        MANDIOCA_COUNT=builder.comment("Mandiocas in each burst, fanned 8 degrees apart.").defineInRange("mandioca_count",3,1,9);
+        MANDIOCA_DAMAGE=builder.comment("Damage of each mandioca.").defineInRange("mandioca_damage",3D,0D,100D);
+        MANDIOCA_INTERVAL=builder.defineInRange("mandioca_interval_ticks",60,10,72000);
+        WIND_COOLDOWN=builder.comment("Estocar vento: 2 s with the arms turning, then either a push or Sem ar (drawn each use).")
+                .defineInRange("estocar_vento_cooldown_ticks",300,40,72000);
+        WIND_RANGE=builder.defineInRange("estocar_vento_range",12D,2D,32D);
+        WIND_PUSH=builder.comment("Horizontal push strength; knockback resistance reduces it.").defineInRange("estocar_vento_push",1.6D,0D,5D);
+        WIND_BREATHLESS_TICKS=builder.defineInRange("estocar_vento_sem_ar_ticks",100,20,1200);
+        SEM_AR_DAMAGE=builder.comment("Drowning damage per second while the air bar is empty under Sem ar.").defineInRange("sem_ar_damage_per_second",2D,0D,100D);
         builder.pop();
         builder.comment("Characters of different factions (Lula, Jair, Renan, Arthur, Haddad...) attack each other on sight;",
                 "characters of the same faction are allies. Players are not affected.").push("faction_rivalry");

@@ -16,5 +16,9 @@ public final class ModEffects {
     public static final RegistryObject<MobEffect> PARALYZED = REGISTER.register("paralisado",
             io.github.omarflk.guerraezuberante.entity.ParalyzedEffect::new);
 
+    /** Dilma's Estocar vento: the air bar empties and the target drowns on dry land while it lasts. */
+    public static final RegistryObject<MobEffect> SEM_AR = REGISTER.register("sem_ar",
+            io.github.omarflk.guerraezuberante.entity.BreathlessEffect::new);
+
     private ModEffects() {}
 }

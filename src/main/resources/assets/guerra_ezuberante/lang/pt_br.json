@@ -284,5 +284,13 @@
     "gui.guerra_ezuberante.haddad_details":  "Vida padrão: 30 HP. Facção Lulista, aliado de Lula. Ronda a vila lulista como o golem de ferro e volta para a praça se se afastar. Defende a vila: ataca mobs hostis (menos creepers) e jogadores de outras facções que chegarem perto.",
     "gui.guerra_ezuberante.haddad_combat":  "Tapas na cara: 3 tapas seguidos, 3 de dano cada; cada tapa que tira vida paralisa o alvo por 3 s (não anda nem pula). Recarga de 10 s; socos entre as sequências. Ao levar dano toca “tapinhas”; abaixo de 20% da vida, “perdeu né seu tonto”.",
     "gui.guerra_ezuberante.boulos_details":  "Vida padrão: 60 HP e 6 de armadura. Facção Lulista, aliado de Lula. Ronda e defende a vila lulista como o Haddad.",
-    "gui.guerra_ezuberante.boulos_combat":  "Tanque corpo a corpo: socos de 5 de dano, difícil de empurrar. Sem poder especial por enquanto. Ao levar dano, 40% de chance de tocar “o pó”."
+    "gui.guerra_ezuberante.boulos_combat":  "Tanque corpo a corpo: socos de 5 de dano, difícil de empurrar. Sem poder especial por enquanto. Ao levar dano, 40% de chance de tocar “o pó”.",
+    "entity.guerra_ezuberante.dilma":  "Dilma",
+    "item.guerra_ezuberante.dilma_spawn_egg":  "Ovo — Dilma",
+    "item.guerra_ezuberante.mandioca":  "Mandioca",
+    "entity.guerra_ezuberante.mandioca":  "Mandioca",
+    "effect.guerra_ezuberante.sem_ar":  "Sem ar",
+    "gui.guerra_ezuberante.character_tab.9":  "Dilma",
+    "gui.guerra_ezuberante.dilma_details":  "Vida padrão: 40 HP. Facção Lulista, aliada de Lula. Ronda e defende a vila lulista como Haddad e Boulos, mas luta de longe: mantém de 5 a 16 blocos do alvo.",
+    "gui.guerra_ezuberante.dilma_combat":  "Mandiocas: rajada de 3 em leque a cada 3 s, 3 de dano cada. Estocar vento (recarga de 15 s, alcance 12): estica os dois braços e gira um no sentido horário e outro no anti-horário por 2 s, com um fluxo de partículas até o alvo; no fim, sorteia entre empurrar para trás os inimigos à frente dela ou deixá-los Sem ar (o ar acaba e toma dano de afogamento por 5 s)."
 }

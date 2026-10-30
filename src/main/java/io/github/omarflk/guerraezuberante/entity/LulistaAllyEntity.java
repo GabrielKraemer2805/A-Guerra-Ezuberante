@@ -21,7 +21,7 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 /**
- * Lula's allies (Haddad, Boulos). Unlike the other characters they defend the Lulista village on their own: they go after
+ * Lula's allies (Haddad, Boulos, Dilma). Unlike the other characters they defend the Lulista village on their own: they go after
  * hostile mobs and players of other factions that come close. Creepers are left alone, like iron golems do, so the
  * village is not blown up. Lula, the other allies and the petista villagers are never targets.
  * <p>

@@ -284,5 +284,13 @@
     "gui.guerra_ezuberante.haddad_details":  "Default health: 30 HP. Lulista faction, Lula's ally. Patrols the Lulista village like an iron golem and returns to the square if he strays. Defends it: attacks hostile mobs (except creepers) and players of other factions who come close.",
     "gui.guerra_ezuberante.haddad_combat":  "Face slaps: 3 slaps in a row, 3 damage each; every slap that takes health paralyses the target for 3 s (no walking or jumping). 10 s cooldown; punches between combos. When hurt he plays “tapinhas”; below 20% health, “perdeu né seu tonto”.",
     "gui.guerra_ezuberante.boulos_details":  "Default health: 60 HP and 6 armor. Lulista faction, Lula's ally. Patrols and defends the Lulista village like Haddad.",
-    "gui.guerra_ezuberante.boulos_combat":  "Melee tank: 5-damage punches, hard to push. No special power yet. When hurt, 40% chance to play “o pó”."
+    "gui.guerra_ezuberante.boulos_combat":  "Melee tank: 5-damage punches, hard to push. No special power yet. When hurt, 40% chance to play “o pó”.",
+    "entity.guerra_ezuberante.dilma":  "Dilma",
+    "item.guerra_ezuberante.dilma_spawn_egg":  "Dilma Spawn Egg",
+    "item.guerra_ezuberante.mandioca":  "Cassava",
+    "entity.guerra_ezuberante.mandioca":  "Cassava",
+    "effect.guerra_ezuberante.sem_ar":  "Breathless",
+    "gui.guerra_ezuberante.character_tab.9":  "Dilma",
+    "gui.guerra_ezuberante.dilma_details":  "Default health: 40 HP. Lulista faction, Lula's ally. Patrols and defends the Lulista village like Haddad and Boulos, but fights from a distance: keeps 5 to 16 blocks from the target.",
+    "gui.guerra_ezuberante.dilma_combat":  "Cassavas: a fan of 3 every 3 s, 3 damage each. Estocar vento (15 s cooldown, range 12): stretches both arms and turns one clockwise and the other counter-clockwise for 2 s, with a stream of particles to the target; at the end it draws between pushing the enemies in front of her away or leaving them Breathless (air runs out and they take drowning damage for 5 s)."
 }

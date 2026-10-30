@@ -25,7 +25,8 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 @GameTestHolder(GuerraEzuberanteMod.MOD_ID)
 @PrefixGameTestTemplate(false)
 public final class LulaPowersGameTests {
-    private static Vec3 arena(GameTestHelper h) { return arena(h, 50); }
+    /** High in the open air: lower down the test area can cut into natural caves, whose water or lava flows in. */
+    private static Vec3 arena(GameTestHelper h) { return arena(h, 200); }
 
     private static Vec3 arena(GameTestHelper h, int height) {
         var p = h.absolutePos(new BlockPos(3, height, 3));
@@ -101,7 +102,7 @@ public final class LulaPowersGameTests {
      */
     @GameTest(template = "empty", batch = "ge_lula_explosao", timeoutTicks = 120)
     public static void fazOLBlowsUpTheBlocksAround(GameTestHelper h) {
-        var p = arena(h, 160);
+        var p = arena(h, 230);
         var drops = h.getLevel().getGameRules().getRule(net.minecraft.world.level.GameRules.RULE_DOBLOCKDROPS);
         boolean dropped = drops.get();
         drops.set(false, h.getLevel().getServer());

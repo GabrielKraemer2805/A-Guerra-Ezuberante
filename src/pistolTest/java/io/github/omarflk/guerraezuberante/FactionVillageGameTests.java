@@ -232,12 +232,13 @@ public final class FactionVillageGameTests {
             assertFlags(h,Faction.LULISTA,castle.getBoundingBox());
             var haddad=h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.HaddadEntity.class, area(start.getBoundingBox()));
             var boulos=h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.BoulosEntity.class, area(start.getBoundingBox()));
-            h.assertTrue(haddad.size()==1 && boulos.size()==1, haddad.size()+" Haddad, "+boulos.size()+" Boulos");
+            var dilma=h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.DilmaEntity.class, area(start.getBoundingBox()));
+            h.assertTrue(haddad.size()==1 && boulos.size()==1 && dilma.size()==1, haddad.size()+" Haddad, "+boulos.size()+" Boulos, "+dilma.size()+" Dilma");
             var villagers=h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.npc.Villager.class, area(start.getBoundingBox()));
             var petistas=villagers.stream().filter(io.github.omarflk.guerraezuberante.registry.ModVillagers::isPetista).toList();
             h.assertTrue(!villagers.isEmpty() && petistas.size()==villagers.size(), petistas.size()+" petistas among "+villagers.size()+" villagers");
             h.assertTrue(villagers.stream().allMatch(v -> v.getType()==net.minecraft.world.entity.EntityType.VILLAGER), "Petista is not a real villager");
-            h.assertTrue(haddad.get(0).home()!=null && boulos.get(0).home()!=null, "Allies without a home");
+            h.assertTrue(haddad.get(0).home()!=null && boulos.get(0).home()!=null && dilma.get(0).home()!=null, "Allies without a home");
             System.out.println("LULISTA_VILLAGE petistas="+petistas.size());
         } finally { cleanUp(h,start); }
         h.succeed();

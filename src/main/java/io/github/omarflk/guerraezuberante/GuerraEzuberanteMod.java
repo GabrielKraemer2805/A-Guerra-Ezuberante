@@ -40,6 +40,7 @@ public final class GuerraEzuberanteMod {
     private void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(ModEntities.LULA.get(), io.github.omarflk.guerraezuberante.entity.LulaEntity.createAttributes().build());
         event.put(ModEntities.HADDAD.get(), io.github.omarflk.guerraezuberante.entity.HaddadEntity.createAttributes().build());
+        event.put(ModEntities.DILMA.get(), io.github.omarflk.guerraezuberante.entity.DilmaEntity.createAttributes().build());
         event.put(ModEntities.BOULOS.get(), io.github.omarflk.guerraezuberante.entity.BoulosEntity.createAttributes().build());
         event.put(ModEntities.PETISTA.get(), net.minecraft.world.entity.npc.Villager.createAttributes().build());
         event.put(ModEntities.JAIR_BOLSONARO.get(),io.github.omarflk.guerraezuberante.entity.JairBolsonaroEntity.createAttributes().build());

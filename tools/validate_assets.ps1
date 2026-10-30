@@ -12,6 +12,7 @@ foreach ($skin in @(
     @{ Texture = 'combatente_ucraniana'; Source = 'skin-loira.png' },
     @{ Texture = 'haddad'; Source = 'haddad_skin_64x64.png' },
     @{ Texture = 'guilherme_boulos'; Source = 'guilherme_boulos_skin_64x64.png' },
+    @{ Texture = 'dilma'; Source = 'dilma.png' },
     @{ Texture = 'petista\petista_0'; Source = 'petistas\petista_0.png' },
     @{ Texture = 'petista\petista_1'; Source = 'petistas\petista_1.png' },
     @{ Texture = 'petista\petista_2' },
