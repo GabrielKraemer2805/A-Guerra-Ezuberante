@@ -140,9 +140,17 @@ public final class FactionVillageStructure extends Structure {
         BlockPos center = square.getBoundingBox().getCenter();
         squareFlag(level, chunkBox, square.getBoundingBox());
         List<EntityType<?>> members = members(faction);
+        var castle = pieces.pieces().stream().filter(FactionCastlePiece.class::isInstance).map(FactionCastlePiece.class::cast).findFirst();
         for (int index = 0; index < members.size(); index++) {
+            EntityType<?> type = members.get(index);
+            if (type == ModEntities.DILMA.get() && castle.isPresent()) {
+                // Dilma keeps watch around the castle, starting at its gate.
+                var gate = castle.get().gate();
+                spawn(level, chunkBox, type, gate.outside(), entity -> ((io.github.omarflk.guerraezuberante.entity.DilmaEntity) entity).setCastle(gate));
+                continue;
+            }
             int offset = index % 2 == 0 ? 3 : -3;
-            spawn(level, chunkBox, members.get(index), center.offset(offset, 0, -offset));
+            spawn(level, chunkBox, type, center.offset(offset, 0, -offset));
         }
         if (faction == Faction.LULISTA) { Petistas.convertVillagers(level, chunkBox, chunk); }
     }
@@ -191,16 +199,27 @@ public final class FactionVillageStructure extends Structure {
 
     /** Spawns one persistent character standing on the ground at that column, if the column is in this chunk. */
     static void spawn(WorldGenLevel level, BoundingBox chunkBox, EntityType<?> type, BlockPos column) {
+        spawn(level, chunkBox, type, column, entity -> {});
+    }
+
+    static void spawn(WorldGenLevel level, BoundingBox chunkBox, EntityType<?> type, BlockPos column,
+                      java.util.function.Consumer<net.minecraft.world.entity.Entity> setup) {
         if (!chunkBox.isInside(column.getX(), chunkBox.minY(), column.getZ())) { return; }
         BlockPos pos = groundAbove(level, column.getX(), column.getZ());
-        spawnAt(level, type, pos, 0);
+        spawnAt(level, type, pos, 0, setup);
     }
 
     static void spawnAt(WorldGenLevel level, EntityType<?> type, BlockPos pos, float yaw) {
+        spawnAt(level, type, pos, yaw, entity -> {});
+    }
+
+    static void spawnAt(WorldGenLevel level, EntityType<?> type, BlockPos pos, float yaw,
+                        java.util.function.Consumer<net.minecraft.world.entity.Entity> setup) {
         var entity = type.create(level.getLevel());
         if (entity == null) { return; }
         entity.moveTo(pos.getX() + .5, pos.getY(), pos.getZ() + .5, yaw, 0);
         if (entity instanceof io.github.omarflk.guerraezuberante.entity.LulistaAllyEntity ally) { ally.setHome(pos); }
+        setup.accept(entity);
         if (entity instanceof Mob mob) {
             mob.setPersistenceRequired();
             mob.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.STRUCTURE, null, null);

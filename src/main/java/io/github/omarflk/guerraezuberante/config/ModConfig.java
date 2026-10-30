@@ -25,7 +25,7 @@ public final class ModConfig {
     public static final ForgeConfigSpec.DoubleValue HADDAD_HEALTH,HADDAD_MELEE,SLAP_DAMAGE,HADDAD_DAMAGE_VOICE_CHANCE,HADDAD_LOW_HEALTH_FRACTION,BOULOS_HEALTH,BOULOS_MELEE,BOULOS_ARMOR,BOULOS_PO_CHANCE;
     public static final ForgeConfigSpec.IntValue SLAP_COUNT,SLAP_PARALYSIS_TICKS,SLAP_COOLDOWN;
     public static final ForgeConfigSpec.BooleanValue RIVALRY_ENABLED;
-    public static final ForgeConfigSpec.DoubleValue DILMA_HEALTH,MANDIOCA_DAMAGE,WIND_RANGE,WIND_PUSH,SEM_AR_DAMAGE;
+    public static final ForgeConfigSpec.DoubleValue DILMA_HEALTH,MANDIOCA_DAMAGE,WIND_RANGE,WIND_PUSH,SEM_AR_DAMAGE,LINK_RANGE,LINK_HEAL,LINK_MULTIPLIER;
     public static final ForgeConfigSpec.IntValue MANDIOCA_COUNT,MANDIOCA_INTERVAL,WIND_COOLDOWN,WIND_BREATHLESS_TICKS;
     public static final ForgeConfigSpec.DoubleValue RIVALRY_RANGE;
     public static final ForgeConfigSpec.IntValue BALANCE_REVISION;
@@ -148,6 +148,11 @@ public final class ModConfig {
         WIND_PUSH=builder.comment("Horizontal push strength; knockback resistance reduces it.").defineInRange("estocar_vento_push",1.6D,0D,5D);
         WIND_BREATHLESS_TICKS=builder.defineInRange("estocar_vento_sem_ar_ticks",100,20,1200);
         SEM_AR_DAMAGE=builder.comment("Drowning damage per second while the air bar is empty under Sem ar.").defineInRange("sem_ar_damage_per_second",2D,0D,100D);
+        LINK_RANGE=builder.comment("Red beam between Dilma and Lula, like the End crystal's: both alive, this close and in sight of each other.")
+                .defineInRange("lula_link_range",12D,2D,32D);
+        LINK_HEAL=builder.comment("Health Lula gets back per second while the beam is on.").defineInRange("lula_link_heal_per_second",4D,0D,100D);
+        LINK_MULTIPLIER=builder.comment("While the beam is on: mandioca damage, push strength and Sem ar damage are multiplied by this.")
+                .defineInRange("lula_link_attack_multiplier",2D,1D,10D);
         builder.pop();
         builder.comment("Characters of different factions (Lula, Jair, Renan, Arthur, Haddad...) attack each other on sight;",
                 "characters of the same faction are allies. Players are not affected.").push("faction_rivalry");

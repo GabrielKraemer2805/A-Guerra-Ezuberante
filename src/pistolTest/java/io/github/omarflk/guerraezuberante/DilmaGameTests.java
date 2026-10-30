@@ -7,7 +7,9 @@ import io.github.omarflk.guerraezuberante.faction.Faction;
 import io.github.omarflk.guerraezuberante.registry.ModEffects;
 import io.github.omarflk.guerraezuberante.registry.ModEntities;
 import io.github.omarflk.guerraezuberante.registry.ModVillagers;
+import io.github.omarflk.guerraezuberante.village.FactionCastlePiece;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
@@ -17,6 +19,10 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Husk;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.state.properties.DoorHingeSide;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -157,6 +163,102 @@ public final class DilmaGameTests {
             } finally { dilma.discard(); illager.discard(); }
             h.succeed();
         });
+    }
+
+    @GameTest(template = "empty", batch = "ge_dilma", timeoutTicks = 120)
+    public static void beamWithLulaHealsHimAndDoublesHerMandiocas(GameTestHelper h) {
+        var p = arena(h);
+        DilmaEntity dilma = dilma(h, p, 72000);
+        dilma.setNoAi(true);
+        var lula = spawn(h, ModEntities.LULA.get(), p.add(5, 0, 0));
+        lula.setNoAi(true);
+        lula.setHealth(100);
+        Husk husk = husk(h, p.add(0, 0, 7));
+        HITS.put(husk.getUUID(), new ArrayList<>());
+        h.runAfterDelay(25, () -> {
+            h.assertTrue(dilma.isLinked() && dilma.linkedLula() == lula, "No beam to Lula 5 blocks away");
+            h.assertTrue(lula.getHealth() > 100, "Lula was not healed: " + lula.getHealth());
+            dilma.setTarget(husk);
+            h.assertTrue(dilma.beginVolley(husk), "No burst started");
+        });
+        h.runAfterDelay(85, () -> {
+            var hits = HITS.remove(husk.getUUID());
+            try {
+                float doubled = (float) (ModConfig.MANDIOCA_DAMAGE.get() * ModConfig.LINK_MULTIPLIER.get());
+                h.assertTrue(hits.stream().anyMatch(hit -> hit.equals("mandioca:" + doubled)), "No doubled mandioca (" + doubled + "): " + hits);
+            } finally { dilma.discard(); lula.discard(); husk.discard(); }
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = "empty", batch = "ge_dilma", timeoutTicks = 60)
+    public static void noBeamThroughWallsOrFromAfar(GameTestHelper h) {
+        var p = arena(h);
+        DilmaEntity walled = spawn(h, ModEntities.DILMA.get(), p.add(-5, 0, 0));
+        DilmaEntity far = spawn(h, ModEntities.DILMA.get(), p.add(0, 0, 15));
+        var lula = spawn(h, ModEntities.LULA.get(), p);
+        for (var dilma : List.of(walled, far)) dilma.setNoAi(true);
+        lula.setNoAi(true);
+        for (int z = -2; z <= 2; z++) for (int y = 0; y < 4; y++) h.getLevel().setBlockAndUpdate(BlockPos.containing(p.add(-2.5, y, z)), Blocks.STONE.defaultBlockState());
+        h.runAfterDelay(25, () -> {
+            try {
+                h.assertTrue(!walled.isLinked(), "Beam through a wall");
+                h.assertTrue(!far.isLinked(), "Beam from 15 blocks");
+            } finally { walled.discard(); far.discard(); lula.discard(); }
+            h.succeed();
+        });
+    }
+
+    /** A small walled hall with an iron double door, laid out like the castle gate: Dilma has to open it to save Lula. */
+    @GameTest(template = "empty", batch = "ge_dilma", timeoutTicks = 400)
+    public static void villageDilmaOpensTheIronDoorToDefendLula(GameTestHelper h) {
+        var p = arena(h);
+        BlockPos o = BlockPos.containing(p);
+        var level = h.getLevel();
+        for (int x = -4; x <= 4; x++) for (int z = 3; z <= 11; z++) for (int y = 0; y <= 4; y++) {
+            boolean wall = x == -4 || x == 4 || z == 3 || z == 11 || y == 4;
+            level.setBlockAndUpdate(o.offset(x, y, z), wall ? Blocks.STONE.defaultBlockState() : Blocks.AIR.defaultBlockState());
+        }
+        var door = Blocks.IRON_DOOR.defaultBlockState().setValue(DoorBlock.FACING, Direction.NORTH);
+        for (int x : new int[]{0, 1}) {
+            var hinge = x == 0 ? DoorHingeSide.LEFT : DoorHingeSide.RIGHT;
+            level.setBlock(o.offset(x, 0, 3), door.setValue(DoorBlock.HINGE, hinge).setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER), 3);
+            level.setBlock(o.offset(x, 1, 3), door.setValue(DoorBlock.HINGE, hinge).setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER), 3);
+        }
+        var gate = new FactionCastlePiece.Gate(o.offset(0, 0, 3), o.offset(1, 0, 3), o.offset(0, 0, 1),
+                o.offset(0, 0, 5), o.offset(0, 0, 7), BoundingBox.fromCorners(o.offset(-3, 0, 4), o.offset(3, 3, 10)));
+        DilmaEntity dilma = dilma(h, p.add(0, 0, -5), 72000);
+        dilma.setCastle(gate);
+        var lula = spawn(h, ModEntities.LULA.get(), p.add(-2, 0, 9));
+        lula.setNoAi(true);
+        Husk husk = husk(h, p.add(2, 0, 9));
+        h.runAfterDelay(5, () -> {
+            h.assertTrue(!gate.hall().isInside(dilma.blockPosition()), "Dilma started inside");
+            lula.hurt(h.getLevel().damageSources().mobAttack(husk), 1);
+        });
+        h.runAfterDelay(25, () -> h.assertTrue(dilma.isRescuing(), "Dilma did not notice the attack on Lula"));
+        h.runAfterDelay(300, () -> {
+            try {
+                h.assertTrue(gate.hall().isInside(dilma.blockPosition()), "Dilma did not get into the hall: " + dilma.blockPosition());
+                h.assertTrue(dilma.getTarget() == husk, "Dilma is not fighting Lula's attacker: " + dilma.getTarget());
+            } finally { dilma.discard(); lula.discard(); husk.discard(); }
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = "empty", batch = "ge_dilma")
+    public static void castlePostSurvivesSaveAndLoad(GameTestHelper h) {
+        DilmaEntity dilma = ModEntities.DILMA.get().create(h.getLevel());
+        var gate = new FactionCastlePiece.Gate(new BlockPos(1, 2, 3), new BlockPos(2, 2, 3), new BlockPos(1, 2, 1),
+                new BlockPos(1, 2, 5), new BlockPos(1, 2, 12), BoundingBox.fromCorners(new BlockPos(-8, 1, 4), new BlockPos(10, 9, 22)));
+        dilma.setCastle(gate);
+        DilmaEntity copy = ModEntities.DILMA.get().create(h.getLevel());
+        copy.load(dilma.saveWithoutId(new CompoundTag()));
+        try {
+            h.assertTrue(gate.equals(copy.castle()), "Castle post lost: " + copy.castle());
+            h.assertTrue(gate.center().equals(copy.home()), "Home is not the castle");
+        } finally { dilma.discard(); copy.discard(); }
+        h.succeed();
     }
 
     @GameTest(template = "empty", batch = "ge_dilma")

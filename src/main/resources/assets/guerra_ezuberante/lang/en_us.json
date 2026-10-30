@@ -291,6 +291,6 @@
     "entity.guerra_ezuberante.mandioca":  "Cassava",
     "effect.guerra_ezuberante.sem_ar":  "Breathless",
     "gui.guerra_ezuberante.character_tab.9":  "Dilma",
-    "gui.guerra_ezuberante.dilma_details":  "Default health: 40 HP. Lulista faction, Lula's ally. Patrols and defends the Lulista village like Haddad and Boulos, but fights from a distance: keeps 5 to 16 blocks from the target.",
+    "gui.guerra_ezuberante.dilma_details":  "Default health: 40 HP. Lulista faction, Lula's ally. In the village she keeps watch around the castle; if Lula is attacked she runs to him, and she is the only one who opens the castle's iron door to get in and out. Fights from a distance: keeps 5 to 16 blocks from the target. Near Lula (up to 12 blocks and in sight), a red beam joins them, like the End crystal and the dragon: Lula heals 2 hearts per second and Dilma's attacks are doubled.",
     "gui.guerra_ezuberante.dilma_combat":  "Cassavas: a fan of 3 every 3 s, 3 damage each. Estocar vento (15 s cooldown, range 12): stretches both arms and turns one clockwise and the other counter-clockwise for 2 s, with a stream of particles to the target; at the end it draws between pushing the enemies in front of her away or leaving them Breathless (air runs out and they take drowning damage for 5 s)."
 }

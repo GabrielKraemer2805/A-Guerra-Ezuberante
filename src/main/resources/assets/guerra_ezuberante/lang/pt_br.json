@@ -291,6 +291,6 @@
     "entity.guerra_ezuberante.mandioca":  "Mandioca",
     "effect.guerra_ezuberante.sem_ar":  "Sem ar",
     "gui.guerra_ezuberante.character_tab.9":  "Dilma",
-    "gui.guerra_ezuberante.dilma_details":  "Vida padrão: 40 HP. Facção Lulista, aliada de Lula. Ronda e defende a vila lulista como Haddad e Boulos, mas luta de longe: mantém de 5 a 16 blocos do alvo.",
+    "gui.guerra_ezuberante.dilma_details":  "Vida padrão: 40 HP. Facção Lulista, aliada de Lula. Na vila, faz a ronda em volta do castelo; se o Lula for atacado, corre até ele e é a única que abre a porta de ferro do castelo para entrar e sair. Luta de longe: mantém de 5 a 16 blocos do alvo. Perto do Lula (até 12 blocos e se enxergando), um raio vermelho liga os dois, como o cristal do End e o dragão: o Lula cura 2 corações por segundo e os ataques da Dilma ficam em dobro.",
     "gui.guerra_ezuberante.dilma_combat":  "Mandiocas: rajada de 3 em leque a cada 3 s, 3 de dano cada. Estocar vento (recarga de 15 s, alcance 12): estica os dois braços e gira um no sentido horário e outro no anti-horário por 2 s, com um fluxo de partículas até o alvo; no fim, sorteia entre empurrar para trás os inimigos à frente dela ou deixá-los Sem ar (o ar acaba e toma dano de afogamento por 5 s)."
 }

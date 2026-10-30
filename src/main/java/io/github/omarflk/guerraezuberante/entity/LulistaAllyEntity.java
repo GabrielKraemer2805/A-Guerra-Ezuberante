@@ -42,11 +42,18 @@ public abstract class LulistaAllyEntity extends RetaliatingCharacterEntity {
         // The golem patrol replaces the shared free stroll, which let them wander off and get lost.
         goalSelector.removeAllGoals(goal -> goal instanceof WaterAvoidingRandomStrollGoal);
         goalSelector.addGoal(4, new MoveTowardsRestrictionGoal(this, 1.0D));
-        goalSelector.addGoal(4, new MoveBackToVillageGoal(this, .6D, false));
+        goalSelector.addGoal(4, new MoveBackToVillageGoal(this, .6D, false) {
+            @Override public boolean canUse() { return patrolsVillage() && super.canUse(); }
+        });
         goalSelector.addGoal(5, new GolemRandomStrollInVillageGoal(this, .6D) {
-            @Override public boolean canUse() { return !isActionLocked() && super.canUse(); }
+            @Override public boolean canUse() { return patrolsVillage() && !isActionLocked() && super.canUse(); }
         });
         targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false, this::isVillageThreat));
+    }
+
+    /** False for an ally with a post of its own (Dilma around the castle): no golem walks through the village then. */
+    protected boolean patrolsVillage() {
+        return true;
     }
 
     /** Set when the village creates them; spawn eggs leave it empty and they only patrol. */

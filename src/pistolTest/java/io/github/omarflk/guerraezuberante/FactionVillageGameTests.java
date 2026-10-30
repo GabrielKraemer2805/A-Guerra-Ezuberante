@@ -239,6 +239,11 @@ public final class FactionVillageGameTests {
             h.assertTrue(!villagers.isEmpty() && petistas.size()==villagers.size(), petistas.size()+" petistas among "+villagers.size()+" villagers");
             h.assertTrue(villagers.stream().allMatch(v -> v.getType()==net.minecraft.world.entity.EntityType.VILLAGER), "Petista is not a real villager");
             h.assertTrue(haddad.get(0).home()!=null && boulos.get(0).home()!=null && dilma.get(0).home()!=null, "Allies without a home");
+            var post=dilma.get(0).castle();
+            h.assertTrue(post!=null && castle.getBoundingBox().isInside(post.center()) && !post.hall().isInside(dilma.get(0).blockPosition()),
+                    "Dilma has no castle post or starts inside the hall");
+            h.assertTrue(h.getLevel().getBlockState(post.leftDoor()).is(net.minecraft.world.level.block.Blocks.IRON_DOOR)
+                    && h.getLevel().getBlockState(post.rightDoor()).is(net.minecraft.world.level.block.Blocks.IRON_DOOR), "Castle gate is not where Dilma thinks");
             System.out.println("LULISTA_VILLAGE petistas="+petistas.size());
         } finally { cleanUp(h,start); }
         h.succeed();

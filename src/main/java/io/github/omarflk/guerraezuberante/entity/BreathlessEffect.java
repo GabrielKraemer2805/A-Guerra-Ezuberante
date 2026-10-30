@@ -10,7 +10,8 @@ import net.minecraft.world.entity.player.Player;
 
 /**
  * "Sem ar", from Dilma's Estocar vento: drowning on dry land. The air bar empties within a second and, while it is
- * empty, the entity takes [dilma] sem_ar_damage_per_second of drowning damage every second, like underwater.
+ * empty, the entity takes [dilma] sem_ar_damage_per_second of drowning damage every second, like underwater; each
+ * amplifier level adds that much again (Dilma linked to Lula casts it stronger).
  * Mobs that breathe underwater are immune. Air comes back the vanilla way once the effect ends.
  */
 public final class BreathlessEffect extends MobEffect {
@@ -28,7 +29,7 @@ public final class BreathlessEffect extends MobEffect {
         entity.setAirSupply(Math.max(0, entity.getAirSupply() - AIR_DRAIN));
         if (entity.getAirSupply() > 0) { return; }
         if (entity.tickCount % 20 == 0) {
-            entity.hurt(entity.damageSources().drown(), ModConfig.SEM_AR_DAMAGE.get().floatValue());
+            entity.hurt(entity.damageSources().drown(), ModConfig.SEM_AR_DAMAGE.get().floatValue() * (amplifier + 1));
         }
         if (entity.tickCount % 4 == 0) {
             level.sendParticles(ParticleTypes.BUBBLE_POP, entity.getX(), entity.getEyeY(), entity.getZ(), 3, .2, .1, .2, 0);

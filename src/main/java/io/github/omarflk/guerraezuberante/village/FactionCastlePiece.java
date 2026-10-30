@@ -143,6 +143,19 @@ public final class FactionCastlePiece extends StructurePiece {
                 context.heightAccessor(), context.randomState());
     }
 
+    /**
+     * The way in and out of the castle for Dilma: the lower halves of both iron doors, a spot in front of the gate, one
+     * just inside it, the centre of the keep and the hall (the inside of the body, walls excluded). World coordinates.
+     */
+    public record Gate(BlockPos leftDoor, BlockPos rightDoor, BlockPos outside, BlockPos inside, BlockPos center, BoundingBox hall) {}
+
+    public Gate gate() {
+        return new Gate(getWorldPos(11, FLOOR + 1, BODY_MIN).immutable(), getWorldPos(12, FLOOR + 1, BODY_MIN).immutable(),
+                getWorldPos(11, FLOOR + 1, BODY_MIN - 2).immutable(), getWorldPos(11, FLOOR + 1, BODY_MIN + 2).immutable(),
+                getWorldPos(11, FLOOR + 1, 11).immutable(),
+                BoundingBox.fromCorners(getWorldPos(BODY_MIN + 1, FLOOR, BODY_MIN + 1), getWorldPos(BODY_MAX - 1, WALL_TOP, BODY_MAX - 1)));
+    }
+
     /** World position of the throne seat, where the leader appears. */
     public BlockPos throne() {
         return getWorldPos(11, FLOOR + 2, 18).immutable();
