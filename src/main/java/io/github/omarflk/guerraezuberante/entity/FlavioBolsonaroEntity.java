@@ -48,7 +48,7 @@ public final class FlavioBolsonaroEntity extends RetaliatingCharacterEntity {
         if(target instanceof net.minecraft.world.entity.Mob mob){var victim=mob.getTarget();return victim==this || (victim!=null && isAlliedTo(victim));}
         return false;
     }
-    @Override public boolean isAlliedTo(Entity other){return other instanceof JairBolsonaroEntity || other instanceof FlavioBolsonaroEntity || super.isAlliedTo(other);}
+    @Override public io.github.omarflk.guerraezuberante.faction.Faction faction(){return io.github.omarflk.guerraezuberante.faction.Faction.BOLSONARISTA;}
     @Override protected List<ModSounds.VoiceLine> interactionVoices(){return List.of();}
     public boolean tryBeginRachadinha(){
         long now=level().getGameTime();var target=getTarget();

@@ -152,15 +152,16 @@ public final class CombatGameTests {
     @GameTest(template = "empty", timeoutTicks = 80)
     public static void counterattackAndDeadTargetCleanup(GameTestHelper helper) {
         floor(helper);
-        var renan = spawn(helper, ModEntities.RENAN_SANTOS.get(), 2);
+        // Renan and Arthur are both Missão since 0.015.2; Flávio is a rival of either.
+        var flavio = spawn(helper, ModEntities.FLAVIO_BOLSONARO.get(), 2);
         var arthur = spawn(helper, ModEntities.ARTHUR_DO_VAL.get(), 3);
-        arthur.hurt(helper.getLevel().damageSources().mobAttack(renan), 1);
-        helper.assertTrue(arthur.getTarget() == renan, "Arthur cannot retaliate against Renan");
+        arthur.hurt(helper.getLevel().damageSources().mobAttack(flavio), 1);
+        helper.assertTrue(arthur.getTarget() == flavio, "Arthur cannot retaliate against Flávio");
         helper.runAfterDelay(30, () -> {
-            helper.assertTrue(renan.getTarget() == arthur, "Renan did not counterattack after actual damage");
+            helper.assertTrue(flavio.getTarget() == arthur, "Flávio did not counterattack after actual damage");
             arthur.kill();
             helper.runAfterDelay(2, () -> {
-                helper.assertTrue(renan.getTarget() == null, "Dead target retained");
+                helper.assertTrue(flavio.getTarget() == null, "Dead target retained");
                 helper.succeed();
             });
         });

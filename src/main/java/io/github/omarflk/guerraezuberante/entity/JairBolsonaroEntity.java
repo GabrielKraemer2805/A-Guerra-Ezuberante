@@ -80,7 +80,7 @@ public final class JairBolsonaroEntity extends SpecialDeathEntity implements Npc
         if(!isActionLocked() && validRangedTarget(getTarget()))tryBeginSummon();
         if((isActionLocked() || !validRangedTarget(getTarget())) && isGunAiming())setGunAiming(false);
     }
-    @Override public boolean isAlliedTo(Entity other){return other instanceof JairBolsonaroEntity || other instanceof FlavioBolsonaroEntity || super.isAlliedTo(other);}
+    @Override public io.github.omarflk.guerraezuberante.faction.Faction faction(){return io.github.omarflk.guerraezuberante.faction.Faction.BOLSONARISTA;}
     @Override protected List<ModSounds.VoiceLine> interactionVoices(){return ModSounds.JAIR_INTERACTION_VOICES;}
     @Override public List<io.github.omarflk.guerraezuberante.audio.MusicTrack> musicTracks(){return io.github.omarflk.guerraezuberante.audio.CharacterAudio.JAIR;}
     @Override public boolean isInteractionTrack(int index){return index != io.github.omarflk.guerraezuberante.audio.CharacterAudio.JAIR_DAMAGE_TRACK;}

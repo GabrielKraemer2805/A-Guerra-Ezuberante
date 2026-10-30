@@ -97,6 +97,9 @@ public final class UkrainianFighterEntity extends RetaliatingCharacterEntity imp
     public boolean isActionLocked() { return emergenceProgress(0) < 1.0F; }
 
     @Override
+    public io.github.omarflk.guerraezuberante.faction.Faction faction() { return io.github.omarflk.guerraezuberante.faction.Faction.MISSAO; }
+
+    @Override
     protected List<ModSounds.VoiceLine> interactionVoices() { return List.of(); }
 
     @Override

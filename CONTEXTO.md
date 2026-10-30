@@ -1,5 +1,14 @@
 # Contexto de trabalho — Guerra Ezuberante
 
+## Rivalidade entre facções — 0.015.2 (29/10/2026)
+
+- Colaborador aprovou a 0.015.1 em mundo novo (commit local `28d1c6e`) e pediu que membros de facções diferentes briguem entre si quando ficam perto, usando os personagens existentes: Lula × Jair, Renan × Lula, Lula × Arthur, Arthur × Haddad etc.
+- `RetaliatingCharacterEntity.faction()` (nulo por padrão): **Missão** Renan, Arthur (todas as variantes) e Ucranianas; **Lulista** Lula, Haddad, Boulos; **Bolsonarista** Jair, Flávio. Novo `NearestAttackableTargetGoal` (prioridade 2) contra `RetaliatingCharacterEntity` de outra facção, com linha de visão e dentro de `faction_rivalry.range` (16 blocos; também limitado pelo alcance de seguimento de cada um). O resto do combate é o mesmo: perseguição desiste fora de 20 blocos ou sem progresso, impacto revalidado. Arthur Invocador conjura Ucranianas contra rivais.
+- `isAlliedTo` centralizado na base: mesma facção = aliados (Renan e Arthur agora são aliados; antes não eram); Lulistas aliados aos villagers petistas. Removidas as listas manuais de Lula, aliados lulistas, Jair e Flávio. Boss em morte especial deixa de ser alvo válido.
+- Fora do escopo: jogadores (só Haddad/Boulos já atacavam jogadores de outra facção), Manifestantes (zumbis do poder) e villagers, que continuam sem ser atacados por rivais.
+- Config nova `faction_rivalry` (`enabled` true, `range` 16). Nos GameTests ela fica desligada fora do lote `ge_rivalidade`, porque estruturas de teste vizinhas ficam a poucos blocos e personagens de testes diferentes brigariam. `counterattackAndDeadTargetCleanup` usa Flávio no lugar de Renan (agora aliado do Arthur).
+- Validação: build aprovado; **141 GameTests com TaCZ e 77 sem TaCZ aprovados**. Novos: Lula×Jair, Renan×Lula, Arthur×Lula, Arthur×Haddad, Flávio×Boulos se alvejam em até 40 ticks a 6 blocos; Missão, Lulistas (com petista) e Bolsonaristas próximos não se atacam; Lula e Jair a 22 blocos se ignoram.
+
 ## Petistas como villagers e ronda dos aliados — 0.015.1 (29/10/2026)
 
 - Retorno do colaborador sobre a 0.015.0: petistas demais para poucas casas; pediu que os petistas **substituam todos os villagers** da vila lulista, com cama e trocas iguais, cada skin ligada a um emprego; Haddad e Boulos "sumiam" andando para longe e deviam rondar a vila como o golem. Decisões: **agrupar profissões** nas 6 skins; **ronda pela vila toda, como golem**; eles tinham ido embora andando (não morrido).

@@ -6,7 +6,6 @@ import io.github.omarflk.guerraezuberante.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.GolemRandomStrollInVillageGoal;
@@ -82,10 +81,8 @@ public abstract class LulistaAllyEntity extends RetaliatingCharacterEntity {
     }
 
     @Override
-    public boolean isAlliedTo(Entity other) {
-        return other instanceof LulaEntity || other instanceof LulistaAllyEntity || other instanceof PetistaEntity
-                || other instanceof net.minecraft.world.entity.npc.Villager villager && io.github.omarflk.guerraezuberante.registry.ModVillagers.isPetista(villager)
-                || super.isAlliedTo(other);
+    public Faction faction() {
+        return Faction.LULISTA;
     }
 
     @Override

@@ -87,6 +87,9 @@ public class RenanSantosEntity extends RetaliatingCharacterEntity implements io.
     }
 
     @Override
+    public io.github.omarflk.guerraezuberante.faction.Faction faction() { return io.github.omarflk.guerraezuberante.faction.Faction.MISSAO; }
+
+    @Override
     protected List<ModSounds.VoiceLine> interactionVoices() {
         return ModSounds.RENAN_VOICES;
     }

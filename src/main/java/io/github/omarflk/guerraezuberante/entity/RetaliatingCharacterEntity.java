@@ -1,6 +1,8 @@
 package io.github.omarflk.guerraezuberante.entity;
 
+import io.github.omarflk.guerraezuberante.faction.Faction;
 import io.github.omarflk.guerraezuberante.registry.ModSounds;
+import io.github.omarflk.guerraezuberante.registry.ModVillagers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -19,13 +21,19 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-/** Peaceful unless hurt by a valid attacker. No proximity-based target selection. */
+/**
+ * Peaceful unless hurt by a valid attacker. The only proximity-based target selection is between characters of rival
+ * factions: a character with a {@link #faction()} goes after any character of another faction within
+ * {@link io.github.omarflk.guerraezuberante.config.ModConfig#RIVALRY_RANGE} blocks it can see, and treats the characters of its own faction as allies.
+ */
 public abstract class RetaliatingCharacterEntity extends PathfinderMob implements software.bernie.geckolib.animatable.GeoEntity {
     private final software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache animationCache =
             software.bernie.geckolib.util.GeckoLibUtil.createInstanceCache(this);
@@ -57,6 +65,8 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
     }
 
     protected abstract List<ModSounds.VoiceLine> interactionVoices();
+    /** The faction this character fights for, or null for characters outside the faction war. */
+    public Faction faction() { return null; }
     public List<io.github.omarflk.guerraezuberante.audio.MusicTrack> musicTracks() { return List.of(); }
     public boolean isInteractionTrack(int index) { return true; }
     public boolean startsAudioOnCombat() { return true; }
@@ -140,10 +150,29 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
         });
         goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F));
         goalSelector.addGoal(4, new RandomLookAroundGoal(this));
+        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, RetaliatingCharacterEntity.class, 10, true, false,
+                target -> io.github.omarflk.guerraezuberante.config.ModConfig.RIVALRY_ENABLED.get() && isRival(target)
+                        && distanceToSqr(target) <= Math.pow(io.github.omarflk.guerraezuberante.config.ModConfig.RIVALRY_RANGE.get(), 2)
+                        && isValidAggressor(target)));
+    }
+
+    /** Characters of two different factions are enemies on sight. */
+    public boolean isRival(Entity other) {
+        return faction() != null && other instanceof RetaliatingCharacterEntity character
+                && character.faction() != null && character.faction() != faction();
+    }
+
+    @Override
+    public boolean isAlliedTo(Entity other) {
+        return faction() != null && other instanceof RetaliatingCharacterEntity character && character.faction() == faction()
+                || faction() == Faction.LULISTA && (other instanceof PetistaEntity
+                || other instanceof Villager villager && ModVillagers.isPetista(villager))
+                || super.isAlliedTo(other);
     }
 
     protected boolean isValidAggressor(LivingEntity attacker) {
         return attacker != this && attacker.isAlive() && !attacker.isRemoved()
+                && !(attacker instanceof SpecialDeathEntity boss && boss.deathState() != SpecialDeathEntity.ALIVE)
                 && attacker.level() == level() && !isAlliedTo(attacker) && !attacker.isAlliedTo(this)
                 && canAttack(attacker)
                 && (!(attacker instanceof Player player) || (!player.isCreative()

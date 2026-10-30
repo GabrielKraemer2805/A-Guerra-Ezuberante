@@ -67,6 +67,9 @@ public final class ArthurDoValEntity extends RetaliatingCharacterEntity {
     }
 
     @Override
+    public io.github.omarflk.guerraezuberante.faction.Faction faction() { return io.github.omarflk.guerraezuberante.faction.Faction.MISSAO; }
+
+    @Override
     protected List<ModSounds.VoiceLine> interactionVoices() {
         return ModSounds.ARTHUR_VOICES;
     }
