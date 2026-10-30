@@ -172,6 +172,9 @@ public final class LulistaAllyGameTests {
                 h.assertTrue(villagers.size() == 1 && villagers.get(0).getType() == EntityType.VILLAGER
                         && ModVillagers.isPetista(villagers.get(0)), "Egg did not become a petista villager: " + villagers);
                 mother = villagers.get(0);
+                var job = mother.getVillagerData().getProfession();
+                h.assertTrue(job != VillagerProfession.NONE && (job == VillagerProfession.NITWIT || mother.getVillagerXp() > 0),
+                        "Egg petista has no lasting job: " + job + " xp " + mother.getVillagerXp());
                 mother.setVillagerData(mother.getVillagerData().setProfession(VillagerProfession.FARMER).setLevel(1));
                 h.assertTrue(!mother.getOffers().isEmpty(), "Farmer petista has no trades");
                 CompoundTag tag = mother.saveWithoutId(new CompoundTag());
@@ -194,6 +197,24 @@ public final class LulistaAllyGameTests {
             } finally {
                 h.getLevel().getEntitiesOfClass(Villager.class, area).forEach(Entity::discard);
             }
+            h.succeed();
+        });
+    }
+
+    /** Each egg petista gets one job per skin group, so 90 eggs show all six skins (chance of missing one: 4e-7). */
+    @GameTest(template = "empty", batch = "ge_lulistas", timeoutTicks = 60)
+    public static void petistaEggGivesEverySkin(GameTestHelper h) {
+        var p = arena(h, 30);
+        for (int i = 0; i < 90; i++) spawn(h, ModEntities.PETISTA.get(), p.add(i % 9 - 4, 0, i / 9 - 4));
+        h.runAfterDelay(3, () -> {
+            var area = new net.minecraft.world.phys.AABB(p, p).inflate(8);
+            var villagers = h.getLevel().getEntitiesOfClass(Villager.class, area);
+            try {
+                var jobs = villagers.stream().map(v -> v.getVillagerData().getProfession()).distinct().toList();
+                h.assertTrue(villagers.size() == 90 && villagers.stream().allMatch(ModVillagers::isPetista), "Eggs did not all become petistas");
+                h.assertTrue(jobs.size() == 6 && jobs.containsAll(List.of(VillagerProfession.FARMER, VillagerProfession.LIBRARIAN,
+                        VillagerProfession.ARMORER, VillagerProfession.BUTCHER, VillagerProfession.MASON, VillagerProfession.NITWIT)), "Jobs: " + jobs);
+            } finally { villagers.forEach(Entity::discard); }
             h.succeed();
         });
     }

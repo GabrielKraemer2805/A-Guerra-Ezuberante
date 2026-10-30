@@ -9,6 +9,7 @@ import io.github.omarflk.guerraezuberante.faction.Faction;
 import io.github.omarflk.guerraezuberante.faction.FactionNetwork;
 import io.github.omarflk.guerraezuberante.faction.Factions;
 import io.github.omarflk.guerraezuberante.summon.OwnedSummon;
+import io.github.omarflk.guerraezuberante.village.FactionVillageStructure;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.nbt.CompoundTag;
@@ -226,8 +227,23 @@ public final class Progression {
         FactionNetwork.sendProfile(player);
     }
 
-    /** XP for a kill: hostile mobs, mod characters, bosses and players of another faction (or none). */
+    /**
+     * XP for a kill: hostile mobs, mod characters, bosses and players of another faction (or none). Mod characters of
+     * another faction than the killer's are worth more, and that faction's leader more still.
+     */
     public static int xpFor(ServerPlayer killer, LivingEntity victim) {
+        int xp = baseXpFor(killer, victim);
+        if (victim instanceof RetaliatingCharacterEntity character && !(victim instanceof OwnedSummon) && character.faction() != null) {
+            var mine = Factions.of(killer);
+            if (mine.isPresent() && mine.get() != character.faction()) {
+                boolean leader = FactionVillageStructure.leader(character.faction()).filter(victim.getType()::equals).isPresent();
+                xp = (int) Math.round(xp * (leader ? ModConfig.XP_RIVAL_LEADER_MULTIPLIER : ModConfig.XP_RIVAL_MULTIPLIER).get());
+            }
+        }
+        return xp;
+    }
+
+    private static int baseXpFor(ServerPlayer killer, LivingEntity victim) {
         if (victim == killer) {
             return 0;
         }

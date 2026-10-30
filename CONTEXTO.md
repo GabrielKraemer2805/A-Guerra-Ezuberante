@@ -1,5 +1,12 @@
 # Contexto de trabalho — Guerra Ezuberante
 
+## XP de rivais e ovo de petista variado — 0.015.3 (30/10/2026)
+
+- Pedido do colaborador (0.015.2 aprovada, enviada e juntada na main do fork em `d15c000`): matar personagens especiais (não villagers) de outra facção dá mais XP — ex.: Bolsonarista que mata Haddad ganha mais que o normal; o líder (Lula) dá 4×. E o ovo de petista deve gerar todas as variedades, não só uma.
+- `Progression.xpFor`: o XP de sempre (personagem 40, boss 200) é multiplicado quando a vítima é um `RetaliatingCharacterEntity` com facção diferente da do jogador: `xp_rival_character_multiplier` 2× e, para o líder da facção (o mesmo de `FactionVillageStructure.leader`: Lula, Jair, Renan), `xp_rival_leader_multiplier` 4×. Ex.: Bolsonarista mata Haddad 80, Lula 800; Lulista mata Renan 160, Flávio 80; personagens da própria facção e tropas invocadas (Ucranianas) seguem o normal. Jogador sem facção continua sem progresso.
+- `PetistaEntity` (ovo): adulto sem emprego recebe ao virar villager petista uma profissão por grupo de skin (agricultor, bibliotecário, armoreiro, açougueiro, pedreiro, bobo) e 1 XP de villager, que impede o jogo de tirar a profissão sem estação de trabalho (bobo não precisa). Filhotes e petistas da vila não mudam.
+- Validação: build aprovado; **142 GameTests com TaCZ e 78 sem TaCZ aprovados**. Teste de XP cobre rival 2×, líder rival 4× (Renan 160, Lula 800), próprio líder normal e tropa invocada; 90 ovos geram as 6 profissões/skins e o ovo sempre tem emprego duradouro.
+
 ## Rivalidade entre facções — 0.015.2 (29/10/2026)
 
 - Colaborador aprovou a 0.015.1 em mundo novo (commit local `28d1c6e`) e pediu que membros de facções diferentes briguem entre si quando ficam perto, usando os personagens existentes: Lula × Jair, Renan × Lula, Lula × Arthur, Arthur × Haddad etc.

@@ -142,7 +142,14 @@ public final class ProgressionGameTests {
         var spider = EntityType.SPIDER.create(h.getLevel()); var pig = EntityType.PIG.create(h.getLevel());
         var lula = ModEntities.LULA.get().create(h.getLevel()); var renan = ModEntities.RENAN_SANTOS.get().create(h.getLevel());
         h.assertTrue(Progression.xpFor(killer, spider) == 10 && Progression.xpFor(killer, pig) == 0, "Hostile 10, animal 0");
-        h.assertTrue(Progression.xpFor(killer, renan) == 40 && Progression.xpFor(killer, lula) == 200, "Character 40, boss 200");
+        // Killer is Lulista: Lula is its own leader (normal boss XP), Renan the Missão leader (4x the character XP).
+        h.assertTrue(Progression.xpFor(killer, renan) == 160 && Progression.xpFor(killer, lula) == 200, "Rival leader 4x40, own leader 200");
+        var haddad = ModEntities.HADDAD.get().create(h.getLevel()); var flavio = ModEntities.FLAVIO_BOLSONARO.get().create(h.getLevel());
+        var fighter = ModEntities.UKRAINIAN_FIGHTER.get().create(h.getLevel());
+        h.assertTrue(Progression.xpFor(killer, haddad) == 40 && Progression.xpFor(killer, flavio) == 80, "Own character 40, rival character 2x40");
+        h.assertTrue(Progression.xpFor(rival, haddad) == 80 && Progression.xpFor(rival, lula) == 800, "Bolsonarista: Haddad 2x40, Lula 4x200");
+        h.assertTrue(Progression.xpFor(rival, fighter) == 10, "Summoned troops stay common mobs");
+        haddad.discard(); flavio.discard(); fighter.discard();
         h.assertTrue(Progression.xpFor(killer, ally) == 0 && Progression.xpFor(killer, rival) == 60, "Same faction 0, rival 60");
         spider.setPos(h.absoluteVec(new Vec3(2, 3, 2)));spider.setNoAi(true);h.getLevel().addFreshEntity(spider);
         spider.hurt(h.getLevel().damageSources().playerAttack(killer),100);

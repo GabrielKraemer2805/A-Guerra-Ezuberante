@@ -33,6 +33,7 @@ public final class ModConfig {
             PLAYER_FISSURE_RANGE,BOLSONARISTA_ARMOR,MISSAO_HEALTH,GROUP_HEAL_RADIUS,DASH_STRENGTH,DIREITA_SPEED;
     public static final ForgeConfigSpec.IntValue MAX_LEVEL,POINTS_PER_LEVEL,STAT_MAX,XP_BASE,XP_PER_LEVEL,XP_HOSTILE,XP_NPC,XP_BOSS,XP_PLAYER,
             CONVICTION_SECOND_POWER,CONVICTION_THIRD_POWER;
+    public static final ForgeConfigSpec.DoubleValue XP_RIVAL_MULTIPLIER,XP_RIVAL_LEADER_MULTIPLIER;
     public static final ForgeConfigSpec.DoubleValue STRENGTH_PER_POINT,SPEED_PER_POINT,HEALTH_PER_POINT,IDEOLOGY_PER_POINT,CONVICTION_PER_POINT;
     public static final ForgeConfigSpec.IntValue STOMP_COOLDOWN,FAZ_O_L_COOLDOWN,FAZ_O_L_ITEMS,ATHLETE_COOLDOWN,ATHLETE_TICKS,GRAVEDIGGER_COOLDOWN,
             METEOR_COOLDOWN,METEOR_COUNT,BOOK_COOLDOWN,BOOK_TICKS,BOOK_INTERVAL,BORED_TICKS,PROTEST_COOLDOWN,PROTEST_COUNT,PROTEST_LIFETIME,
@@ -163,6 +164,10 @@ public final class ModConfig {
         XP_NPC=builder.defineInRange("xp_mod_character",40,0,100000);
         XP_BOSS=builder.comment("Characters with a boss bar and vanilla bosses.").defineInRange("xp_boss",200,0,100000);
         XP_PLAYER=builder.comment("Only for players of another faction or without one.").defineInRange("xp_enemy_player",60,0,100000);
+        XP_RIVAL_MULTIPLIER=builder.comment("Multiplies the XP of a mod character of another faction than the killer's (Haddad for a Bolsonarista).")
+                .defineInRange("xp_rival_character_multiplier",2D,1D,20D);
+        XP_RIVAL_LEADER_MULTIPLIER=builder.comment("Same, for the leader of another faction (Lula, Jair, Renan). Replaces the multiplier above.")
+                .defineInRange("xp_rival_leader_multiplier",4D,1D,20D);
         STRENGTH_PER_POINT=builder.defineInRange("strength_attack_damage_per_point",.5D,0D,10D);
         SPEED_PER_POINT=builder.comment("Fraction of base movement speed per point.").defineInRange("speed_bonus_per_point",.02D,0D,.5D);
         HEALTH_PER_POINT=builder.defineInRange("health_bonus_per_point",1D,0D,20D);
