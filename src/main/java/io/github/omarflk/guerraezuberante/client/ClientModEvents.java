@@ -28,6 +28,7 @@ public final class ClientModEvents {
         event.registerEntityRenderer(ModEntities.HADDAD.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "haddad", 1));
         event.registerEntityRenderer(ModEntities.BOULOS.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "guilherme_boulos", 1));
         event.registerEntityRenderer(ModEntities.PETISTA.get(), io.github.omarflk.guerraezuberante.client.renderer.PetistaRenderer::new);
+        event.registerEntityRenderer(net.minecraft.world.entity.EntityType.VILLAGER, io.github.omarflk.guerraezuberante.client.renderer.VillagerOrPetistaRenderer::new);
         event.registerEntityRenderer(ModEntities.BEAN.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context,.65F,false));
         event.registerEntityRenderer(ModEntities.RENAN_SANTOS.get(), RenanRenderer::new);
         event.registerEntityRenderer(ModEntities.ARTHUR_DO_VAL.get(), ArthurRenderer::new);

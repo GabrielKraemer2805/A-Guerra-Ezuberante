@@ -2,7 +2,6 @@ package io.github.omarflk.guerraezuberante.village;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.omarflk.guerraezuberante.config.ModConfig;
 import io.github.omarflk.guerraezuberante.faction.Faction;
 import io.github.omarflk.guerraezuberante.registry.ModEntities;
 import io.github.omarflk.guerraezuberante.registry.ModWorldgen;
@@ -145,25 +144,7 @@ public final class FactionVillageStructure extends Structure {
             int offset = index % 2 == 0 ? 3 : -3;
             spawn(level, chunkBox, members.get(index), center.offset(offset, 0, -offset));
         }
-        if (faction == Faction.LULISTA) { spawnPetistas(level, chunkBox, pieces); }
-    }
-
-    /**
-     * Petistas live with the vanilla villagers, spread over the village streets (open ground, never a roof). The spots
-     * come from the whole village and are the same for every chunk, so each petista is created exactly once: by the
-     * chunk that holds its spot.
-     */
-    private static void spawnPetistas(WorldGenLevel level, BoundingBox chunkBox, PiecesContainer pieces) {
-        List<BoundingBox> streets = pieces.pieces().stream()
-                .filter(piece -> piece instanceof PoolElementStructurePiece pool && pool.getElement().toString().contains("/streets/"))
-                .map(StructurePiece::getBoundingBox).toList();
-        if (streets.isEmpty()) { streets = List.of(pieces.pieces().get(0).getBoundingBox()); }
-        int count = ModConfig.PETISTAS_PER_VILLAGE.get();
-        for (int index = 0; index < count; index++) {
-            BlockPos center = streets.get(index % streets.size()).getCenter();
-            int round = index / streets.size();
-            spawn(level, chunkBox, ModEntities.PETISTA.get(), center.offset(round % 2 == 0 ? round : -round, 0, 0));
-        }
+        if (faction == Faction.LULISTA) { Petistas.convertVillagers(level, chunkBox, chunk); }
     }
 
     private static boolean isHouse(StructurePiece piece) {
@@ -219,6 +200,7 @@ public final class FactionVillageStructure extends Structure {
         var entity = type.create(level.getLevel());
         if (entity == null) { return; }
         entity.moveTo(pos.getX() + .5, pos.getY(), pos.getZ() + .5, yaw, 0);
+        if (entity instanceof io.github.omarflk.guerraezuberante.entity.LulistaAllyEntity ally) { ally.setHome(pos); }
         if (entity instanceof Mob mob) {
             mob.setPersistenceRequired();
             mob.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.STRUCTURE, null, null);

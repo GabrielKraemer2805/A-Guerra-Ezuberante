@@ -10,6 +10,7 @@ import io.github.omarflk.guerraezuberante.faction.Factions;
 import io.github.omarflk.guerraezuberante.registry.ModEffects;
 import io.github.omarflk.guerraezuberante.registry.ModEntities;
 import io.github.omarflk.guerraezuberante.registry.ModItems;
+import io.github.omarflk.guerraezuberante.registry.ModVillagers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -127,7 +128,9 @@ public final class LulistaAllyGameTests {
         BoulosEntity boulos = spawn(h, ModEntities.BOULOS.get(), p);
         HaddadEntity haddad = spawn(h, ModEntities.HADDAD.get(), p.add(2, 0, 0));
         var lula = spawn(h, ModEntities.LULA.get(), p.add(-2, 0, 0));
-        PetistaEntity petista = spawn(h, ModEntities.PETISTA.get(), p.add(0, 0, 3));
+        Villager petista = spawn(h, EntityType.VILLAGER, p.add(0, 0, 3));
+        ModVillagers.makePetista(petista);
+        Villager plain = spawn(h, EntityType.VILLAGER, p.add(1, 0, 3));
         var creeper = spawn(h, EntityType.CREEPER, p.add(3, 0, 3));
         var zombie = spawn(h, EntityType.HUSK, p.add(-3, 0, 3));
         var cow = spawn(h, EntityType.COW, p.add(0, 0, 6));
@@ -140,41 +143,74 @@ public final class LulistaAllyGameTests {
                 h.assertTrue(ally.isVillageThreat(zombie), "Hostile mob is not a threat");
                 h.assertTrue(!ally.isVillageThreat(comrade) && !ally.isVillageThreat(neutral), "Lulista or faction-less player targeted");
                 h.assertTrue(!ally.isVillageThreat(creeper) && !ally.isVillageThreat(cow), "Creeper or animal targeted");
-                h.assertTrue(!ally.isVillageThreat(lula) && !ally.isVillageThreat(petista) && !ally.isVillageThreat(ally == boulos ? haddad : boulos),
-                        "Ally targeted");
+                h.assertTrue(!ally.isVillageThreat(lula) && !ally.isVillageThreat(petista) && !ally.isVillageThreat(plain)
+                        && !ally.isVillageThreat(ally == boulos ? haddad : boulos), "Ally or villager targeted");
+                h.assertTrue(ally.isAlliedTo(petista), "Petista is not an ally");
             }
             h.assertTrue(lula.isAlliedTo(haddad) && lula.isAlliedTo(boulos) && haddad.isAlliedTo(lula), "Lula alliance missing");
             rival.setGameMode(GameType.CREATIVE);
             h.assertTrue(!boulos.isVillageThreat(rival), "Creative player targeted");
         } finally {
             for (var player : List.of(rival, comrade, neutral)) Factions.clear(player);
-            for (Entity entity : List.of(boulos, haddad, lula, petista, creeper, zombie, cow)) entity.discard();
+            for (Entity entity : List.of(boulos, haddad, lula, petista, plain, creeper, zombie, cow)) entity.discard();
         }
         h.succeed();
     }
 
-    @GameTest(template = "empty", batch = "ge_lulistas")
-    public static void petistaIsATradingVillagerWithASavedSkin(GameTestHelper h) {
+    @GameTest(template = "empty", batch = "ge_lulistas", timeoutTicks = 60)
+    public static void petistaEggMakesARealVillagerThatTradesAndBreedsPetistas(GameTestHelper h) {
         var p = arena(h, 30);
         var egg = (ForgeSpawnEggItem) ModItems.PETISTA_SPAWN_EGG.get();
         var spawned = egg.getType(null).spawn(h.getLevel(), new ItemStack(egg), null, BlockPos.containing(p), MobSpawnType.SPAWN_EGG, false, false);
+        h.assertTrue(spawned instanceof PetistaEntity, "Egg did not spawn a petista");
+        h.runAfterDelay(3, () -> {
+            var area = new net.minecraft.world.phys.AABB(p, p).inflate(3);
+            var villagers = h.getLevel().getEntitiesOfClass(Villager.class, area);
+            Villager mother = null;
+            try {
+                h.assertTrue(h.getLevel().getEntitiesOfClass(PetistaEntity.class, area).isEmpty(), "Old petista entity was not converted");
+                h.assertTrue(villagers.size() == 1 && villagers.get(0).getType() == EntityType.VILLAGER
+                        && ModVillagers.isPetista(villagers.get(0)), "Egg did not become a petista villager: " + villagers);
+                mother = villagers.get(0);
+                mother.setVillagerData(mother.getVillagerData().setProfession(VillagerProfession.FARMER).setLevel(1));
+                h.assertTrue(!mother.getOffers().isEmpty(), "Farmer petista has no trades");
+                CompoundTag tag = mother.saveWithoutId(new CompoundTag());
+                Villager copy = EntityType.VILLAGER.create(h.getLevel());
+                copy.load(tag);
+                h.assertTrue(ModVillagers.isPetista(copy) && copy.getOffers().size() == mother.getOffers().size(), "Type or trades lost on save");
+                copy.discard();
+                // Same steps as VillagerMakeLove.breed: the parent gets age 6000, the baby (age -24000) appears on it.
+                mother.setAge(6000);
+                Villager baby = EntityType.VILLAGER.create(h.getLevel());
+                baby.setAge(-24000);
+                baby.moveTo(mother.getX(), mother.getY(), mother.getZ(), 0, 0);
+                h.getLevel().addFreshEntityWithPassengers(baby);
+                h.assertTrue(ModVillagers.isPetista(baby), "Baby of a petista is not a petista");
+                Villager stranger = EntityType.VILLAGER.create(h.getLevel());
+                stranger.setAge(-24000);
+                stranger.moveTo(p.x + 2.5, p.y, p.z, 0, 0);
+                h.getLevel().addFreshEntityWithPassengers(stranger);
+                h.assertTrue(!ModVillagers.isPetista(stranger), "Baby away from petistas became a petista");
+            } finally {
+                h.getLevel().getEntitiesOfClass(Villager.class, area).forEach(Entity::discard);
+            }
+            h.succeed();
+        });
+    }
+
+    @GameTest(template = "empty", batch = "ge_lulistas")
+    public static void alliesPatrolLikeGolemsAndKeepTheirHome(GameTestHelper h) {
+        var p = arena(h, 30);
+        HaddadEntity haddad = spawn(h, ModEntities.HADDAD.get(), p);
         try {
-            h.assertTrue(spawned instanceof PetistaEntity, "Egg did not spawn a petista");
-            PetistaEntity petista = (PetistaEntity) spawned;
-            h.assertTrue(petista instanceof Villager && petista.skin() >= 0 && petista.skin() < PetistaEntity.SKINS, "Not a villager with a skin");
-            petista.setVillagerData(petista.getVillagerData().setProfession(VillagerProfession.FARMER).setLevel(1));
-            h.assertTrue(!petista.getOffers().isEmpty(), "Farmer petista has no trades");
-            h.assertTrue(petista.getName().getContents() instanceof net.minecraft.network.chat.contents.TranslatableContents key
-                    && key.getKey().equals("entity.guerra_ezuberante.petista.farmer"), "Name is not Petista Agricultor: " + petista.getName());
-            CompoundTag tag = petista.saveWithoutId(new CompoundTag());
-            PetistaEntity copy = ModEntities.PETISTA.get().create(h.getLevel());
-            copy.load(tag);
-            h.assertTrue(copy.skin() == petista.skin() && copy.getOffers().size() == petista.getOffers().size(), "Skin or trades lost on save");
+            BlockPos home = BlockPos.containing(p);
+            haddad.setHome(home);
+            HaddadEntity copy = ModEntities.HADDAD.get().create(h.getLevel());
+            copy.load(haddad.saveWithoutId(new CompoundTag()));
+            h.assertTrue(home.equals(copy.home()) && copy.hasRestriction() && copy.getRestrictCenter().equals(home)
+                    && copy.getRestrictRadius() == io.github.omarflk.guerraezuberante.entity.LulistaAllyEntity.HOME_RADIUS, "Home lost on save");
             copy.discard();
-            var baby = petista.getBreedOffspring(h.getLevel(), petista);
-            h.assertTrue(baby instanceof PetistaEntity, "Baby of a petista is not a petista");
-            baby.discard();
-        } finally { if (spawned != null) spawned.discard(); }
+        } finally { haddad.discard(); }
         h.succeed();
     }
 

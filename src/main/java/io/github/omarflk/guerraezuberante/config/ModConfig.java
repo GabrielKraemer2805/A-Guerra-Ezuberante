@@ -21,7 +21,7 @@ public final class ModConfig {
     public static final ForgeConfigSpec.BooleanValue FISSURE_BLOCK_DAMAGE;
     public static final ForgeConfigSpec.DoubleValue FISSURE_FINAL_RADIUS;
     public static final ForgeConfigSpec.DoubleValue HADDAD_HEALTH,HADDAD_MELEE,SLAP_DAMAGE,BOULOS_HEALTH,BOULOS_MELEE,BOULOS_ARMOR;
-    public static final ForgeConfigSpec.IntValue SLAP_COUNT,SLAP_PARALYSIS_TICKS,SLAP_COOLDOWN,PETISTAS_PER_VILLAGE;
+    public static final ForgeConfigSpec.IntValue SLAP_COUNT,SLAP_PARALYSIS_TICKS,SLAP_COOLDOWN;
     public static final ForgeConfigSpec.IntValue BALANCE_REVISION;
     public static final ForgeConfigSpec.BooleanValue FACTION_KIT_ENABLED;
     public static final ForgeConfigSpec.IntValue BEAN_VOLLEY_COOLDOWN,BEAN_VOLLEY_COUNT,PLAYER_FISSURE_COOLDOWN,PLAYER_TROOPS_COOLDOWN,
@@ -114,10 +114,6 @@ public final class ModConfig {
         BOULOS_HEALTH=builder.defineInRange("max_health",60D,1D,1024D);
         BOULOS_MELEE=builder.defineInRange("melee_damage",5D,0D,100D);
         BOULOS_ARMOR=builder.defineInRange("armor",6D,0D,30D);
-        builder.pop();
-        builder.push("petistas");
-        PETISTAS_PER_VILLAGE=builder.comment("Petistas spawned in each new Lulista village, besides the vanilla villagers.")
-                .defineInRange("per_village",10,0,40);
         builder.pop();
         builder.comment("Player faction powers (B key), passives and the one-time starting kit.").push("faction_powers");
         FACTION_KIT_ENABLED=builder.comment("Kit is given once per player per world, only on the player's own first choice.")
