@@ -47,6 +47,47 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.CiroGomesEntity>> CIRO_GOMES = REGISTER.register(
             "ciro_gomes", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.CiroGomesEntity::new, MobCategory.CREATURE)
                     .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":ciro_gomes"));
+    /** 0.020: Enéias, leader of the Direita (boss), and Augusto Cury with his drones. */
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.EneiasEntity>> ENEIAS = REGISTER.register(
+            "eneias", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.EneiasEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":eneias"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.AugustoCuryEntity>> AUGUSTO_CURY = REGISTER.register(
+            "augusto_cury", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.AugustoCuryEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":augusto_cury"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.DroneEntity>> DRONE = REGISTER.register(
+            "drone", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.DroneEntity::new, MobCategory.MISC)
+                    .sized(.7F,.4F).clientTrackingRange(8).updateInterval(1).build(GuerraEzuberanteMod.MOD_ID+":drone"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.BombinhaProjectile>> BOMBINHA = REGISTER.register(
+            "bombinha", () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.BombinhaProjectile>of(io.github.omarflk.guerraezuberante.entity.BombinhaProjectile::new, MobCategory.MISC)
+                    .sized(.3F,.3F).clientTrackingRange(8).updateInterval(1).build(GuerraEzuberanteMod.MOD_ID+":bombinha"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.DiplomaProjectile>> DIPLOMA = REGISTER.register(
+            "diploma", () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.DiplomaProjectile>of(io.github.omarflk.guerraezuberante.entity.DiplomaProjectile::new, MobCategory.MISC)
+                    .sized(.3F,.3F).clientTrackingRange(8).updateInterval(1).build(GuerraEzuberanteMod.MOD_ID+":diploma"));
+    /** 0.022: Romeu Zema and Ronaldo Caiado of the Direita; the appliances and oxen of their powers are never saved. */
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.RomeuZemaEntity>> ROMEU_ZEMA = REGISTER.register(
+            "romeu_zema", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.RomeuZemaEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":romeu_zema"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.RonaldoCaiadoEntity>> RONALDO_CAIADO = REGISTER.register(
+            "ronaldo_caiado", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.RonaldoCaiadoEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":ronaldo_caiado"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.ApplianceEntity>> APPLIANCE = REGISTER.register(
+            "eletrodomestico", () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.ApplianceEntity>of(io.github.omarflk.guerraezuberante.entity.ApplianceEntity::new, MobCategory.MISC)
+                    .sized(.9F,.9F).clientTrackingRange(8).updateInterval(1).noSave().build(GuerraEzuberanteMod.MOD_ID+":eletrodomestico"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.StampedeOxEntity>> STAMPEDE_OX = REGISTER.register(
+            "boi_da_boiada", () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.StampedeOxEntity>of(io.github.omarflk.guerraezuberante.entity.StampedeOxEntity::new, MobCategory.MISC)
+                    .sized(.9F,1.4F).clientTrackingRange(8).updateInterval(1).noSave().build(GuerraEzuberanteMod.MOD_ID+":boi_da_boiada"));
+    /** Spawn egg of the Direita villagers (0.022); same size and tracking as the vanilla villager. */
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.DireitistaEntity>> DIREITISTA = REGISTER.register(
+            "direitista", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.DireitistaEntity::new, MobCategory.MISC)
+                    .sized(.6F,1.95F).clientTrackingRange(10).build(GuerraEzuberanteMod.MOD_ID+":direitista"));
+    /** 0.020: two armed guards on each tower of every faction castle. */
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.TowerGuardEntity>> TOWER_GUARD = REGISTER.register(
+            "guarda_da_torre", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.TowerGuardEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(10).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":guarda_da_torre"));
+    /** Spawn egg of the Bolsonarista villagers; same size and tracking as the vanilla villager. */
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.BolsonaristaEntity>> BOLSONARISTA = REGISTER.register(
+            "bolsonarista", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.BolsonaristaEntity::new, MobCategory.MISC)
+                    .sized(.6F,1.95F).clientTrackingRange(10).build(GuerraEzuberanteMod.MOD_ID+":bolsonarista"));
     /** Spawn egg of the Esquerda Independente villagers; same size and tracking as the vanilla villager. */
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.ComunistaEntity>> COMUNISTA = REGISTER.register(
             "comunista", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.ComunistaEntity::new, MobCategory.MISC)

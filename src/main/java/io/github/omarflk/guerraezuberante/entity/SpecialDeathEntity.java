@@ -28,7 +28,7 @@ public abstract class SpecialDeathEntity extends RetaliatingCharacterEntity {
 
     protected SpecialDeathEntity(EntityType<? extends SpecialDeathEntity> type,Level level){
         super(type,level);
-        bossEvent=new ServerBossEvent(type.getDescription(),greenDeathEnergy()?BossEvent.BossBarColor.GREEN:BossEvent.BossBarColor.RED,BossEvent.BossBarOverlay.PROGRESS);
+        bossEvent=new ServerBossEvent(type.getDescription(),bossBarColor(),BossEvent.BossBarOverlay.PROGRESS);
         bossEvent.setVisible(false);
     }
     protected abstract double configuredMaxHealth();
@@ -47,6 +47,10 @@ public abstract class SpecialDeathEntity extends RetaliatingCharacterEntity {
     protected abstract DeathSettings deathSettings();
     protected abstract String deathSavePrefix();
     public boolean greenDeathEnergy(){return false;}
+    /** Boss bar colour: red, or green for the green death energy; Enéias overrides it with blue. Called from the constructor. */
+    protected BossEvent.BossBarColor bossBarColor(){return greenDeathEnergy()?BossEvent.BossBarColor.GREEN:BossEvent.BossBarColor.RED;}
+    /** Colour of the death energy (particles and the body tint), red or green unless overridden. */
+    public Vector3f deathEnergyColor(){return greenDeathEnergy()?new Vector3f(.035F,1,.06F):new Vector3f(1,.035F,.025F);}
     protected void onSpecialDeathStart() {}
     @Override protected void defineSynchedData(){
         super.defineSynchedData();entityData.define(STATE,ALIVE);entityData.define(ELAPSED,0);entityData.define(DURATION,60);
@@ -86,7 +90,7 @@ public abstract class SpecialDeathEntity extends RetaliatingCharacterEntity {
         progress=progress*progress*(3-2*progress);
         setPos(deathOrigin.x,deathOrigin.y+deathRise*progress,deathOrigin.z);setDeltaMovement(Vec3.ZERO);
         if(level() instanceof ServerLevel server && elapsed%3==0){
-            var color=greenDeathEnergy()?new Vector3f(.035F,1,.06F):new Vector3f(1,.035F,.025F);
+            var color=deathEnergyColor();
             server.sendParticles(new DustParticleOptions(color,1.1F),getX(),getY()+.85,getZ(),
                     elapsed*6>=deathDuration()*5?12:4,.3,.45,.3,.01);
             if(greenDeathEnergy())server.sendParticles(new DustParticleOptions(new Vector3f(1,.85F,.03F),.85F),

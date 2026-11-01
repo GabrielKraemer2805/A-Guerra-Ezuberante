@@ -113,7 +113,7 @@ public final class FactionMultiplayerChecks {
                 case 2->{if(age<65)return;require(pig.getHealth()<40 && FactionPowers.remainingCooldown(host)>0,"Bean power/impact/cooldown missing");serverResults.put("beanTargetHp",pig.getHealth());pig.discard();
                     host.removeAllEffects();other.removeAllEffects();host.setHealth(10);other.setHealth(10);next();}
                 case 3->{if(age<80 || !exists("observer-cooldown.ack"))return;
-                    require(host.getHealth()>10 && other.getHealth()>10,"Real group heal did not heal both players");serverResults.put("groupHealHp",List.of(host.getHealth(),other.getHealth()));
+                    require(!protesters(other).isEmpty(),"Real Manifestando from the observer did not spawn");serverResults.put("observerProtesters",protesters(other).size());protesters(other).forEach(net.minecraft.world.entity.Entity::discard);
                     host.removeAllEffects();other.removeAllEffects();host.setHealth(20);other.setHealth(20);Factions.assign(host,Faction.MISSAO);FactionPowers.resetCooldown(host);server.setPvpAllowed(false);next();}
                 case 4->{if(age==85){var units=troops(host);require(units.size()==2,"Real player did not summon two troops");
                         require(!other.hurt(other.damageSources().playerAttack(host),1),"Direct hit bypassed PvP OFF");units.get(0).hurt(host.damageSources().playerAttack(other),1);serverResults.put("pvpOffHp",other.getHealth());}
@@ -138,7 +138,7 @@ public final class FactionMultiplayerChecks {
                     position(host,true);other.teleportTo(server.overworld(),13000.5,220,13006.5,180,0);other.invulnerableTime=0;FactionPowers.resetCooldown(host);server.setPvpAllowed(true);next();}
                 case 12->{if(age<90)return;require(other.getHealth()<20,"Player fissure did not hit real player with PvP ON");serverResults.put("fissurePvpOnHp",other.getHealth());
                     other.setGameMode(GameType.CREATIVE);Factions.assign(host,Faction.MISSAO);Progression.addXp(host,1_000_000);FactionPowers.resetCooldown(host);position(host,true);next();}
-                case 13->{if(age<45)return;require(Progression.level(host)==30 && Progression.stat(host,Stat.CONVICCAO)==10 && Progression.stat(host,Stat.FORCA_IDEOLOGICA)==1,"Point spending packets failed");
+                case 13->{if(age<45)return;require(Progression.level(host)==Progression.maxLevel() && Progression.stat(host,Stat.CONVICCAO)==10 && Progression.stat(host,Stat.FORCA_IDEOLOGICA)==1,"Point spending packets failed");
                     require(Progression.availablePoints(host)==18 && Progression.unlockedPowers(host)==3,"Profile/unlock mismatch");serverResults.put("profile",List.of(30,10,1,18,3));next();}
                 case 14->{if(age<135)return;require(serverMeteors==20 && Progression.selectedPower(host)==1 && FactionPowers.remainingCooldown(host,1)>0,"Meteor RPC/selected power failed");serverResults.put("meteors",serverMeteors);next();}
                 case 15->{if(age<55)return;require(serverBooks>=3 && Progression.selectedPower(host)==2 && FactionPowers.remainingCooldown(host,1)>0 && FactionPowers.remainingCooldown(host,2)>0,"Book RPC/independent slots failed");serverResults.put("books",serverBooks);
@@ -203,7 +203,7 @@ public final class FactionMultiplayerChecks {
             if(stage==4 && clientStageTicks>60)capture("summoned-troops");
             if(stage==8 && observer() && !disconnected){capture("before-reconnect");disconnected=true;mc.level.disconnect();mc.clearLevel(new TitleScreen());return;}
             if(stage>=9 && stage<=15 && observer()){require(Factions.of(mc.player).orElse(null)==Faction.ESQUERDA,"Reconnect lost faction");clientResults.put("reconnectedWithoutChoice",true);capture("after-reconnect");}
-            if(stage==13 && !observer() && Factions.of(mc.player).orElse(null)==Faction.MISSAO && ProgressionClient.level()==30 && requested.add(13)){
+            if(stage==13 && !observer() && Factions.of(mc.player).orElse(null)==Faction.MISSAO && ProgressionClient.level()==ProgressionClient.maxLevel() && requested.add(13)){
                 mc.setScreen(new ProfileScreen());for(int i=0;i<10;i++)FactionNetwork.spendPoint(Stat.CONVICCAO);FactionNetwork.spendPoint(Stat.FORCA_IDEOLOGICA);
                 for(var node:new io.github.omarflk.guerraezuberante.progression.SkillTree.Node[]{io.github.omarflk.guerraezuberante.progression.SkillTree.Node.P1_RECARGA,
                         io.github.omarflk.guerraezuberante.progression.SkillTree.Node.P2,io.github.omarflk.guerraezuberante.progression.SkillTree.Node.P2_RECARGA,
@@ -212,7 +212,7 @@ public final class FactionMultiplayerChecks {
             if(stage==13 && !observer() && ProgressionClient.unlocked()==3 && ProgressionClient.points()==18){clientResults.put("profilePackets",true);capture("profile-unlocked");}
             if(!observer() && (stage==14 || stage==15 || stage==16 || stage==18) && !requested.contains(stage)){
                 Faction desired=stage<=15?Faction.MISSAO:stage==16?Faction.ESQUERDA:Faction.LULISTA;
-                if(Factions.of(mc.player).orElse(null)==desired){int slot=stage==14 || stage==16?1:2;if(!(mc.screen instanceof ProfileScreen))mc.setScreen(new ProfileScreen());
+                if(Factions.of(mc.player).orElse(null)==desired){int slot=stage==14?1:stage==16?0:2;if(!(mc.screen instanceof ProfileScreen))mc.setScreen(new ProfileScreen());
                     var field=ProfileScreen.class.getDeclaredField("powerButtons");field.setAccessible(true);var buttons=(Button[])field.get(mc.screen);if(buttons[slot].active){buttons[slot].onPress();mc.setScreen(null);mc.player.setYRot(0);mc.player.setXRot(10);FactionNetwork.usePower();requested.add(stage);}}
             }
             if(stage==19 && observer() && mc.player.getInventory().items.stream().filter(s->!s.isEmpty()).count()==1){clientResults.put("inventoryDropPacket",true);capture("faz-o-l-inventory");signal("observer-theft.ack","ok");}

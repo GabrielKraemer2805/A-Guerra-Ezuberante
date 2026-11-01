@@ -26,7 +26,7 @@ public final class BoulosEntity extends LulistaAllyEntity {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return createMobAttributes().add(Attributes.MAX_HEALTH, 60).add(Attributes.ATTACK_DAMAGE, 5).add(Attributes.ARMOR, 6)
+        return createMobAttributes().add(Attributes.MAX_HEALTH, 100).add(Attributes.ATTACK_DAMAGE, 5).add(Attributes.ARMOR, 6)
                 .add(Attributes.KNOCKBACK_RESISTANCE, .6).add(Attributes.MOVEMENT_SPEED, .23).add(Attributes.FOLLOW_RANGE, 16);
     }
 
@@ -50,4 +50,5 @@ public final class BoulosEntity extends LulistaAllyEntity {
         if (!isAlive() || isSpeaking() || roll >= ModConfig.BOULOS_PO_CHANCE.get()) { return false; }
         return musicSession().playTrack(0);
     }
+    @Override protected double configuredHealth() { return io.github.omarflk.guerraezuberante.config.ModConfig.BOULOS_HEALTH.get(); }
 }

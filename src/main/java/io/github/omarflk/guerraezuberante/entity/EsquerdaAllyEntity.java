@@ -1,5 +1,6 @@
 package io.github.omarflk.guerraezuberante.entity;
 
+import io.github.omarflk.guerraezuberante.faction.CastPose;
 import io.github.omarflk.guerraezuberante.faction.Faction;
 import io.github.omarflk.guerraezuberante.registry.ModSounds;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -14,12 +15,12 @@ import java.util.List;
 
 /**
  * Jones Manoel's allies (Tabata Amaral, Marina Silva, Ciro Gomes): they defend the Esquerda Independente village and
- * fight with their fists. Their powers show the "cast" pose for {@link #CAST_LENGTH} ticks, synchronised by the server.
+ * fight with their fists. Each power strikes its own {@link CastPose} (the same gestures as the players), synchronised
+ * by the server.
  */
-public abstract class EsquerdaAllyEntity extends VillageAllyEntity {
-    /** Length of the "cast" clip. */
-    public static final int CAST_LENGTH = 20;
+public abstract class EsquerdaAllyEntity extends VillageAllyEntity implements PosingCharacter {
     private static final EntityDataAccessor<Long> CAST_START = SynchedEntityData.defineId(EsquerdaAllyEntity.class, EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<Integer> CAST_POSE = SynchedEntityData.defineId(EsquerdaAllyEntity.class, EntityDataSerializers.INT);
 
     protected EsquerdaAllyEntity(EntityType<? extends EsquerdaAllyEntity> type, Level level) {
         super(type, level);
@@ -33,12 +34,15 @@ public abstract class EsquerdaAllyEntity extends VillageAllyEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(CAST_START, -1000L);
+        entityData.define(CAST_POSE, 0);
     }
 
-    public float castAge(float partialTick) { return level().getGameTime() - entityData.get(CAST_START) + partialTick; }
-    public long castToken() { return entityData.get(CAST_START); }
+    @Override public float castAge(float partialTick) { return level().getGameTime() - entityData.get(CAST_START) + partialTick; }
+    @Override public long castToken() { return entityData.get(CAST_START); }
+    @Override public CastPose castPose() { return CastPose.byOrdinal(entityData.get(CAST_POSE)).orElse(CastPose.MANIFESTANDO); }
 
-    protected void startCastPose() {
+    protected void startCastPose(CastPose pose) {
+        entityData.set(CAST_POSE, pose.ordinal());
         entityData.set(CAST_START, level().getGameTime());
     }
 }

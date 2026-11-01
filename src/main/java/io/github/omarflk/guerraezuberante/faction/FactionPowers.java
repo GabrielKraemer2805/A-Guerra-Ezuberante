@@ -33,7 +33,7 @@ import java.util.UUID;
 
 /**
  * Faction powers (B key uses the one selected in the J profile), their cooldowns and the light passives.
- * Slot 0 is the starting power implemented here; slots 1 and 2 live in {@link ConvictionPowers}.
+ * Slot 0 is the starting power implemented here; the bought ones live in {@link ConvictionPowers}, and every\n * Esquerda Independente power in {@link EsquerdaPowers}.
  * Server authoritative: the client only asks to use the power. Cooldowns are stored per slot in Forge's
  * persisted player data so reconnecting or dying does not reset them.
  */
@@ -52,6 +52,9 @@ public final class FactionPowers {
 
     /** Base cooldown of a power slot, before Ideological Conviction shortens it. */
     public static int cooldown(Faction faction, int slot) {
+        if (faction == Faction.ESQUERDA) {
+            return EsquerdaPowers.cooldown(slot);
+        }
         if (slot > 0) {
             return ConvictionPowers.cooldown(faction, slot);
         }
@@ -59,7 +62,7 @@ public final class FactionPowers {
             case LULISTA -> ModConfig.BEAN_VOLLEY_COOLDOWN.get();
             case BOLSONARISTA -> ModConfig.PLAYER_FISSURE_COOLDOWN.get();
             case MISSAO -> ModConfig.PLAYER_TROOPS_COOLDOWN.get();
-            case ESQUERDA -> ModConfig.GROUP_HEAL_COOLDOWN.get();
+            case ESQUERDA -> ModConfig.PROTEST_COOLDOWN.get();
             case DIREITA -> ModConfig.DASH_COOLDOWN.get();
             case CENTRO -> ModConfig.STANCE_COOLDOWN.get();
         };
@@ -138,11 +141,12 @@ public final class FactionPowers {
             player.displayClientMessage(Component.translatable("power.guerra_ezuberante.cooldown", power, (remaining + 19) / 20), true);
             return false;
         }
-        boolean fired = slot > 0 ? ConvictionPowers.fire(player, faction.get(), slot) : switch (faction.get()) {
+        boolean fired = faction.get() == Faction.ESQUERDA ? EsquerdaPowers.fire(player, slot)
+                : slot > 0 ? ConvictionPowers.fire(player, faction.get(), slot) : switch (faction.get()) {
             case LULISTA -> beanVolley(player);
             case BOLSONARISTA -> rachadinha(player);
             case MISSAO -> ukrainianArmy(player);
-            case ESQUERDA -> groupHeal(player);
+            case ESQUERDA -> false;
             case DIREITA -> dash(player);
             case CENTRO -> switchStance(player);
         };
@@ -187,20 +191,6 @@ public final class FactionPowers {
             return false;
         }
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.SUMMON.get(), SoundSource.PLAYERS, 1, 1);
-        return true;
-    }
-
-    private static boolean groupHeal(ServerPlayer player) {
-        double radius = ModConfig.GROUP_HEAL_RADIUS.get();
-        var targets = new java.util.LinkedHashSet<Player>();
-        targets.add(player);
-        targets.addAll(player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius),
-                other -> other.isAlive() && !other.isSpectator() && other.distanceToSqr(player) <= radius * radius));
-        for (Player target : targets) {
-            target.addEffect(new MobEffectInstance(MobEffects.REGENERATION, (int) Math.round(ModConfig.GROUP_HEAL_TICKS.get() * Progression.powerScale(player, 0)), 1), player);
-            player.serverLevel().sendParticles(ParticleTypes.HEART, target.getX(), target.getY() + 2.1, target.getZ(), 4, .4, .2, .4, 0);
-        }
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, .8F, 1.4F);
         return true;
     }
 

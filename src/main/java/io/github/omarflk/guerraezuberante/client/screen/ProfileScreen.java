@@ -17,7 +17,6 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,12 +32,11 @@ public final class ProfileScreen extends Screen {
     /** Compact enough for 240 scaled pixels of height (720p window with automatic GUI scale). */
     private static final int ROW = 16, CONTENT = 44, PANEL_HEIGHT = CONTENT + 178, NODE_HEIGHT = 18, NODE_ROW = 24;
     private enum Tab { PERFIL, ARVORE }
-    /** Tree layout: row and column (0 left, 1 centre, 2 right). The free first power is drawn as the root at row 0. */
-    private record Cell(Node node, int row, int column) {}
-    private static final List<Cell> CELLS = List.of(
-            new Cell(Node.P1_POTENCIA, 1, 0), new Cell(Node.P1_RECARGA, 1, 2), new Cell(Node.P2, 2, 1),
-            new Cell(Node.P2_POTENCIA, 3, 0), new Cell(Node.P2_RECARGA, 3, 2), new Cell(Node.P3, 4, 1), new Cell(Node.CLASSE, 4, 2),
-            new Cell(Node.P3_POTENCIA, 5, 0), new Cell(Node.P3_RECARGA, 5, 2));
+    /** Screen rectangle of a tree node (height {@link #NODE_HEIGHT}). */
+    private record Box(int x, int y, int w) {
+        boolean contains(double mouseX, double mouseY) { return mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + NODE_HEIGHT; }
+        int centerX() { return x + w / 2; }
+    }
     private static Tab tab = Tab.PERFIL;
     private int left, top, panelWidth, panelHeight;
     private Faction faction;
@@ -60,7 +58,8 @@ public final class ProfileScreen extends Screen {
     @Override
     protected void init() {
         faction = minecraft.player == null ? null : Factions.of(minecraft.player).orElse(null);
-        panelWidth = Math.min(width - 16, 300);
+        // The Esquerda tree has four branches side by side.
+        panelWidth = Math.min(width - 16, faction == null || !SkillTree.wide(faction) ? 300 : SkillTree.columns(faction) > 4 ? 440 : 380);
         panelHeight = faction == null ? 90 : PANEL_HEIGHT;
         left = (width - panelWidth) / 2;
         top = Math.max(4, (height - panelHeight) / 2);
@@ -240,20 +239,28 @@ public final class ProfileScreen extends Screen {
 
     // --- Skill tree -------------------------------------------------------------------------------------------------
 
-    private int columnLeft(int column) {
-        int inner = panelWidth - 20, gap = 6, center = Math.round(inner * .42F), side = (inner - center - 2 * gap) / 2;
-        return left + 10 + switch (column) { case 0 -> 0; case 1 -> side + gap; default -> side + gap + center + gap; };
+    /** The Esquerda tree has 4 equal columns; the others 3, with a wide centre column for the powers. */
+    private boolean wideTree() { return SkillTree.wide(faction); }
+
+    private Box box(int row, int column) {
+        int inner = panelWidth - 20, gap = 6, y = treeTop() + row * NODE_ROW;
+        if (wideTree()) {
+            int columns = SkillTree.columns(faction), w = (inner - (columns - 1) * gap) / columns;
+            return new Box(left + 10 + column * (w + gap), y, w);
+        }
+        int center = Math.round(inner * .42F), side = (inner - center - 2 * gap) / 2;
+        int x = left + 10 + switch (column) { case 0 -> 0; case 1 -> side + gap; default -> side + gap + center + gap; };
+        return new Box(x, y, column == 1 ? center : side);
     }
 
-    private int columnWidth(int column) {
-        int inner = panelWidth - 20, gap = 6, center = Math.round(inner * .42F), side = (inner - center - 2 * gap) / 2;
-        return column == 1 ? center : side;
-    }
+    private Box box(Node node) { return box(node.row(), node.column()); }
 
-    private int rowTop(int row) { return treeTop() + row * NODE_ROW; }
-
-    private static Cell cell(Node node) {
-        return CELLS.stream().filter(value -> value.node() == node).findFirst().orElseThrow();
+    /** The free first power: centre column, or the two middle columns of the Esquerda tree. */
+    private Box rootBox() {
+        Box first = box(0, 1);
+        if (!wideTree()) { return first; }
+        Box second = box(0, SkillTree.columns(faction) - 2);
+        return new Box(first.x(), first.y(), second.x() + second.w() - first.x());
     }
 
     private static boolean requirementsMet(Node node) {
@@ -267,15 +274,25 @@ public final class ProfileScreen extends Screen {
         return !ProgressionClient.owns(node) && requirementsMet(node) && ProgressionClient.treePoints() >= node.cost();
     }
 
-    /** Elbow line from the bottom of one cell to the top of another; gold once the upper one is owned. */
-    private void connect(GuiGraphics graphics, int fromRow, int fromColumn, int toRow, int toColumn, boolean lit) {
+    /** Elbow line from the bottom of one node to the top of another; gold once the upper one is owned. */
+    private void connect(GuiGraphics graphics, Box from, Box to, boolean lit) {
         int color = lit ? GOLD : LINE;
-        int x1 = columnLeft(fromColumn) + columnWidth(fromColumn) / 2, y1 = rowTop(fromRow) + NODE_HEIGHT;
-        int x2 = columnLeft(toColumn) + columnWidth(toColumn) / 2, y2 = rowTop(toRow);
+        int x1 = from.centerX(), y1 = from.y() + NODE_HEIGHT, x2 = to.centerX(), y2 = to.y();
         int mid = (y1 + y2) / 2;
         graphics.fill(x1, y1, x1 + 1, mid + 1, color);
         graphics.fill(Math.min(x1, x2), mid, Math.max(x1, x2) + 1, mid + 1, color);
         graphics.fill(x2, mid, x2 + 1, y2, color);
+    }
+
+    /**
+     * Edges drawn for a node. With several parents, only the one in the same column is drawn when there is one, to keep
+     * the drawing readable (Classe+ and Manifestando hang from one side); the Esquerda Classe+ has no edge (see tooltip).
+     */
+    private static List<Node> drawnParents(Node node) {
+        if (node.kind() == SkillTree.Kind.CLASSE && node.tree() != SkillTree.Tree.GENERIC) { return List.of(); }
+        List<Node> parents = List.of(node.requires());
+        List<Node> sameColumn = parents.stream().filter(parent -> parent.column() == node.column()).toList();
+        return parents.size() > 1 && !sameColumn.isEmpty() ? sameColumn : parents;
     }
 
     private Component renderTree(GuiGraphics graphics, int mouseX, int mouseY) {
@@ -283,41 +300,38 @@ public final class ProfileScreen extends Screen {
         int y0 = top + CONTENT;
         graphics.drawString(font, Component.translatable("gui.guerra_ezuberante.tree.points", ProgressionClient.treePoints()), left + 10, y0,
                 ProgressionClient.treePoints() > 0 ? GREEN : MUTED);
-        // Edges first, so nodes are drawn over them.
-        connect(graphics, 0, 1, 1, 0, true);
-        connect(graphics, 0, 1, 1, 2, true);
-        for (Cell child : CELLS) {
-            for (Node parent : child.node().requires()) {
-                Cell from = cell(parent);
-                // Classe aprimorada hangs from the right branch only, to keep the drawing readable.
-                if (child.node() == Node.CLASSE && from.column() != 2) { continue; }
-                connect(graphics, from.row(), from.column(), child.row(), child.column(), ProgressionClient.owns(parent));
+        List<Node> nodes = SkillTree.nodes(faction);
+        Box root = rootBox();
+        // Edges first, so nodes are drawn over them. Nodes without requirements below the root hang from it.
+        for (Node child : nodes) {
+            if (child.requires().length == 0) {
+                if (child.row() > 0) { connect(graphics, root, box(child), true); }
+                continue;
             }
+            for (Node parent : drawnParents(child)) { connect(graphics, box(parent), box(child), ProgressionClient.owns(parent)); }
         }
         int selected = ProgressionClient.selected();
-        if (drawNode(graphics, 0, 1, faction.powerName(0), true, false, selected == 0, 0, mouseX, mouseY)) {
+        if (drawNode(graphics, root, faction.powerName(0), true, false, selected == 0, 0, mouseX, mouseY)) {
             tooltip = powerTooltip(0, true);
         }
-        for (Cell cell : CELLS) {
-            Node node = cell.node();
+        for (Node node : nodes) {
             boolean owned = ProgressionClient.owns(node);
             boolean isPower = node.kind() == SkillTree.Kind.POWER;
-            if (drawNode(graphics, cell.row(), cell.column(), node.displayName(faction), owned, canBuy(node),
+            if (drawNode(graphics, box(node), node.displayName(faction), owned, canBuy(node),
                     isPower && owned && selected == node.slot(), owned ? 0 : node.cost(), mouseX, mouseY)) {
                 tooltip = isPower ? powerTooltip(node.slot(), owned) : upgradeTooltip(node, owned);
             }
         }
-        int slot = ProgressionClient.selected();
         graphics.drawString(font, Component.translatable("gui.guerra_ezuberante.tree.selected", ModKeyBindings.USE_POWER.getTranslatedKeyMessage(),
-                faction.powerName(slot), seconds(ProgressionClient.remaining(slot))), left + 10, rowTop(6) + 2, TEXT);
+                faction.powerName(selected), seconds(ProgressionClient.remaining(selected))), left + 10, treeTop() + 6 * NODE_ROW + 2, TEXT);
         return tooltip;
     }
 
     /** Draws one node; returns true when the mouse is over it. */
-    private boolean drawNode(GuiGraphics graphics, int row, int column, Component label, boolean owned, boolean buyable,
+    private boolean drawNode(GuiGraphics graphics, Box box, Component label, boolean owned, boolean buyable,
                              boolean selected, int cost, int mouseX, int mouseY) {
-        int x = columnLeft(column), y = rowTop(row), w = columnWidth(column);
-        boolean hover = mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + NODE_HEIGHT;
+        int x = box.x(), y = box.y(), w = box.w();
+        boolean hover = box.contains(mouseX, mouseY);
         int border = selected ? 0xFFFFE08A : owned ? GOLD : buyable ? GREEN : LINE;
         int fill = selected ? 0xFF5A4A1A : owned ? 0xFF3B3216 : hover && buyable ? 0xFF1F3326 : 0xFF22252C;
         graphics.fill(x, y, x + w, y + NODE_HEIGHT, border);
@@ -326,10 +340,17 @@ public final class ProfileScreen extends Screen {
         String badge = cost > 0 ? String.valueOf(cost) : selected ? "B" : "";
         float scale = .6F;
         int badgeWidth = badge.isEmpty() ? 0 : Math.round(font.width(badge) * scale) + 3;
-        String text = font.plainSubstrByWidth(label.getString(), Math.max(10, w - 6 - badgeWidth));
+        int room = Math.max(10, w - 6 - badgeWidth);
         int color = owned ? 0xFFFFFFFF : buyable ? TEXT : 0xFF6B7280;
-        graphics.drawCenteredString(font, Component.literal(text).withStyle(owned ? label.getStyle() : label.getStyle().withColor(ChatFormatting.GRAY)),
-                x + (w - badgeWidth) / 2, y + 5, color);
+        var style = owned ? label.getStyle() : label.getStyle().withColor(ChatFormatting.GRAY);
+        // Long names shrink down to 70% before being cut, so the narrow Esquerda columns stay readable.
+        float textScale = Math.max(.7F, Math.min(1F, room / (float) Math.max(1, font.width(label))));
+        String text = font.plainSubstrByWidth(label.getString(), Math.round(room / textScale));
+        graphics.pose().pushPose();
+        graphics.pose().translate(x + (w - badgeWidth) / 2F, y + NODE_HEIGHT / 2F, 0);
+        graphics.pose().scale(textScale, textScale, 1);
+        graphics.drawCenteredString(font, Component.literal(text).withStyle(style), 0, -4, color);
+        graphics.pose().popPose();
         if (!badge.isEmpty()) {
             graphics.pose().pushPose();
             graphics.pose().scale(scale, scale, 1);
@@ -346,16 +367,15 @@ public final class ProfileScreen extends Screen {
             return text.append(Component.translatable(slot == ProgressionClient.selected() ? "gui.guerra_ezuberante.tree.is_selected"
                     : "gui.guerra_ezuberante.tree.click_select").withStyle(ChatFormatting.YELLOW));
         }
-        Node node = slot == 1 ? Node.P2 : Node.P3;
-        return text.append(buyState(node));
+        return SkillTree.powerNode(faction, slot).map(node -> text.append(buyState(node))).orElse(text);
     }
 
     private Component upgradeTooltip(Node node, boolean owned) {
         Component description = switch (node.kind()) {
             case POTENCIA -> Component.translatable("tree.guerra_ezuberante.potencia.desc",
-                    Math.round(ModConfig.NODE_POWER_BONUS.get() * 100), faction.powerName(node.slot()));
+                    Math.round(ModConfig.NODE_POWER_BONUS.get() * 100), node.powerNames(faction));
             case RECARGA -> Component.translatable("tree.guerra_ezuberante.recarga.desc",
-                    Math.round(ModConfig.NODE_COOLDOWN_REDUCTION.get() * 100), faction.powerName(node.slot()));
+                    Math.round(ModConfig.NODE_COOLDOWN_REDUCTION.get() * 100), node.powerNames(faction));
             default -> Component.translatable("tree.guerra_ezuberante.classe.desc", Math.round(ModConfig.NODE_CLASS_COOLDOWN_REDUCTION.get() * 100));
         };
         var text = Component.empty().append(node.displayName(faction).copy().withStyle(ChatFormatting.GOLD)).append("\n").append(description).append("\n\n");
@@ -364,9 +384,12 @@ public final class ProfileScreen extends Screen {
 
     private Component buyState(Node node) {
         if (!requirementsMet(node)) {
-            List<Component> names = new ArrayList<>();
-            for (Node required : node.requires()) { names.add(required.displayName(faction)); }
-            Component list = names.size() == 1 ? names.get(0) : Component.translatable("gui.guerra_ezuberante.tree.or", names.get(0), names.get(1));
+            Component list = Component.empty();
+            Node[] requires = node.requires();
+            for (int index = 0; index < requires.length; index++) {
+                Component name = requires[index].displayName(faction);
+                list = index == 0 ? name : Component.translatable("gui.guerra_ezuberante.tree.or", list, name);
+            }
             return Component.translatable("gui.guerra_ezuberante.tree.requires", node.cost(), list).withStyle(ChatFormatting.RED);
         }
         if (ProgressionClient.treePoints() < node.cost()) {
@@ -383,13 +406,12 @@ public final class ProfileScreen extends Screen {
         if (faction == null || tab != Tab.ARVORE || button != 0) {
             return false;
         }
-        if (inside(mouseX, mouseY, 0, 1)) {
+        if (rootBox().contains(mouseX, mouseY)) {
             FactionNetwork.selectPower(0);
             return true;
         }
-        for (Cell cell : CELLS) {
-            if (!inside(mouseX, mouseY, cell.row(), cell.column())) { continue; }
-            Node node = cell.node();
+        for (Node node : SkillTree.nodes(faction)) {
+            if (!box(node).contains(mouseX, mouseY)) { continue; }
             if (ProgressionClient.owns(node)) {
                 if (node.kind() == SkillTree.Kind.POWER) { FactionNetwork.selectPower(node.slot()); }
             } else if (canBuy(node)) {
@@ -399,12 +421,6 @@ public final class ProfileScreen extends Screen {
         }
         return false;
     }
-
-    private boolean inside(double mouseX, double mouseY, int row, int column) {
-        int x = columnLeft(column), y = rowTop(row);
-        return mouseX >= x && mouseX < x + columnWidth(column) && mouseY >= y && mouseY < y + NODE_HEIGHT;
-    }
-
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (ModKeyBindings.OPEN_PROFILE.matches(keyCode, scanCode)) {

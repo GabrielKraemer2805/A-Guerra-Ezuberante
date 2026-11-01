@@ -93,13 +93,13 @@ public final class BossRiftGameTests {
     }
     @GameTest(template="empty",batch="boss_config")
     public static void oldDefaultsUpgradeButCustomBalanceSurvives(GameTestHelper h){
-        double l=ModConfig.LULA_HEALTH.get(),j=ModConfig.JAIR_HEALTH.get(),d=ModConfig.FISSURE_DAMAGE.get(),k=ModConfig.FISSURE_KNOCKBACK.get();int cd=ModConfig.FISSURE_COOLDOWN.get(),rev=ModConfig.BALANCE_REVISION.get();
+        double l=ModConfig.LULA_HEALTH.get(),j=ModConfig.JAIR_HEALTH.get(),d=ModConfig.FISSURE_DAMAGE.get(),k=ModConfig.FISSURE_KNOCKBACK.get();int cd=ModConfig.FISSURE_COOLDOWN.get(),rev=ModConfig.BALANCE_REVISION.get(),max=ModConfig.MAX_LEVEL.get();
         try{
-            ModConfig.BALANCE_REVISION.set(0);ModConfig.LULA_HEALTH.set(30D);ModConfig.JAIR_HEALTH.set(30D);ModConfig.FISSURE_DAMAGE.set(6D);ModConfig.FISSURE_KNOCKBACK.set(.35D);ModConfig.FISSURE_COOLDOWN.set(240);
-            ConfigMigrations.upgradeLegacyDefaults();h.assertTrue(ModConfig.LULA_HEALTH.get()==300 && ModConfig.JAIR_HEALTH.get()==300 && ModConfig.FISSURE_DAMAGE.get()==10 && ModConfig.FISSURE_COOLDOWN.get()==120 && ModConfig.FISSURE_KNOCKBACK.get()==.65,"Old defaults not upgraded");
-            ModConfig.BALANCE_REVISION.set(0);ModConfig.LULA_HEALTH.set(420D);ModConfig.JAIR_HEALTH.set(550D);ModConfig.FISSURE_DAMAGE.set(14D);ModConfig.FISSURE_COOLDOWN.set(400);ConfigMigrations.upgradeLegacyDefaults();ConfigMigrations.upgradeLegacyDefaults();
-            h.assertTrue(ModConfig.LULA_HEALTH.get()==420 && ModConfig.JAIR_HEALTH.get()==550 && ModConfig.FISSURE_DAMAGE.get()==14 && ModConfig.FISSURE_COOLDOWN.get()==400,"Custom balance overwritten");
-        }finally{ModConfig.LULA_HEALTH.set(l);ModConfig.JAIR_HEALTH.set(j);ModConfig.FISSURE_DAMAGE.set(d);ModConfig.FISSURE_KNOCKBACK.set(k);ModConfig.FISSURE_COOLDOWN.set(cd);ModConfig.BALANCE_REVISION.set(rev);}
+            ModConfig.BALANCE_REVISION.set(0);ModConfig.LULA_HEALTH.set(30D);ModConfig.JAIR_HEALTH.set(30D);ModConfig.FISSURE_DAMAGE.set(6D);ModConfig.FISSURE_KNOCKBACK.set(.35D);ModConfig.FISSURE_COOLDOWN.set(240);ModConfig.MAX_LEVEL.set(30);
+            ConfigMigrations.upgradeLegacyDefaults();h.assertTrue(ModConfig.MAX_LEVEL.get()==100 && ModConfig.BALANCE_REVISION.get()==4 && ModConfig.LULA_HEALTH.get()==300 && ModConfig.JAIR_HEALTH.get()==300 && ModConfig.FISSURE_DAMAGE.get()==10 && ModConfig.FISSURE_COOLDOWN.get()==120 && ModConfig.FISSURE_KNOCKBACK.get()==.65,"Old defaults not upgraded");
+            ModConfig.BALANCE_REVISION.set(0);ModConfig.LULA_HEALTH.set(420D);ModConfig.JAIR_HEALTH.set(550D);ModConfig.FISSURE_DAMAGE.set(14D);ModConfig.FISSURE_COOLDOWN.set(400);ModConfig.MAX_LEVEL.set(45);ConfigMigrations.upgradeLegacyDefaults();ConfigMigrations.upgradeLegacyDefaults();
+            h.assertTrue(ModConfig.LULA_HEALTH.get()==420 && ModConfig.JAIR_HEALTH.get()==550 && ModConfig.FISSURE_DAMAGE.get()==14 && ModConfig.FISSURE_COOLDOWN.get()==400 && ModConfig.MAX_LEVEL.get()==45,"Custom balance overwritten");
+        }finally{ModConfig.LULA_HEALTH.set(l);ModConfig.JAIR_HEALTH.set(j);ModConfig.FISSURE_DAMAGE.set(d);ModConfig.FISSURE_KNOCKBACK.set(k);ModConfig.FISSURE_COOLDOWN.set(cd);ModConfig.BALANCE_REVISION.set(rev);ModConfig.MAX_LEVEL.set(max);}
         h.succeed();
     }
 }

@@ -24,9 +24,10 @@ public final class Petistas {
     /**
      * Runs from the village's afterPlace, once per chunk. In normal generation the house villagers are still saved
      * entity data of the chunk being generated, so only their villager type is changed; when a structure is placed
-     * into a loaded world (/place, GameTests) they are already real entities.
+     * into a loaded world (/place, GameTests) they are already real entities, searched in the whole village: a house on a
+     * chunk border can drop its villager into a chunk that was already handled.
      */
-    static void convertVillagers(WorldGenLevel level, BoundingBox chunkBox, ChunkPos chunk, VillagerType villagerType) {
+    static void convertVillagers(WorldGenLevel level, BoundingBox chunkBox, BoundingBox village, ChunkPos chunk, VillagerType villagerType) {
         String type = BuiltInRegistries.VILLAGER_TYPE.getKey(villagerType).toString();
         if (level.getChunk(chunk.x, chunk.z) instanceof ProtoChunk proto) {
             for (CompoundTag entity : proto.getEntities()) {
@@ -38,7 +39,7 @@ public final class Petistas {
             }
         }
         if (level instanceof net.minecraft.server.level.ServerLevel) {
-            level.getEntitiesOfClass(Villager.class, AABB.of(chunkBox))
+            level.getEntitiesOfClass(Villager.class, AABB.of(village).inflate(2))
                     .forEach(villager -> villager.setVillagerData(villager.getVillagerData().setType(villagerType)));
         }
     }

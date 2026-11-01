@@ -57,21 +57,29 @@ public final class FactionRivalryGameTests {
         return entity;
     }
 
-    /** Two characters 6 blocks apart must pick each other as target within 40 ticks. */
+    /**
+     * Two characters 6 blocks apart must pick each other as target. Checked every tick until 90 instead of once at 40: the
+     * duels of the batch run side by side, and a character that first locked onto a neighbouring duel needs a moment to
+     * come back after that duel ends (the failure used to move from one pair to another between runs).
+     */
     private static void duel(GameTestHelper h, EntityType<? extends RetaliatingCharacterEntity> first,
                              EntityType<? extends RetaliatingCharacterEntity> second) {
         var p = arena(h);
         RetaliatingCharacterEntity a = spawn(h, first, p);
         RetaliatingCharacterEntity b = spawn(h, second, p.add(0, 0, 6));
-        h.runAfterDelay(40, () -> {
-            try {
-                h.assertTrue(a.isRival(b) && b.isRival(a) && !a.isAlliedTo(b), "Not rivals: " + a.faction() + " x " + b.faction());
-                h.assertTrue(a.getTarget() == b && b.getTarget() == a, first.getDescriptionId() + " -> " + a.getTarget()
-                        + ", " + second.getDescriptionId() + " -> " + b.getTarget() + " alive=" + b.isAlive() + " hp=" + b.getHealth()
-                        + " locked=" + b.isActionLocked() + " sees=" + b.getSensing().hasLineOfSight(a) + " lastHurtBy=" + b.getLastHurtByMob()
-                        + " dist=" + Math.sqrt(a.distanceToSqr(b)));
-            } finally { a.discard(); b.discard(); }
-            h.succeed();
+        h.assertTrue(a.isRival(b) && b.isRival(a) && !a.isAlliedTo(b), "Not rivals: " + a.faction() + " x " + b.faction());
+        int[] age = new int[1];
+        h.onEachTick(() -> {
+            if (a.getTarget() == b && b.getTarget() == a) {
+                a.discard(); b.discard();
+                h.succeed();
+            } else if (++age[0] >= 90) {
+                String state = first.getDescriptionId() + " -> " + a.getTarget() + ", " + second.getDescriptionId() + " -> " + b.getTarget()
+                        + " alive=" + b.isAlive() + " hp=" + b.getHealth() + " locked=" + b.isActionLocked()
+                        + " sees=" + b.getSensing().hasLineOfSight(a) + " lastHurtBy=" + b.getLastHurtByMob() + " dist=" + Math.sqrt(a.distanceToSqr(b));
+                a.discard(); b.discard();
+                h.fail(state);
+            }
         });
     }
 

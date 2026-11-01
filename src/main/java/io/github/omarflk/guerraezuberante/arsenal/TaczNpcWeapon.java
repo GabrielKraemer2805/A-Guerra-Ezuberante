@@ -14,6 +14,8 @@ import net.minecraftforge.fml.LogicalSide;
 public final class TaczNpcWeapon {
     public static boolean equipped(LivingEntity owner) {
         var gun=IGun.getIGunOrNull(owner.getMainHandItem());
+        // Tower guards carry any of the five weapons.
+        if(owner instanceof io.github.omarflk.guerraezuberante.entity.TowerGuardEntity)return gun!=null;
         var expected=owner instanceof io.github.omarflk.guerraezuberante.entity.JairBolsonaroEntity?Arsenal.GLOCK:Arsenal.AKM;
         return gun!=null && gun.getGunId(owner.getMainHandItem()).equals(expected.gunId());
     }
@@ -24,6 +26,15 @@ public final class TaczNpcWeapon {
         // Normal native stack. Unlimited ammo is a property of the Renan operator, never the item.
         IGun.getIGunOrNull(stack).setFireMode(stack,FireMode.SEMI);
         owner.setItemSlot(EquipmentSlot.MAINHAND,stack);if(owner instanceof net.minecraft.world.entity.Mob mob)mob.setDropChance(EquipmentSlot.MAINHAND,0);
+        IGunOperator.fromLivingEntity(owner).draw(owner::getMainHandItem);
+    }
+    /** A tower guard's weapon, picked once by index among the five kit weapons. */
+    public static void equipGuard(io.github.omarflk.guerraezuberante.entity.TowerGuardEntity owner,int weapon) {
+        if(equipped(owner))return;
+        ItemStack stack=Arsenal.createGun(Arsenal.WEAPONS.get(Math.floorMod(weapon,Arsenal.WEAPONS.size())));
+        if(stack.isEmpty())return;
+        IGun.getIGunOrNull(stack).setFireMode(stack,FireMode.SEMI);
+        owner.setItemSlot(EquipmentSlot.MAINHAND,stack);owner.setDropChance(EquipmentSlot.MAINHAND,0);
         IGunOperator.fromLivingEntity(owner).draw(owner::getMainHandItem);
     }
     public static void prepare(LivingEntity owner,boolean aim) {

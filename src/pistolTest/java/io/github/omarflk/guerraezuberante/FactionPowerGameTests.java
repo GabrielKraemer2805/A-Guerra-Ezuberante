@@ -88,9 +88,8 @@ public final class FactionPowerGameTests {
     @GameTest(template="empty") public static void cooldownBlocksReuseAndRefusalsAreFree(GameTestHelper h) {
         var player = fake(h, "CooldownQA");
         h.assertTrue(!FactionPowers.use(player), "Power worked without a faction");
-        Factions.assign(player, Faction.ESQUERDA);
-        h.assertTrue(FactionPowers.use(player) && player.hasEffect(MobEffects.REGENERATION)
-                && player.getEffect(MobEffects.REGENERATION).getAmplifier() == 1, "Group heal did not give Regeneration II");
+        Factions.assign(player, Faction.CENTRO);
+        h.assertTrue(FactionPowers.use(player) && FactionPowers.mobilityStance(player), "Adaptação did not switch the stance");
         h.assertTrue(!FactionPowers.use(player) && FactionPowers.remainingCooldown(player) > 0, "Cooldown did not block reuse");
         FactionPowers.resetCooldown(player);
         Factions.assign(player, Faction.BOLSONARISTA);

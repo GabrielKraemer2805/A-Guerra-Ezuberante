@@ -38,7 +38,7 @@ public final class CombatGameTests {
         cow(helper, 6);
         helper.runAfterDelay(40, () -> {
             helper.assertTrue(renan.getTarget() == null && arthur.getTarget() == null, "Unprovoked targeting");
-            helper.assertTrue(renan.getHealth() == 30 && arthur.getHealth() == 32, "Unprovoked damage");
+            helper.assertTrue(renan.getHealth() == 300 && arthur.getHealth() == 80, "Unprovoked damage");
             helper.succeed();
         });
     }
@@ -57,7 +57,7 @@ public final class CombatGameTests {
         arthur.hurt(helper.getLevel().damageSources().generic(), 3);
         var restored = ModEntities.ARTHUR_DO_VAL.get().create(helper.getLevel());
         restored.load(arthur.saveWithoutId(new CompoundTag()));
-        helper.assertTrue(restored.getHealth() == 29 && restored.isPersistenceRequired(), "Arthur save/load failed");
+        helper.assertTrue(restored.getHealth() == 77 && restored.isPersistenceRequired(), "Arthur save/load failed");
         helper.succeed();
     }
 

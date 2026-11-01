@@ -38,6 +38,7 @@ public final class ArthurDoValEntity extends RetaliatingCharacterEntity {
     public ArthurDoValEntity(EntityType<? extends ArthurDoValEntity> type, Level level, boolean summoner) {
         super(type, level);
         this.summoner = summoner;
+        if (!level.isClientSide) { applyConfiguredHealth(); }
         if (!summoner) {
             setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND,
                     new net.minecraft.world.item.ItemStack(io.github.omarflk.guerraezuberante.registry.ModItems.UKRAINIAN_SWORD.get()));
@@ -56,7 +57,7 @@ public final class ArthurDoValEntity extends RetaliatingCharacterEntity {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return createMobAttributes().add(Attributes.MAX_HEALTH, 32.0D)
+        return createMobAttributes().add(Attributes.MAX_HEALTH, 80.0D)
                 .add(Attributes.ATTACK_DAMAGE, 5.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.24D).add(Attributes.FOLLOW_RANGE, 20.0D);
     }
@@ -126,6 +127,8 @@ public final class ArthurDoValEntity extends RetaliatingCharacterEntity {
             summonSoundCooldown = ModSounds.ARTHUR_SUMMON.cooldownTicks();
         }
     }
+
+    @Override protected double configuredHealth() { return io.github.omarflk.guerraezuberante.config.ModConfig.ARTHUR_HEALTH.get(); }
 
     @Override
     public void tick() {

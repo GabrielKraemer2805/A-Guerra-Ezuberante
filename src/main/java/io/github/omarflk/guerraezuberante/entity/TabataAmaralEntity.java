@@ -42,7 +42,7 @@ public final class TabataAmaralEntity extends EsquerdaAllyEntity {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return createMobAttributes().add(Attributes.MAX_HEALTH, 30).add(Attributes.ATTACK_DAMAGE, 3)
+        return createMobAttributes().add(Attributes.MAX_HEALTH, 80).add(Attributes.ATTACK_DAMAGE, 3)
                 .add(Attributes.MOVEMENT_SPEED, .26).add(Attributes.FOLLOW_RANGE, 16);
     }
 
@@ -55,6 +55,8 @@ public final class TabataAmaralEntity extends EsquerdaAllyEntity {
         return entity instanceof Mob && !(entity instanceof SpecialDeathEntity) && !(entity instanceof net.minecraft.world.entity.monster.Creeper)
                 && !(entity instanceof net.minecraft.world.entity.boss.wither.WitherBoss) && !hasTurned(entity);
     }
+
+    @Override protected double configuredHealth() { return io.github.omarflk.guerraezuberante.config.ModConfig.TABATA_HEALTH.get(); }
 
     @Override
     public void tick() {
@@ -81,11 +83,11 @@ public final class TabataAmaralEntity extends EsquerdaAllyEntity {
         turned.put(mob.getUUID(), level().getGameTime() + ModConfig.TABATA_TURNCOAT_TICKS.get());
         mob.setTarget(victim);
         if (getTarget() == mob) { setTarget(null); }
-        server.sendParticles(ParticleTypes.HAPPY_VILLAGER, mob.getX(), mob.getEyeY() + .4, mob.getZ(), 12, .4, .3, .4, 0);
         server.sendParticles(ParticleTypes.NOTE, getX(), getEyeY() + .6, getZ(), 3, .3, .1, .3, 0);
+        io.github.omarflk.guerraezuberante.faction.PowerEffects.virarOVoto(this, mob);
         playSound(SoundEvents.VILLAGER_YES, 1, 1.4F);
         playSound(SoundEvents.ENCHANTMENT_TABLE_USE, .8F, 1.4F);
-        startCastPose();
+        startCastPose(io.github.omarflk.guerraezuberante.faction.CastPose.VIRAR_O_VOTO);
         nextTurncoat = level().getGameTime() + ModConfig.TABATA_TURNCOAT_COOLDOWN.get();
         noteCombatProgress();
         return mob;
@@ -140,9 +142,8 @@ public final class TabataAmaralEntity extends EsquerdaAllyEntity {
     /** Voto de consciência. Public for GameTests. */
     public void conscienceVote() {
         setAbsorptionAmount(Math.max(getAbsorptionAmount(), ModConfig.TABATA_SHIELD_ABSORPTION.get().floatValue()));
-        if (level() instanceof ServerLevel server) {
-            server.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, getX(), getY() + 1, getZ(), 20, .4, .6, .4, .2);
-        }
+        io.github.omarflk.guerraezuberante.faction.PowerEffects.votoDeConsciencia(this);
+        startCastPose(io.github.omarflk.guerraezuberante.faction.CastPose.VOTO_DE_CONSCIENCIA);
         playSound(SoundEvents.ARMOR_EQUIP_GOLD, 1.2F, 1);
         nextShield = level().getGameTime() + ModConfig.TABATA_SHIELD_COOLDOWN.get();
     }

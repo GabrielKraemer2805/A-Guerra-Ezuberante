@@ -67,6 +67,15 @@ public final class GenerateLulaAssets {
         rot("left_arm",.9,k(0,-2,0,5),k(.1,14,0,10),k(.6,14,0,10),k(.9,-2,0,5));
         GenerateGeckoAssets.finish("lula_faz_o_l",.9,false);
         GenerateGeckoAssets.begin();
+        // Manifestação (0.019): both fists up and pumping, like the player striking Manifestando.
+        rot("body",1.5,k(0,4,0,0),k(1.5,4,0,0));
+        for(String side:List.of("right","left")){
+            int sign=side.equals("right")?1:-1;double phase=sign<0?1.6:0;
+            GenerateGeckoAssets.pose(side+"_arm",1.5,t->new double[]{-160+15*Math.sin(t*2*Math.PI*3+phase),0,20*sign});
+            GenerateGeckoAssets.pose(side+"_forearm",1.5,t->new double[]{-20-15*Math.sin(t*2*Math.PI*3+phase),0,0});
+        }
+        GenerateGeckoAssets.finish("lula_manifestacao",1.5,false);
+        GenerateGeckoAssets.begin();
         rot("body",.5,k(0,4,0,0),k(.1,-8,0,-5),k(.5,4,0,0));
         rot("head",.5,k(0,0,0,0),k(.1,-8,0,4),k(.5,0,0,0));
         GenerateGeckoAssets.finish("lula_hurt",.5,false);
@@ -100,5 +109,5 @@ public final class GenerateLulaAssets {
         GenerateGeckoAssets.write("models/item/semente_feijao.json",GenerateGeckoAssets.map("parent","minecraft:item/generated","textures",GenerateGeckoAssets.map("layer0","guerra_ezuberante:item/semente_feijao")));
         GenerateGeckoAssets.write("models/item/lula_spawn_egg.json",GenerateGeckoAssets.map("parent","minecraft:item/template_spawn_egg"));
     }
-    public static void main(String[] args)throws Exception{model();animate();bean();System.out.println("Generated Lula: 15 bones, original 64x64 UV, stepped belly, six clips and original 16x16 bean.");}
+    public static void main(String[] args)throws Exception{model();animate();bean();System.out.println("Generated Lula: 15 bones, original 64x64 UV, stepped belly, seven clips and original 16x16 bean.");}
 }

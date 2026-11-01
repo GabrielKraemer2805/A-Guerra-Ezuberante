@@ -44,7 +44,7 @@ public final class HaddadEntity extends LulistaAllyEntity {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return createMobAttributes().add(Attributes.MAX_HEALTH, 30).add(Attributes.ATTACK_DAMAGE, 3)
+        return createMobAttributes().add(Attributes.MAX_HEALTH, 80).add(Attributes.ATTACK_DAMAGE, 3)
                 .add(Attributes.MOVEMENT_SPEED, .25).add(Attributes.FOLLOW_RANGE, 16);
     }
 
@@ -113,6 +113,8 @@ public final class HaddadEntity extends LulistaAllyEntity {
             }
         });
     }
+
+    @Override protected double configuredHealth() { return io.github.omarflk.guerraezuberante.config.ModConfig.HADDAD_HEALTH.get(); }
 
     @Override
     public void tick() {

@@ -32,6 +32,18 @@ public final class ClientModEvents {
         event.registerEntityRenderer(ModEntities.PETISTA.get(), io.github.omarflk.guerraezuberante.client.renderer.PetistaRenderer::new);
         event.registerEntityRenderer(ModEntities.COMUNISTA.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.PetistaRenderer<>(c, io.github.omarflk.guerraezuberante.client.renderer.PetistaRenderer.COMUNISTAS));
         event.registerEntityRenderer(ModEntities.JONES_MANOEL.get(), io.github.omarflk.guerraezuberante.client.renderer.JonesManoelRenderer::new);
+        event.registerEntityRenderer(ModEntities.ENEIAS.get(), io.github.omarflk.guerraezuberante.client.renderer.EneiasRenderer::new);
+        event.registerEntityRenderer(ModEntities.AUGUSTO_CURY.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "augusto_cury", 1));
+        event.registerEntityRenderer(ModEntities.ROMEU_ZEMA.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "romeu_zema", 1));
+        event.registerEntityRenderer(ModEntities.RONALDO_CAIADO.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "ronaldo_caiado", 1));
+        event.registerEntityRenderer(ModEntities.APPLIANCE.get(), io.github.omarflk.guerraezuberante.client.renderer.ApplianceRenderer::new);
+        event.registerEntityRenderer(ModEntities.STAMPEDE_OX.get(), net.minecraft.client.renderer.entity.CowRenderer::new);
+        event.registerEntityRenderer(ModEntities.DIREITISTA.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.PetistaRenderer<>(c, io.github.omarflk.guerraezuberante.client.renderer.PetistaRenderer.DIREITISTAS));
+        event.registerEntityRenderer(ModEntities.DRONE.get(), io.github.omarflk.guerraezuberante.client.renderer.DroneRenderer::new);
+        event.registerEntityRenderer(ModEntities.TOWER_GUARD.get(), io.github.omarflk.guerraezuberante.client.renderer.TowerGuardRenderer::new);
+        event.registerEntityRenderer(ModEntities.BOMBINHA.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 1.0F, false));
+        event.registerEntityRenderer(ModEntities.DIPLOMA.get(), context -> new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context, 1.0F, false));
+        event.registerEntityRenderer(ModEntities.BOLSONARISTA.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.PetistaRenderer<>(c, io.github.omarflk.guerraezuberante.client.renderer.PetistaRenderer.BOLSONARISTAS));
         event.registerEntityRenderer(ModEntities.TABATA_AMARAL.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "tabata_amaral", 1));
         event.registerEntityRenderer(ModEntities.MARINA_SILVA.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "marina_silva", 1));
         event.registerEntityRenderer(ModEntities.CIRO_GOMES.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "ciro_gomes", 1));

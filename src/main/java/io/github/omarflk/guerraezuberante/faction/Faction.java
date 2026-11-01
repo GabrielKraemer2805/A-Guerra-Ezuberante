@@ -29,7 +29,21 @@ public enum Faction {
     public String descriptionKey() { return "gui.guerra_ezuberante.faction." + id; }
     public Component powerName() { return powerName(0); }
     public Component powerDescription() { return powerDescription(0); }
-    /** Slot 0 is the starting power; slots 1 and 2 are unlocked by Ideological Conviction. */
+    /**
+     * Powers of the faction: 3 for most; the Lulistas add Manifestando and the powers of Dilma, Haddad and Boulos; the
+     * Esquerda Independente has Manifestando and the nine powers of Jones Manoel, Tabata Amaral, Marina Silva and Ciro
+     * Gomes; the Direita adds the powers of Enéias, Augusto Cury, Romeu Zema and Ronaldo Caiado.
+     */
+    public int powerCount() {
+        return switch (this) {
+            case LULISTA -> 8;
+            case ESQUERDA -> 10;
+            case DIREITA -> 13;
+            default -> 3;
+        };
+    }
+
+    /** Slot 0 is the starting power; the others are bought in the skill tree. */
     public String powerKey(int slot) { return "faction.guerra_ezuberante." + id + ".power" + (slot == 0 ? "" : String.valueOf(slot + 1)); }
     public Component powerName(int slot) { return Component.translatable(powerKey(slot)).withStyle(color); }
     public Component powerDescription(int slot) { return Component.translatable(powerKey(slot) + ".desc"); }

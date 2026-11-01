@@ -80,7 +80,7 @@ public final class BolsonaroGameTests {
         var p=arena(h,25);var j=jair(h,p);var f=flavio(h,p.add(4,0,0));var c=cow(h,p.add(0,0,8));
         h.assertTrue(((net.minecraftforge.common.ForgeSpawnEggItem)ModItems.JAIR_SPAWN_EGG.get()).getType(null)==ModEntities.JAIR_BOLSONARO.get(),"Wrong Jair egg");
         h.assertTrue(((net.minecraftforge.common.ForgeSpawnEggItem)ModItems.FLAVIO_SPAWN_EGG.get()).getType(null)==ModEntities.FLAVIO_BOLSONARO.get(),"Wrong Flavio egg");
-        h.assertTrue(j.getHealth()==300 && f.getHealth()==30 && j.isAlliedTo(f) && f.isAlliedTo(j),"Attributes/faction mismatch");
+        h.assertTrue(j.getHealth()==300 && f.getHealth()==80 && j.isAlliedTo(f) && f.isAlliedTo(j),"Attributes/faction mismatch");
         h.assertTrue(!j.validRangedTarget(f) && !f.validFissureTarget(j) && f.getOwnerId()==null,"Allied targeting or independent spawn bound to owner");
         h.runAfterDelay(40,()->{h.assertTrue(j.getTarget()==null && f.getTarget()==null && c.getHealth()==1024,"Unprovoked aggression");j.discard();f.discard();c.discard();h.succeed();});
     }
@@ -121,7 +121,7 @@ public final class BolsonaroGameTests {
         var p=arena(h,25);var f=flavio(h,p);f.setNoAi(true);f.setNoGravity(true);var target=cow(h,p.add(0,0,7));
         var ally=flavio(h,p.add(.2,0,4));ally.setNoAi(true);ally.setNoGravity(true);var bystander=cow(h,p.add(.1,0,5));
         var effect=fissure(f,target,false);h.assertTrue(effect!=null,"No fissure");
-        h.runAfterDelay(70,()->{h.assertTrue(target.getHealth()==1014 && ally.getHealth()==30 && bystander.getHealth()==1024 && f.getHealth()==30,"Fissure caused friendly/ambient damage");
+        h.runAfterDelay(70,()->{h.assertTrue(target.getHealth()==1014 && ally.getHealth()==80 && bystander.getHealth()==1024 && f.getHealth()==80,"Fissure caused friendly/ambient damage");
             h.assertTrue(effect.isRemoved() && effect.damagedEntities()==1,"Effect lifetime or per-activation hit set failed");f.discard();ally.discard();target.discard();bystander.discard();h.succeed();});
     }
     @GameTest(template="empty",batch="bolsonaro") public static void surfaceTraceFollowsStepsAndStopsAtWall(GameTestHelper h){
@@ -173,7 +173,7 @@ public final class BolsonaroGameTests {
             h.assertTrue(restored.deathElapsed()==tag.getInt("JairDeathElapsed"),"Reload restarted death");
             h.runAfterDelay(34,()->{
                 h.assertTrue(restored.isRemoved() && blasts.getOrDefault(restored.getUUID(),0)==1 && powers.get(restored.getUUID())==7F,"Missing/duplicate native power7 explosion");
-                h.assertTrue(ally.isAlive() && ally.getHealth()==30 && c.getHealth()<1024,"Native death damaged ally or missed enemy");
+                h.assertTrue(ally.isAlive() && ally.getHealth()==80 && c.getHealth()<1024,"Native death damaged ally or missed enemy");
                 var terminal=restored.saveWithoutId(new CompoundTag());var loaded=ModEntities.JAIR_BOLSONARO.get().create(h.getLevel());loaded.load(terminal);h.getLevel().addFreshEntity(loaded);
                 h.runAfterDelay(3,()->{h.assertTrue(loaded.isRemoved() && blasts.getOrDefault(loaded.getUUID(),0)==1,"EXPLODED save produced another blast");ally.discard();c.discard();h.succeed();});
             });

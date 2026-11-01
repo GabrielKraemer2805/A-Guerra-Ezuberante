@@ -2,7 +2,6 @@ package io.github.omarflk.guerraezuberante.entity;
 
 import io.github.omarflk.guerraezuberante.config.ModConfig;
 import io.github.omarflk.guerraezuberante.registry.ModEffects;
-import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -18,14 +17,14 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
 /**
  * Marina Silva. Fights with her fists and two powers:
  * <ul>
  *     <li><b>Sumiço de 4 anos</b>: low on health she turns invisible, drops the fight, walks away and heals.</li>
- *     <li><b>Raízes da Amazônia</b>: vines hold the enemies around her (Paralisado).</li>
+ *     <li><b>Raízes da Amazônia</b>: vines hold the enemies around her (Paralisado), poison them a little and grow a leaves
+ *     block at their feet while they are held, like the player power.</li>
  * </ul>
  */
 public final class MarinaSilvaEntity extends EsquerdaAllyEntity {
@@ -41,11 +40,13 @@ public final class MarinaSilvaEntity extends EsquerdaAllyEntity {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return createMobAttributes().add(Attributes.MAX_HEALTH, 30).add(Attributes.ATTACK_DAMAGE, 3)
+        return createMobAttributes().add(Attributes.MAX_HEALTH, 80).add(Attributes.ATTACK_DAMAGE, 3)
                 .add(Attributes.MOVEMENT_SPEED, .25).add(Attributes.FOLLOW_RANGE, 16);
     }
 
     public boolean isVanished() { return vanishRemaining > 0; }
+
+    @Override protected double configuredHealth() { return io.github.omarflk.guerraezuberante.config.ModConfig.MARINA_HEALTH.get(); }
 
     @Override
     public void tick() {
@@ -72,17 +73,20 @@ public final class MarinaSilvaEntity extends EsquerdaAllyEntity {
         var victims = hostilesAround(ModConfig.MARINA_ROOTS_RADIUS.get());
         if (victims.isEmpty()) { return 0; }
         int ticks = ModConfig.MARINA_ROOTS_TICKS.get();
-        var vine = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.VINE.defaultBlockState());
-        var leaves = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.JUNGLE_LEAVES.defaultBlockState());
+        int poison = ModConfig.MARINA_ROOTS_POISON_TICKS.get();
         for (LivingEntity victim : victims) {
             victim.addEffect(new MobEffectInstance(ModEffects.PARALYZED.get(), ticks, 0), this);
-            server.sendParticles(vine, victim.getX(), victim.getY() + .5, victim.getZ(), 25, .3, .5, .3, .1);
+            if (poison > 0) { victim.addEffect(new MobEffectInstance(MobEffects.POISON, poison, 0), this); }
+            if (ModConfig.MARINA_ROOTS_LEAVES.get() && io.github.omarflk.guerraezuberante.faction.TemporaryBlocks.place(this, victim.blockPosition(),
+                    io.github.omarflk.guerraezuberante.faction.EsquerdaPowers.ROOT_LEAVES, ticks)) {
+                server.playSound(null, victim.blockPosition(), SoundEvents.AZALEA_LEAVES_PLACE, getSoundSource(), 1, .9F);
+            }
             server.sendParticles(ParticleTypes.COMPOSTER, victim.getX(), victim.getY() + .2, victim.getZ(), 12, .4, .1, .4, 0);
         }
-        server.sendParticles(leaves, getX(), getY() + .2, getZ(), 40, ModConfig.MARINA_ROOTS_RADIUS.get() / 2, .1, ModConfig.MARINA_ROOTS_RADIUS.get() / 2, .1);
+        io.github.omarflk.guerraezuberante.faction.PowerEffects.raizes(this, victims, ModConfig.MARINA_ROOTS_RADIUS.get());
         playSound(SoundEvents.ROOTED_DIRT_BREAK, 1.4F, .7F);
         playSound(SoundEvents.CAVE_VINES_PLACE, 1.2F, .8F);
-        startCastPose();
+        startCastPose(io.github.omarflk.guerraezuberante.faction.CastPose.RAIZES);
         nextRoots = level().getGameTime() + ModConfig.MARINA_ROOTS_COOLDOWN.get();
         noteCombatProgress();
         return victims.size();
@@ -108,11 +112,8 @@ public final class MarinaSilvaEntity extends EsquerdaAllyEntity {
         cancelStrike();
         setTarget(null);
         dropPursuers();
-        if (level() instanceof ServerLevel server) {
-            server.sendParticles(ParticleTypes.POOF, getX(), getY() + 1, getZ(), 20, .3, .5, .3, .05);
-            server.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.JUNGLE_LEAVES.defaultBlockState()),
-                    getX(), getY() + 1, getZ(), 30, .4, .6, .4, .1);
-        }
+        io.github.omarflk.guerraezuberante.faction.PowerEffects.sumico(this);
+        startCastPose(io.github.omarflk.guerraezuberante.faction.CastPose.SUMICO);
         playSound(SoundEvents.ILLUSIONER_MIRROR_MOVE, 1, 1.2F);
         if (awayFrom != null) {
             Vec3 spot = DefaultRandomPos.getPosAway(this, 16, 7, awayFrom);

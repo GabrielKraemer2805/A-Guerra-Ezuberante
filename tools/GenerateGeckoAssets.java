@@ -164,6 +164,7 @@ public final class GenerateGeckoAssets {
         rot("body",2,new double[][]{key(0,0,0,0),key(windIn,6,0,0),key(windOut,6,0,0),key(2,0,0,0)});
         rot("head",2,new double[][]{key(0,0,0,0),key(windIn,-6,0,0),key(windOut,-6,0,0),key(2,0,0,0)});
         finish("estocar_vento",2,false);
+        poses();
         // Rifle posture is owned by the Renan-only clips. Shared model/UV and old clips remain intact.
         for(String name:List.of("rifle_idle","rifle_prepare","rifle_aim","rifle_walk","rifle_fire","rifle_hurt")) {
             begin();
@@ -191,6 +192,106 @@ public final class GenerateGeckoAssets {
             finish(name,duration,lowered || walk || name.equals("rifle_aim"));
         }
         write("animations/humanoid.animation.json",map("format_version","1.8.0","animations",animations));
+    }
+    /** Weight of a pose: in over .15 s, held, out over the last .15 s. */
+    static double fade(double t,double length){double w=Math.max(0,Math.min(1,Math.min(t/.15,(length-t)/.15)));return w*w*(3-2*w);}
+    static void pose(String bone,double length,DoubleFunction<double[]> target){
+        channel(bone,"rotation",length,t->{double w=fade(t,length);double[] v=target.apply(t);return vec(v[0]*w,v[1]*w,v[2]*w);});
+    }
+    /**
+     * 0.019: the gestures of the Esquerda powers, the same the player strikes (CastPose), for Jones Manoel, Tabata Amaral,
+     * Marina Silva and Ciro Gomes. Clip names are the pose names; "live" loops every second while the Live lasts.
+     * On this rig a positive z rotation opens the right arm away from the body (negative for the left one).
+     */
+    static void poses() {
+        begin();
+        for(String side:List.of("right","left")) {
+            int sign=side.equals("right")?1:-1;double phase=sign<0?1.6:0;
+            pose(side+"_arm",1.5,t->new double[]{-165+15*Math.sin(t*2*Math.PI*3+phase),0,20*sign});
+            pose(side+"_forearm",1.5,t->new double[]{-20-15*Math.sin(t*2*Math.PI*3+phase),0,0});
+        }
+        pose("head",1.5,t->new double[]{-12,0,0});
+        finish("manifestando",1.5,false);
+        begin();
+        pose("right_arm",1,t->new double[]{-90,30*Math.sin(Math.PI*t),0});
+        pose("body",1,t->new double[]{0,10*Math.sin(Math.PI*t),0});
+        finish("virar_o_voto",1,false);
+        begin();
+        pose("right_arm",1,t->new double[]{-175,0,8});
+        pose("left_arm",1,t->new double[]{-35,0,10});
+        pose("left_forearm",1,t->new double[]{-75,0,0});
+        finish("voto_de_consciencia",1,false);
+        // Raízes: bends down, hands to the ground grabbing the roots, then rises pulling them up over the head.
+        begin();
+        rot("body",1.25,new double[][]{key(0,0,0,0),key(.3,35,0,0),key(.55,35,0,0),key(.85,-8,0,0),key(1.1,-8,0,0),key(1.25,0,0,0)});
+        rot("head",1.25,new double[][]{key(0,0,0,0),key(.3,20,0,0),key(.55,20,0,0),key(.85,-20,0,0),key(1.1,-20,0,0),key(1.25,0,0,0)});
+        for(String side:List.of("right","left")) {
+            int sign=side.equals("right")?1:-1;
+            rot(side+"_arm",1.25,new double[][]{key(0,0,0,0),key(.3,-40,0,10*sign),key(.55,-35,0,10*sign),key(.85,-170,0,30*sign),key(1.1,-170,0,30*sign),key(1.25,0,0,0)});
+            rot(side+"_forearm",1.25,new double[][]{key(0,0,0,0),key(.3,-20,0,0),key(.55,-45,0,0),key(.85,0,0,0),key(1.25,0,0,0)});
+        }
+        finish("raizes",1.25,false);
+        begin();
+        for(String side:List.of("right","left")) {
+            int sign=side.equals("right")?1:-1;
+            pose(side+"_arm",.75,t->new double[]{-95,0,-15*sign});
+            pose(side+"_forearm",.75,t->new double[]{-95,0,0});
+        }
+        finish("sumico",.75,false);
+        begin();
+        for(String side:List.of("right","left")) {
+            int sign=side.equals("right")?1:-1;
+            pose(side+"_arm",1,t->new double[]{-10,0,80*sign+8*Math.sin(t*40)});
+            pose(side+"_forearm",1,t->new double[]{-35,0,0});
+        }
+        pose("head",1,t->new double[]{6*Math.sin(t*35),0,0});
+        finish("pavio_curto",1,false);
+        begin();
+        pose("right_arm",1,t->new double[]{-160,0,15+25*Math.sin(t*2*Math.PI*3)});
+        pose("right_forearm",1,t->new double[]{-10,0,0});
+        finish("paris",1,false);
+        // The Live lasts several seconds and replays this second: no fade, a seamless loop of the left hand explaining.
+        begin();
+        channel("right_arm","rotation",1,t->vec(-75,15,0));
+        channel("right_forearm","rotation",1,t->vec(-75,0,0));
+        channel("left_arm","rotation",1,t->vec(-35-20*Math.sin(2*Math.PI*t),0,-10));
+        channel("left_forearm","rotation",1,t->vec(-45,0,0));
+        channel("head","rotation",1,t->vec(-5,0,0));
+        finish("live",1,false);
+        begin();
+        for(String side:List.of("right","left")) {
+            int sign=side.equals("right")?1:-1;
+            pose(side+"_arm",.75,t->new double[]{-90,0,6*sign});
+            pose(side+"_forearm",.75,t->new double[]{-5,0,0});
+        }
+        pose("body",.75,t->new double[]{6,0,0});
+        finish("inverno",.75,false);
+        begin();
+        pose("right_arm",1.5,t->new double[]{-178,0,6});
+        pose("head",1.5,t->new double[]{-10,0,0});
+        finish("comite",1.5,false);
+        // Romeu Zema's Liquidação: both arms up and open, waving the sale in.
+        begin();
+        for(String side:List.of("right","left")) {
+            int sign=side.equals("right")?1:-1;double phase=sign<0?1.6:0;
+            pose(side+"_arm",1,t->new double[]{-150+12*Math.sin(t*2*Math.PI*2+phase),0,32*sign});
+            pose(side+"_forearm",1,t->new double[]{-15,0,0});
+        }
+        pose("head",1,t->new double[]{-10,0,0});
+        finish("liquidacao",1,false);
+        // Ronaldo Caiado's Laço: lasso spinning over the head for the first half, then thrown forward.
+        begin();
+        pose("right_arm",.8,t->t<.48?new double[]{-170,0,18*Math.sin(t*2*Math.PI*4)}:new double[]{-80,0,0});
+        pose("right_forearm",.8,t->new double[]{t<.48?-20:-5,0,0});
+        pose("body",.8,t->new double[]{0,t<.48?0:-12,0});
+        finish("laco",.8,false);
+        // Ronaldo Caiado's Boiada: the right arm sends the herd ahead, the left hand holds the hat.
+        begin();
+        pose("right_arm",1,t->new double[]{-95+25*Math.sin(Math.PI*t),0,0});
+        pose("left_arm",1,t->new double[]{-160,0,-25});
+        pose("left_forearm",1,t->new double[]{-70,0,0});
+        pose("head",1,t->new double[]{-8,0,0});
+        finish("boiada",1,false);
     }
     static void write(String relative,Object value)throws Exception{
         Path file=ASSETS.resolve(relative);Files.createDirectories(file.getParent());Files.writeString(file,json(value,0)+"\n");

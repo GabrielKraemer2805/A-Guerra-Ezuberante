@@ -50,7 +50,8 @@ public final class Progression {
     private static final UUID STRENGTH_ID = UUID.fromString("5c1d7e2a-3b4f-4a6d-8e9f-1a2b3c4d5e01");
     private static final UUID SPEED_ID = UUID.fromString("5c1d7e2a-3b4f-4a6d-8e9f-1a2b3c4d5e02");
     private static final UUID HEALTH_ID = UUID.fromString("5c1d7e2a-3b4f-4a6d-8e9f-1a2b3c4d5e03");
-    public static final int POWER_SLOTS = 3;
+    /** Most powers a faction has (the Direita); see {@link io.github.omarflk.guerraezuberante.faction.Faction#powerCount()}. */
+    public static final int POWER_SLOTS = 13;
     private static final String XP_AWARDED = "GuerraEzuberanteXpAwarded";
     private record PendingKill(LivingDeathEvent event, ServerPlayer killer, int xp) {}
     private static final Map<UUID, PendingKill> PENDING_KILLS = new ConcurrentHashMap<>();

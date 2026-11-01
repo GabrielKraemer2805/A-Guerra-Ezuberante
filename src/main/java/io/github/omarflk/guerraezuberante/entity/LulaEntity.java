@@ -19,6 +19,9 @@ public final class LulaEntity extends SpecialDeathEntity {
     public static final int THROW_INTERVAL=40,THROW_RELEASE=8,THROW_LENGTH=18,FAZ_O_L_LENGTH=18;
     private static final EntityDataAccessor<Long> THROW_START=SynchedEntityData.defineId(LulaEntity.class,EntityDataSerializers.LONG);
     private static final EntityDataAccessor<Long> FAZ_O_L_START=SynchedEntityData.defineId(LulaEntity.class,EntityDataSerializers.LONG);
+    /** Manifestação: fists up while the crowd arrives, as long as the players' Manifestando pose. */
+    private static final EntityDataAccessor<Long> PROTEST_START=SynchedEntityData.defineId(LulaEntity.class,EntityDataSerializers.LONG);
+    public static final int PROTEST_LENGTH=30;
     private long nextThrow;
     private LivingEntity pendingBean;
     private int hitsTaken;
@@ -30,12 +33,14 @@ public final class LulaEntity extends SpecialDeathEntity {
             .add(Attributes.MAX_HEALTH,ModConfig.LULA_HEALTH.getDefault()).add(Attributes.ATTACK_DAMAGE,4)
             .add(Attributes.MOVEMENT_SPEED,.23).add(Attributes.FOLLOW_RANGE,20);}
     @Override protected float getStandingEyeHeight(Pose pose,EntityDimensions dimensions){return 1.62F;}
-    @Override protected void defineSynchedData(){super.defineSynchedData();entityData.define(THROW_START,-1000L);entityData.define(FAZ_O_L_START,-1000L);}
+    @Override protected void defineSynchedData(){super.defineSynchedData();entityData.define(THROW_START,-1000L);entityData.define(FAZ_O_L_START,-1000L);entityData.define(PROTEST_START,-1000L);}
     public float throwAge(float partialTick){return level().getGameTime()-entityData.get(THROW_START)+partialTick;}
     public long throwToken(){return entityData.get(THROW_START);}
     /** The Faz o L pose: right arm stretched toward the target. */
     public float fazOLAge(float partialTick){return level().getGameTime()-entityData.get(FAZ_O_L_START)+partialTick;}
     public long fazOLToken(){return entityData.get(FAZ_O_L_START);}
+    public float protestAge(float partialTick){return level().getGameTime()-entityData.get(PROTEST_START)+partialTick;}
+    public long protestToken(){return entityData.get(PROTEST_START);}
 
     @Override protected boolean allowsMeleeCombat(){return false;}
     @Override protected List<ModSounds.VoiceLine> interactionVoices(){return List.of();}
@@ -110,9 +115,14 @@ public final class LulaEntity extends SpecialDeathEntity {
     /** The Esquerda power's crowd, on Lula's side, up to its usual size. Public for GameTests. */
     public int callProtest(){
         if(!(level() instanceof ServerLevel server) || deathState()!=ALIVE)return 0;
-        int missing=ModConfig.PROTEST_COUNT.get()-io.github.omarflk.guerraezuberante.faction.ConvictionPowers.protesters(this).size();
+        var before=new java.util.HashSet<>(io.github.omarflk.guerraezuberante.faction.ConvictionPowers.protesters(this));
+        int missing=ModConfig.PROTEST_COUNT.get()-before.size();
         int created=missing<=0?0:io.github.omarflk.guerraezuberante.faction.ConvictionPowers.spawnProtesters(server,this,missing,1);
-        if(created>0){playSound(net.minecraft.sounds.SoundEvents.ZOMBIE_AMBIENT,1.2F,.7F);playSound(net.minecraft.sounds.SoundEvents.RAID_HORN.value(),.6F,1.4F);}
+        if(created>0){
+            io.github.omarflk.guerraezuberante.faction.PowerEffects.manifestando(this,io.github.omarflk.guerraezuberante.faction.ConvictionPowers.protesters(this)
+                    .stream().filter(protester->!before.contains(protester)).toList());
+            entityData.set(PROTEST_START,level().getGameTime());
+            playSound(net.minecraft.sounds.SoundEvents.ZOMBIE_AMBIENT,1.2F,.7F);playSound(net.minecraft.sounds.SoundEvents.RAID_HORN.value(),.6F,1.4F);}
         return created;
     }
     @Override protected String deathSavePrefix(){return "Lula";}

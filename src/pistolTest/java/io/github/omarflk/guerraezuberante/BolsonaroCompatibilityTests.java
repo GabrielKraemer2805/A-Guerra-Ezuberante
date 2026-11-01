@@ -17,6 +17,6 @@ public final class BolsonaroCompatibilityTests {
         h.assertTrue(j.isArmed()==guns,"Optional TaCZ equipment/fallback mismatch");
         if(!guns)h.assertTrue(j.getMainHandItem().isEmpty() && !j.tryGunShot(),"Missing TaCZ produced a fake weapon or shot");
         h.assertTrue(j.isAlliedTo(f) && f.isAlliedTo(j) && j.deathState()==0 && l.deathState()==0,"Family or shared cinematic state did not load");
-        h.assertTrue(l.musicTracks().size()==4 && l.getHealth()==300 && j.getHealth()==300 && f.getHealth()==30,"Optional guns changed character state/audio");h.succeed();
+        h.assertTrue(l.musicTracks().size()==4 && l.getHealth()==300 && j.getHealth()==300 && f.getHealth()==80,"Optional guns changed character state/audio");h.succeed();
     }
 }

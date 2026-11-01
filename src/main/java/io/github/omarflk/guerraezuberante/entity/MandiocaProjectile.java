@@ -37,6 +37,10 @@ public final class MandiocaProjectile extends ThrowableItemProjectile {
     @Override
     protected boolean canHitEntity(Entity entity) {
         var owner = getOwner();
+        if (owner instanceof net.minecraft.world.entity.player.Player player) {
+            // A player's throw follows the power rules: PvP, the faction spared, no animals.
+            return super.canHitEntity(entity) && entity instanceof LivingEntity living && io.github.omarflk.guerraezuberante.faction.PowerTargets.enemy(player, living);
+        }
         return super.canHitEntity(entity) && entity != owner && (owner == null || !owner.isAlliedTo(entity) && !entity.isAlliedTo(owner));
     }
 

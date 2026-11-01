@@ -10,22 +10,27 @@ import net.minecraft.client.renderer.entity.VillagerRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.npc.Villager;
 
-/** Replaces the renderer of minecraft:villager: petista and comunista villagers get the player model, every other villager stays vanilla. */
+/** Replaces the renderer of minecraft:villager: petista, comunista, bolsonarista and direitista villagers get the player model, every other villager stays vanilla. */
 public final class VillagerOrPetistaRenderer extends EntityRenderer<Villager> {
     private final VillagerRenderer vanilla;
     private final PetistaRenderer<Villager> petista;
     private final PetistaRenderer<Villager> comunista;
+    private final PetistaRenderer<Villager> bolsonarista;
+    private final PetistaRenderer<Villager> direitista;
 
     public VillagerOrPetistaRenderer(EntityRendererProvider.Context context) {
         super(context);
         vanilla = new VillagerRenderer(context);
         petista = new PetistaRenderer<>(context);
         comunista = new PetistaRenderer<>(context, PetistaRenderer.COMUNISTAS);
+        bolsonarista = new PetistaRenderer<>(context, PetistaRenderer.BOLSONARISTAS);
+        direitista = new PetistaRenderer<>(context, PetistaRenderer.DIREITISTAS);
         shadowRadius = .5F;
     }
 
     private EntityRenderer<Villager> pick(Villager villager) {
-        return ModVillagers.isPetista(villager) ? petista : ModVillagers.isComunista(villager) ? comunista : vanilla;
+        return ModVillagers.isPetista(villager) ? petista : ModVillagers.isComunista(villager) ? comunista
+                : ModVillagers.isBolsonarista(villager) ? bolsonarista : ModVillagers.isDireitista(villager) ? direitista : vanilla;
     }
 
     @Override

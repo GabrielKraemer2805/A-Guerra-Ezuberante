@@ -30,7 +30,7 @@ public final class FlavioBolsonaroEntity extends RetaliatingCharacterEntity {
             getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(ModConfig.FLAVIO_SPEED.get());getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ModConfig.FLAVIO_MELEE.get());
         }
     }
-    public static AttributeSupplier.Builder createAttributes(){return createMobAttributes().add(Attributes.MAX_HEALTH,30)
+    public static AttributeSupplier.Builder createAttributes(){return createMobAttributes().add(Attributes.MAX_HEALTH,80)
             .add(Attributes.ATTACK_DAMAGE,4).add(Attributes.MOVEMENT_SPEED,.25).add(Attributes.FOLLOW_RANGE,20);}
     @Override protected float getStandingEyeHeight(Pose pose,EntityDimensions size){return 1.62F;}
     @Override protected void defineSynchedData(){super.defineSynchedData();entityData.define(CAST,-1000L);}
@@ -78,6 +78,8 @@ public final class FlavioBolsonaroEntity extends RetaliatingCharacterEntity {
             @Override public void stop(){getNavigation().stop();}
         });
     }
+    @Override protected double configuredHealth() { return io.github.omarflk.guerraezuberante.config.ModConfig.FLAVIO_HEALTH.get(); }
+
     @Override public void tick(){
         if(!level().isClientSide && ownerId!=null && level() instanceof ServerLevel server){
             var ledger=SummonLedger.get(server);

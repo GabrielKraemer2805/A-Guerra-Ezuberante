@@ -48,6 +48,15 @@ public final class GuerraEzuberanteMod {
         event.put(ModEntities.MARINA_SILVA.get(), io.github.omarflk.guerraezuberante.entity.MarinaSilvaEntity.createAttributes().build());
         event.put(ModEntities.CIRO_GOMES.get(), io.github.omarflk.guerraezuberante.entity.CiroGomesEntity.createAttributes().build());
         event.put(ModEntities.COMUNISTA.get(), net.minecraft.world.entity.npc.Villager.createAttributes().build());
+        event.put(ModEntities.BOLSONARISTA.get(), net.minecraft.world.entity.npc.Villager.createAttributes().build());
+        event.put(ModEntities.ENEIAS.get(), io.github.omarflk.guerraezuberante.entity.EneiasEntity.createAttributes().build());
+        event.put(ModEntities.AUGUSTO_CURY.get(), io.github.omarflk.guerraezuberante.entity.AugustoCuryEntity.createAttributes().build());
+        event.put(ModEntities.ROMEU_ZEMA.get(), io.github.omarflk.guerraezuberante.entity.RomeuZemaEntity.createAttributes().build());
+        event.put(ModEntities.RONALDO_CAIADO.get(), io.github.omarflk.guerraezuberante.entity.RonaldoCaiadoEntity.createAttributes().build());
+        event.put(ModEntities.STAMPEDE_OX.get(), net.minecraft.world.entity.animal.Cow.createAttributes().build());
+        event.put(ModEntities.DIREITISTA.get(), net.minecraft.world.entity.npc.Villager.createAttributes().build());
+        event.put(ModEntities.DRONE.get(), io.github.omarflk.guerraezuberante.entity.DroneEntity.createAttributes().build());
+        event.put(ModEntities.TOWER_GUARD.get(), io.github.omarflk.guerraezuberante.entity.TowerGuardEntity.createAttributes().build());
         event.put(ModEntities.JAIR_BOLSONARO.get(),io.github.omarflk.guerraezuberante.entity.JairBolsonaroEntity.createAttributes().build());
         event.put(ModEntities.FLAVIO_BOLSONARO.get(),io.github.omarflk.guerraezuberante.entity.FlavioBolsonaroEntity.createAttributes().build());
         event.put(ModEntities.RENAN_SANTOS.get(), RenanSantosEntity.createAttributes().build());

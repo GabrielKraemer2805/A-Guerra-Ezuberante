@@ -28,6 +28,17 @@ public final class TaczIntegration {
     public static boolean fireRenan(io.github.omarflk.guerraezuberante.entity.RenanSantosEntity owner) {
         return ModList.get().isLoaded("tacz") && TaczNpcWeapon.fire(owner);
     }
+    public static boolean available() { return ModList.get().isLoaded("tacz"); }
+    /** Castle tower guards: one of the five TaCZ weapons, by index. */
+    public static void equipGuard(io.github.omarflk.guerraezuberante.entity.TowerGuardEntity owner, int weapon) {
+        if (available()) TaczNpcWeapon.equipGuard(owner, weapon);
+    }
+    public static void aimGuard(io.github.omarflk.guerraezuberante.entity.TowerGuardEntity owner, boolean aim) {
+        if (available()) TaczNpcWeapon.prepare(owner, aim);
+    }
+    public static boolean fireGuard(io.github.omarflk.guerraezuberante.entity.TowerGuardEntity owner) {
+        return available() && TaczNpcWeapon.fire(owner);
+    }
     private TaczIntegration() {}
     public static boolean jairArmed(net.minecraft.world.entity.LivingEntity owner){
         return ModList.get().isLoaded("tacz") && TaczNpcWeapon.equipped(owner);

@@ -33,6 +33,21 @@ public final class ModItems {
             () -> new ForgeSpawnEggItem(ModEntities.MARINA_SILVA,0x2D6A4F,0xE9E4D4,new Item.Properties()));
     public static final RegistryObject<Item> CIRO_SPAWN_EGG = REGISTER.register("ciro_gomes_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.CIRO_GOMES,0x3A3FBF,0xDADADA,new Item.Properties()));
+    public static final RegistryObject<Item> ENEIAS_SPAWN_EGG = REGISTER.register("eneias_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.ENEIAS,0x1D4ED8,0xF5F5F5,new Item.Properties()));
+    public static final RegistryObject<Item> AUGUSTO_CURY_SPAWN_EGG = REGISTER.register("augusto_cury_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.AUGUSTO_CURY,0x1E293B,0x60A5FA,new Item.Properties()));
+    public static final RegistryObject<Item> ROMEU_ZEMA_SPAWN_EGG = REGISTER.register("romeu_zema_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.ROMEU_ZEMA,0xF97316,0xE5E7EB,new Item.Properties()));
+    public static final RegistryObject<Item> RONALDO_CAIADO_SPAWN_EGG = REGISTER.register("ronaldo_caiado_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.RONALDO_CAIADO,0x1E3A8A,0xA16207,new Item.Properties()));
+    public static final RegistryObject<Item> DIREITISTA_SPAWN_EGG = REGISTER.register("direitista_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.DIREITISTA,0x2563EB,0xFACC15,new Item.Properties()));
+    public static final RegistryObject<Item> BOLSONARISTA_SPAWN_EGG = REGISTER.register("bolsonarista_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.BOLSONARISTA,0x16A34A,0xFACC15,new Item.Properties()));
+    /** Sprites of Enéias's projectiles; not in the creative tab. */
+    public static final RegistryObject<Item> BOMBINHA = REGISTER.register("bombinha", () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> DIPLOMA = REGISTER.register("diploma", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> COMUNISTA_SPAWN_EGG = REGISTER.register("comunista_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.COMUNISTA,0xD00000,0xFFD60A,new Item.Properties()));
     public static final RegistryObject<Item> BEAN = REGISTER.register("semente_feijao", () -> new Item(new Item.Properties()));

@@ -91,7 +91,9 @@ public final class RenanArmedGameTests {
         h.assertTrue(renan.musicSerial()==serial,"Combat restarted interaction track");
         h.runAfterDelay(11,()->{h.assertTrue(session.interact() && renan.musicTrackIndex()!=first,"Interaction did not skip to another recording");
             int second=renan.musicSerial();session.activateCombat();h.assertTrue(renan.musicSerial()==second,"Damage activation duplicated session");
-            renan.kill();h.assertTrue(renan.musicTrackIndex()==-1,"Death retained playback");h.succeed();});
+            renan.kill();h.assertTrue(renan.musicTrackIndex()==-1,"Death retained playback");
+            // A boss since 0.020: removed at once, before its death explosion reaches the neighbouring tests.
+            renan.discard();h.succeed();});
     }
     @GameTest(template="empty",timeoutTicks=340) public static void durationMetadataStopsWithoutAutoplay(GameTestHelper h) {
         var renan=spawn(h);renan.setNoAi(true);renan.musicSession().interact();

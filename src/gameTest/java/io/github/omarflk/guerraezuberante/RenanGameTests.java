@@ -31,19 +31,21 @@ public final class RenanGameTests {
                 new ItemStack(egg), null, helper.absolutePos(new BlockPos(1, 1, 1)),
                 MobSpawnType.SPAWN_EGG, false, false);
         helper.assertTrue(renan != null, "Renan egg spawn path failed");
-        helper.assertTrue(renan.getMaxHealth() == 30.0F, "Wrong initial health");
+        helper.assertTrue(renan.getMaxHealth() == 300.0F && renan.bossBar().getColor() == net.minecraft.world.BossEvent.BossBarColor.YELLOW, "Wrong initial health or boss bar");
         helper.assertTrue(renan.isPersistenceRequired(), "Entity must persist");
         helper.assertTrue(renan.hurt(helper.getLevel().damageSources().generic(), 4.0F), "Entity cannot take damage");
-        helper.assertTrue(renan.getHealth() == 26.0F, "Damage was not applied");
+        helper.assertTrue(renan.getHealth() == 296.0F, "Damage was not applied");
         CompoundTag data = renan.saveWithoutId(new CompoundTag());
         RenanSantosEntity restored = ModEntities.RENAN_SANTOS.get().create(helper.getLevel());
         helper.assertTrue(restored != null, "Cannot recreate entity");
         restored.load(data);
-        helper.assertTrue(restored.getHealth() == 26.0F && restored.isPersistenceRequired(),
+        helper.assertTrue(restored.getHealth() == 296.0F && restored.isPersistenceRequired(),
                 "Entity state was not preserved on save/load");
         renan.invulnerableTime = 0;
-        renan.hurt(helper.getLevel().damageSources().generic(), 100.0F);
-        helper.assertTrue(renan.isDeadOrDying(), "Entity cannot die");
+        renan.hurt(helper.getLevel().damageSources().generic(), 1000.0F);
+        // A boss since 0.020: the lethal hit starts the boss death.
+        helper.assertTrue(renan.isDeadOrDying() || renan.deathState() != io.github.omarflk.guerraezuberante.entity.SpecialDeathEntity.ALIVE, "Entity cannot die");
+        renan.discard();
         helper.succeed();
     }
 

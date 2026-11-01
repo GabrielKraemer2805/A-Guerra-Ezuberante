@@ -23,8 +23,9 @@ public final class FactionNetwork {
     /**
      * 2: per-slot cooldowns, the J profile, spending points and choosing the B power (0.013). 3: faction villages (0.014).
      * 4: village music (0.014.3). 5: classes, skill tree and moral bar (0.017).
+     * 6: up to 10 power slots, a 64-bit node mask (Esquerda tree and Lulista Manifestando) and cast poses (0.019).
      */
-    private static final String VERSION = "5";
+    private static final String VERSION = "7";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(GuerraEzuberanteMod.MOD_ID, "faction"), () -> VERSION, VERSION::equals, VERSION::equals);
     /** ordinal -1 means "no faction". */
@@ -38,7 +39,7 @@ public final class FactionNetwork {
      */
     public record Profile(int level, int maxLevel, int xp, int xpToNext, int points, int[] stats, int statMax,
                           int selected, int unlocked, int[] cooldowns, int playerClass, int classChanges, int classCooldown,
-                          int treePoints, int nodes, int moral) {}
+                          int treePoints, long nodes, int moral) {}
     public record SpendPoint(int stat) {}
     public record SelectPower(int slot) {}
     /** Village centres of the player's faction as x/z pairs; empty without a faction or in a world without villages. */
@@ -49,6 +50,8 @@ public final class FactionNetwork {
     public record ChooseClass(int ordinal) {}
     public record UseClassSkill() {}
     public record BuyNode(int node) {}
+    /** A player strikes a {@link CastPose} for some ticks; sent to the player and everyone around. */
+    public record CastPoseSync(int entity, int pose, int ticks) {}
 
     public static void register() {
         CHANNEL.messageBuilder(Sync.class, 0, NetworkDirection.PLAY_TO_CLIENT)
@@ -97,12 +100,12 @@ public final class FactionNetwork {
                     buffer.writeVarInt(packet.statMax()); buffer.writeVarInt(packet.selected()); buffer.writeVarInt(packet.unlocked());
                     buffer.writeVarIntArray(packet.cooldowns());
                     buffer.writeVarInt(packet.playerClass() + 1); buffer.writeVarInt(packet.classChanges()); buffer.writeVarInt(packet.classCooldown());
-                    buffer.writeVarInt(packet.treePoints()); buffer.writeVarInt(packet.nodes()); buffer.writeInt(packet.moral());
+                    buffer.writeVarInt(packet.treePoints()); buffer.writeLong(packet.nodes()); buffer.writeInt(packet.moral());
                 })
                 .decoder(buffer -> new Profile(buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt(),
                         buffer.readVarInt(), buffer.readVarIntArray(Stat.values().length), buffer.readVarInt(), buffer.readVarInt(),
                         buffer.readVarInt(), buffer.readVarIntArray(Progression.POWER_SLOTS), buffer.readVarInt() - 1, buffer.readVarInt(),
-                        buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt(), buffer.readInt()))
+                        buffer.readVarInt(), buffer.readVarInt(), buffer.readLong(), buffer.readInt()))
                 .consumerMainThread((packet, context) -> {
                     DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
                             io.github.omarflk.guerraezuberante.client.ProgressionClient.apply(packet));
@@ -173,6 +176,24 @@ public final class FactionNetwork {
                     if (player != null) { SkillTree.Node.byOrdinal(packet.node()).ifPresent(node -> SkillTree.buy(player, node)); }
                     context.get().setPacketHandled(true);
                 }).add();
+        CHANNEL.messageBuilder(CastPoseSync.class, 13, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder((packet, buffer) -> { buffer.writeVarInt(packet.entity()); buffer.writeVarInt(packet.pose()); buffer.writeVarInt(packet.ticks()); })
+                .decoder(buffer -> new CastPoseSync(buffer.readVarInt(), buffer.readVarInt(), Math.min(1200, buffer.readVarInt())))
+                .consumerMainThread((packet, context) -> {
+                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+                            io.github.omarflk.guerraezuberante.client.PlayerPoseClient.start(packet));
+                    context.get().setPacketHandled(true);
+                }).add();
+    }
+
+    /** Players further than this do not see the pose (well past the usual player tracking range). */
+    private static final double POSE_RANGE = 128;
+
+    public static void castPose(ServerPlayer player, CastPose pose, int ticks) {
+        var packet = new CastPoseSync(player.getId(), pose.ordinal(), ticks);
+        for (ServerPlayer target : player.serverLevel().players()) {
+            if (target == player || target.distanceToSqr(player) <= POSE_RANGE * POSE_RANGE) { send(target, packet); }
+        }
     }
 
     /** Skips connections that are not open (disconnecting players, GameTest mock players). */
@@ -193,7 +214,8 @@ public final class FactionNetwork {
                 Progression.availablePoints(player), stats, io.github.omarflk.guerraezuberante.config.ModConfig.STAT_MAX.get(),
                 Progression.selectedPower(player), Progression.unlockedPowers(player), cooldowns,
                 playerClass.map(Enum::ordinal).orElse(-1), PlayerClasses.changesLeft(player), PlayerClasses.remainingSkillCooldown(player),
-                SkillTree.available(player), SkillTree.Node.mask(node -> SkillTree.owns(player, node)), Morality.moral(player)));
+                SkillTree.available(player), SkillTree.Node.mask(Factions.of(player).orElse(Faction.CENTRO), node -> SkillTree.owns(player, node)),
+                Morality.moral(player)));
     }
 
     public static void sendVillages(ServerPlayer player) {

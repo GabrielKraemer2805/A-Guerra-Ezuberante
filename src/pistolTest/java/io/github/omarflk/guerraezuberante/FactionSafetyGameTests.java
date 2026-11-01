@@ -95,7 +95,7 @@ public final class FactionSafetyGameTests {
     }
     @GameTest(template="empty",batch="faction_safety")
     public static void relogPreservesRecoveryDelayAndPowerCooldown(GameTestHelper h){
-        var p=arena(h);UUID id=UUID.randomUUID();var old=player(h,p,id,"SafeRecovery");Factions.assign(old,Faction.ESQUERDA);h.assertTrue(FactionPowers.use(old),"Heal cast failed");
+        var p=arena(h);UUID id=UUID.randomUUID();var old=player(h,p,id,"SafeRecovery");Factions.assign(old,Faction.ESQUERDA);h.assertTrue(FactionPowers.use(old),"Manifestando cast failed");ConvictionPowers.protesters(old).forEach(Entity::discard);
         old.setHealth(10);old.tickCount=80;FactionPowers.hurt(new LivingHurtEvent(old,h.getLevel().damageSources().generic(),1));
         FactionPowers.playerTick(new TickEvent.PlayerTickEvent(TickEvent.Phase.END,old));h.assertTrue(old.getHealth()==10,"Recovery ignored recent damage");
         var persisted=old.getPersistentData().copy();MinecraftForge.EVENT_BUS.post(new PlayerEvent.PlayerLoggedOutEvent(old));h.getLevel().removePlayerImmediately(old,Entity.RemovalReason.DISCARDED);

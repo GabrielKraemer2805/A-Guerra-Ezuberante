@@ -42,7 +42,14 @@ public final class ProgressionClient {
     public static java.util.Optional<PlayerClass> playerClass() { return profile == null ? java.util.Optional.empty() : PlayerClass.byOrdinal(profile.playerClass()); }
     public static int classChanges() { return profile == null ? 0 : profile.classChanges(); }
     public static int treePoints() { return profile == null ? 0 : profile.treePoints(); }
-    public static boolean owns(SkillTree.Node node) { return profile != null && (profile.nodes() & (1 << node.ordinal())) != 0; }
+    /** Bit i of the profile's mask is the i-th node of the player's faction tree. */
+    public static boolean owns(SkillTree.Node node) {
+        var player = Minecraft.getInstance().player;
+        if (profile == null || player == null) { return false; }
+        int index = SkillTree.nodes(io.github.omarflk.guerraezuberante.faction.Factions.of(player)
+                .orElse(io.github.omarflk.guerraezuberante.faction.Faction.CENTRO)).indexOf(node);
+        return index >= 0 && (profile.nodes() & (1L << index)) != 0;
+    }
     public static int moral() { return profile == null ? 0 : profile.moral(); }
 
     /** Client estimate of the class skill cooldown between profile updates. */

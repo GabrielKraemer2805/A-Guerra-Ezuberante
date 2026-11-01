@@ -73,13 +73,19 @@ public final class ProgressionGameTests {
         pig.setNoAi(true); pig.moveTo(at.x, at.y, at.z, 0, 0); h.getLevel().addFreshEntity(pig);
         return pig;
     }
-    /** Level 30, Conviction 10 and the cheapest tree path to the three powers (Recarga nodes: no damage change). */
+    /**
+     * Max level, Conviction 10 and the cheapest path to the 2nd and 3rd powers of the current faction's tree (Recarga nodes
+     * at most: no damage change). Call again after a faction change: each tree has its own nodes.
+     */
     private static void unlockAll(ServerPlayer player) {
         Progression.addXp(player, 1_000_000);
         for (int i = 0; i < 10; i++) Progression.spend(player, Stat.CONVICCAO);
-        for (var node : new SkillTree.Node[]{SkillTree.Node.P1_RECARGA, SkillTree.Node.P2, SkillTree.Node.P2_RECARGA, SkillTree.Node.P3}) {
-            SkillTree.buy(player, node);
-        }
+        var path = switch (Factions.of(player).orElse(Faction.CENTRO)) {
+            case LULISTA -> new SkillTree.Node[]{SkillTree.Node.LUL_FIM_DA_ESCALA, SkillTree.Node.LUL_FAZ_O_L};
+            case DIREITA -> new SkillTree.Node[]{SkillTree.Node.DIR_SALTO_LIBERAL, SkillTree.Node.DIR_MAO_INVISIVEL};
+            default -> new SkillTree.Node[]{SkillTree.Node.P1_RECARGA, SkillTree.Node.P2, SkillTree.Node.P2_RECARGA, SkillTree.Node.P3};
+        };
+        for (var node : path) SkillTree.buy(player, node);
     }
     private static boolean near(float actual, double expected) { return Math.abs(actual - expected) < 1e-3; }
     /** Runs the cleanup even when an assertion fails, so a failed test cannot leave players or mobs for the next batches. */
@@ -101,7 +107,7 @@ public final class ProgressionGameTests {
         h.assertTrue(Progression.addXp(player, 1 + 80 + 5) == 2 && Progression.level(player) == 3 && Progression.xp(player) == 5, "Two levels from one big gain");
         h.assertTrue(Progression.availablePoints(player) == 2, "Expected 2 points at level 3");
         Progression.addXp(player, 1_000_000);
-        h.assertTrue(Progression.level(player) == 30 && Progression.xp(player) == 0 && Progression.availablePoints(player) == 29, "Max level 30 with 29 points");
+        h.assertTrue(Progression.level(player) == 100 && Progression.xp(player) == 0 && Progression.availablePoints(player) == 99, "Max level 100 with 99 points");
         h.assertTrue(Progression.addXp(player, 100) == 0 && Progression.xp(player) == 0, "XP kept growing at max level");
         Factions.clear(player); h.succeed();
     }
@@ -112,7 +118,7 @@ public final class ProgressionGameTests {
         h.assertTrue(!Progression.spend(player, Stat.FORCA), "Spent a point without having one");
         Progression.addXp(player, 1_000_000);
         for (int i = 0; i < 12; i++) Progression.spend(player, Stat.FORCA);
-        h.assertTrue(Progression.stat(player, Stat.FORCA) == 10 && Progression.availablePoints(player) == 19, "Strength went past 10 or points wrong");
+        h.assertTrue(Progression.stat(player, Stat.FORCA) == 10 && Progression.availablePoints(player) == Progression.maxLevel() - 11, "Strength went past 10 or points wrong");
         Progression.spend(player, Stat.VIDA); Progression.spend(player, Stat.VIDA); Progression.spend(player, Stat.VELOCIDADE);
         h.assertTrue(Math.abs(player.getAttributeValue(Attributes.ATTACK_DAMAGE) - (attack + 5)) < 1e-6, "Strength 10 should give +5 attack");
         h.assertTrue(player.getMaxHealth() == health + 2, "Health 2 should give +2 max health");
@@ -177,8 +183,8 @@ public final class ProgressionGameTests {
         var spider = EntityType.SPIDER.create(h.getLevel()); var pig = EntityType.PIG.create(h.getLevel());
         var lula = ModEntities.LULA.get().create(h.getLevel()); var renan = ModEntities.RENAN_SANTOS.get().create(h.getLevel());
         h.assertTrue(Progression.xpFor(killer, spider) == 10 && Progression.xpFor(killer, pig) == 0, "Hostile 10, animal 0");
-        // Killer is Lulista: Lula is its own leader (normal boss XP), Renan the Missão leader (4x the character XP).
-        h.assertTrue(Progression.xpFor(killer, renan) == 160 && Progression.xpFor(killer, lula) == 200, "Rival leader 4x40, own leader 200");
+        // Killer is Lulista: Lula is its own leader (normal boss XP), Renan the Missão leader, a boss since 0.020 (4x the boss XP).
+        h.assertTrue(Progression.xpFor(killer, renan) == 800 && Progression.xpFor(killer, lula) == 200, "Rival leader 4x200, own leader 200");
         var haddad = ModEntities.HADDAD.get().create(h.getLevel()); var flavio = ModEntities.FLAVIO_BOLSONARO.get().create(h.getLevel());
         var fighter = ModEntities.UKRAINIAN_FIGHTER.get().create(h.getLevel());
         h.assertTrue(Progression.xpFor(killer, haddad) == 40 && Progression.xpFor(killer, flavio) == 80, "Own character 40, rival character 2x40");
@@ -319,7 +325,8 @@ public final class ProgressionGameTests {
     @GameTest(template="empty", batch="ge_protest", timeoutTicks=200) public static void protestersFollowOwnerAndSpareFaction(GameTestHelper h) {
         var p = arena(h, 150);
         var player = real(h, p, "ProtestQA");
-        Factions.assign(player, Faction.ESQUERDA); unlockAll(player);
+        // Manifestando is the free first power of the Esquerda Independente.
+        Factions.assign(player, Faction.ESQUERDA);
         var ally = fake(h, "ProtestAllyQA"); Factions.assign(ally, Faction.ESQUERDA);
         var rival = fake(h, "ProtestRivalQA"); Factions.assign(rival, Faction.DIREITA);
         var spider = enemy(h, p.add(5, 0, 5));
@@ -327,33 +334,29 @@ public final class ProgressionGameTests {
             ConvictionPowers.protesters(player).forEach(ManifestanteEntity::discard);
             spider.discard(); Factions.clear(ally); Factions.clear(rival); leave(h, player);
         }, () -> {
-            h.assertTrue(FactionPowers.use(player, 1), "Manifestando failed");
+            h.assertTrue(FactionPowers.use(player, 0), "Manifestando failed");
             var zombies = ConvictionPowers.protesters(player);
             h.assertTrue(zombies.size() == 10, "Expected 10 protesters, got " + zombies.size());
             ManifestanteEntity zombie = zombies.get(0);
             h.assertTrue(!zombie.canAttack(player) && !zombie.canAttack(ally) && !zombie.canAttack(zombies.get(1)), "Protester may attack its side");
             h.assertTrue(zombie.canAttack(spider) && zombie.isAlliedTo(ally) && !zombie.isAlliedTo(rival), "Protester alliances wrong");
             FactionPowers.resetCooldown(player);
-            h.assertTrue(!FactionPowers.use(player, 1) && FactionPowers.remainingCooldown(player, 1) == 0, "Full protest summoned more or spent cooldown");
+            h.assertTrue(!FactionPowers.use(player, 0) && FactionPowers.remainingCooldown(player, 0) == 0, "Full protest summoned more or spent cooldown");
         });
         h.succeed();
     }
-    @GameTest(template="empty", batch="ge_area", timeoutTicks=200) public static void areaPowersOfEsquerdaDireitaAndCentro(GameTestHelper h) {
+    @GameTest(template="empty", batch="ge_area", timeoutTicks=200) public static void areaPowersOfDireitaAndCentro(GameTestHelper h) {
         var p = arena(h, 150);
         clearNaturalMonsters(h, p);
         var player = real(h, p, "AreaQA");
-        Factions.assign(player, Faction.ESQUERDA); unlockAll(player);
+        Factions.assign(player, Faction.DIREITA); unlockAll(player);
         var spider = enemy(h, p.add(3, 0, 0)); var pig = animal(h, p.add(-3, 0, 0));
         guarded(() -> { spider.discard(); pig.discard(); leave(h, player); }, () -> {
-            h.assertTrue(FactionPowers.use(player, 2) && spider.hasEffect(MobEffects.MOVEMENT_SLOWDOWN) && spider.hasEffect(MobEffects.WEAKNESS)
-                    && !pig.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "Greve Geral wrong");
-            Factions.assign(player, Faction.DIREITA);
-            // Cooldowns belong to the slot, not the faction.
-            FactionPowers.resetCooldown(player);
             float before = spider.getHealth();
             h.assertTrue(FactionPowers.use(player, 2) && near(spider.getHealth(), before - 6) && pig.getHealth() == pig.getMaxHealth(), "Mão Invisível wrong");
             h.assertTrue(FactionPowers.use(player, 1) && player.getDeltaMovement().y > 1, "Salto Liberal did not launch");
             Factions.assign(player, Faction.CENTRO);
+            unlockAll(player);
             FactionPowers.resetCooldown(player);
             h.assertTrue(FactionPowers.use(player, 1) && player.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() == 3, "Isenção is not Resistance IV");
             spider.moveTo(p.x + 2, p.y, p.z); spider.invulnerableTime = 0;

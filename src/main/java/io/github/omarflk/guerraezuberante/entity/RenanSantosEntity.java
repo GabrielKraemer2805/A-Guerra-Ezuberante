@@ -10,10 +10,14 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-public class RenanSantosEntity extends RetaliatingCharacterEntity implements io.github.omarflk.guerraezuberante.combat.NpcGunUser {
+/**
+ * Renan Santos, leader of the Missão, on the castle throne. A boss since 0.020: yellow boss bar, cinematic death and
+ * explosion like Lula, Jair, Jones and Enéias. Fights with the TaCZ AKM when that mod is installed, with his fists otherwise.
+ */
+public class RenanSantosEntity extends SpecialDeathEntity implements io.github.omarflk.guerraezuberante.combat.NpcGunUser, RifleUser {
     public RenanSantosEntity(EntityType<? extends RenanSantosEntity> type, Level level) {
         super(type, level);
-        if (!level.isClientSide) io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.equipRenan(this);
+        if (!level.isClientSide) { applyConfiguredHealth(); io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.equipRenan(this); }
         equipmentChecked = isArmed();
     }
     private boolean equipmentChecked;
@@ -60,6 +64,20 @@ public class RenanSantosEntity extends RetaliatingCharacterEntity implements io.
     @Override protected void registerGoals() {
         super.registerGoals();goalSelector.addGoal(1,new io.github.omarflk.guerraezuberante.combat.RenanRangedGoal(this));
     }
+    @Override protected double configuredHealth() { return io.github.omarflk.guerraezuberante.config.ModConfig.RENAN_HEALTH.get(); }
+    @Override protected double configuredMaxHealth() { return io.github.omarflk.guerraezuberante.config.ModConfig.RENAN_HEALTH.get(); }
+    @Override protected String deathSavePrefix() { return "Renan"; }
+    @Override protected net.minecraft.world.BossEvent.BossBarColor bossBarColor() { return net.minecraft.world.BossEvent.BossBarColor.YELLOW; }
+    @Override public org.joml.Vector3f deathEnergyColor() { return new org.joml.Vector3f(1, .85F, .1F); }
+    @Override protected boolean isValidAggressor(net.minecraft.world.entity.LivingEntity target) { return deathState() == ALIVE && super.isValidAggressor(target); }
+    @Override protected DeathSettings deathSettings() {
+        return new DeathSettings(io.github.omarflk.guerraezuberante.config.ModConfig.RENAN_EXPLOSION_ENABLED.get(),
+                io.github.omarflk.guerraezuberante.config.ModConfig.RENAN_EXPLOSION_POWER.get().floatValue(),
+                io.github.omarflk.guerraezuberante.config.ModConfig.RENAN_DEATH_TICKS.get(),
+                io.github.omarflk.guerraezuberante.config.ModConfig.RENAN_RISE.get().floatValue(),
+                io.github.omarflk.guerraezuberante.config.ModConfig.RENAN_BLOCK_DAMAGE.get());
+    }
+
     @Override public void tick() {
         if(!level().isClientSide && !equipmentChecked && tickCount%20==0) {
             io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.equipRenan(this);
@@ -76,7 +94,7 @@ public class RenanSantosEntity extends RetaliatingCharacterEntity implements io.
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return createMobAttributes().add(Attributes.MAX_HEALTH, 30.0D)
+        return createMobAttributes().add(Attributes.MAX_HEALTH, 300.0D)
                 .add(Attributes.ATTACK_DAMAGE, 4.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.25D).add(Attributes.FOLLOW_RANGE, 20.0D);
     }

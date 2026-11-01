@@ -47,7 +47,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Second and third power of each faction, unlocked by Ideological Conviction. Powers that last more than one tick
+ * Powers bought in the skill tree (Lulista Manifestando is the 4th; the Esquerda ones live in {@link EsquerdaPowers}). Powers that last more than one tick
  * (stomp, leap, meteors, book volley, the grave) run as {@link Task}s owned by the caster and stop if the caster
  * dies, logs out or leaves the faction. Damage is multiplied by Ideological Strength ({@link Progression#powerScale}).
  */
@@ -63,16 +63,16 @@ public final class ConvictionPowers {
     private static final List<Running> TASKS = new java.util.concurrent.CopyOnWriteArrayList<>();
     /** Players in the air from Salto Liberal: no fall damage until they land. */
     private static final Set<UUID> LEAPING = ConcurrentHashMap.newKeySet();
-    private static final DustParticleOptions RED = new DustParticleOptions(new Vector3f(.9F, .05F, .05F), 1.4F);
     private static final DustParticleOptions YELLOW = new DustParticleOptions(new Vector3f(1F, .85F, .1F), 1.2F);
 
     public static int cooldown(Faction faction, int slot) {
         return switch (faction) {
-            case LULISTA -> slot == 1 ? ModConfig.STOMP_COOLDOWN.get() : ModConfig.FAZ_O_L_COOLDOWN.get();
+            case LULISTA -> slot == 1 ? ModConfig.STOMP_COOLDOWN.get() : slot == 2 ? ModConfig.FAZ_O_L_COOLDOWN.get()
+                    : slot == 3 ? ModConfig.PROTEST_COOLDOWN.get() : LulistaPowers.cooldown(slot);
             case BOLSONARISTA -> slot == 1 ? ModConfig.ATHLETE_COOLDOWN.get() : ModConfig.GRAVEDIGGER_COOLDOWN.get();
             case MISSAO -> slot == 1 ? ModConfig.METEOR_COOLDOWN.get() : ModConfig.BOOK_COOLDOWN.get();
-            case ESQUERDA -> slot == 1 ? ModConfig.PROTEST_COOLDOWN.get() : ModConfig.STRIKE_COOLDOWN.get();
-            case DIREITA -> slot == 1 ? ModConfig.LEAP_COOLDOWN.get() : ModConfig.PUSH_COOLDOWN.get();
+            case ESQUERDA -> EsquerdaPowers.cooldown(slot);
+            case DIREITA -> slot == 1 ? ModConfig.LEAP_COOLDOWN.get() : slot == 2 ? ModConfig.PUSH_COOLDOWN.get() : DireitaPowers.cooldown(slot);
             case CENTRO -> slot == 1 ? ModConfig.EXEMPTION_COOLDOWN.get() : ModConfig.DRAIN_COOLDOWN.get();
         };
     }
@@ -81,11 +81,12 @@ public final class ConvictionPowers {
     public static boolean fire(ServerPlayer player, Faction faction, int slot) {
         double scale = Progression.powerScale(player, slot);
         return switch (faction) {
-            case LULISTA -> slot == 1 ? endOfShift(player, scale) : fazOL(player, scale);
+            case LULISTA -> slot == 1 ? endOfShift(player, scale) : slot == 2 ? fazOL(player, scale)
+                    : slot == 3 ? protest(player, scale) : LulistaPowers.fire(player, slot, scale);
             case BOLSONARISTA -> slot == 1 ? athlete(player, scale) : notAGravedigger(player, scale);
             case MISSAO -> slot == 1 ? meteorShower(player, scale) : yellowBook(player, scale);
-            case ESQUERDA -> slot == 1 ? protest(player, scale) : generalStrike(player, scale);
-            case DIREITA -> slot == 1 ? liberalLeap(player, scale) : invisibleHand(player, scale);
+            case ESQUERDA -> EsquerdaPowers.fire(player, slot);
+            case DIREITA -> slot == 1 ? liberalLeap(player, scale) : slot == 2 ? invisibleHand(player, scale) : DireitaPowers.fire(player, slot, scale);
             case CENTRO -> slot == 1 ? exemption(player, scale) : giveAndTake(player, scale);
         };
     }
@@ -128,13 +129,18 @@ public final class ConvictionPowers {
 
     // ---------------------------------------------------------------- Lulista
 
-    /** "Fim da Escala!": short hop, heavy stomp and a shockwave. Spares Lulistas and passive animals. */
+    /** Tick of the "Fim da Escala!" pose when the raised foot hits the ground. */
+    public static final int STOMP_TICK = 9;
+
+    /**
+     * "Fim da Escala!": holding a "6x1" sign over the head, the caster lifts one foot and stamps it down; the shockwave
+     * comes with the stamp. No jump. Spares Lulistas and passive animals.
+     */
     private static boolean endOfShift(ServerPlayer player, double scale) {
-        player.setDeltaMovement(player.getDeltaMovement().multiply(.2, 0, .2).add(0, .55, 0));
-        player.hurtMarked = true;
+        CastPose.FIM_DA_ESCALA.play(player);
         sound(player, SoundEvents.PLAYER_ATTACK_STRONG, 1, .6F);
         schedule(player, Faction.LULISTA, (caster, age) -> {
-            if (age < 4 || !(caster.onGround() || age >= 25)) { return true; }
+            if (age < STOMP_TICK) { return true; }
             stompImpact(caster, scale);
             return false;
         });
@@ -291,15 +297,16 @@ public final class ConvictionPowers {
         return true;
     }
 
-    // ---------------------------------------------------------------- Esquerda
+    // ---------------------------------------------------------------- Manifestando (Esquerda and Lulista)
 
     public static List<ManifestanteEntity> protesters(LivingEntity owner) {
         return owner.level().getEntitiesOfClass(ManifestanteEntity.class, owner.getBoundingBox().inflate(64),
                 zombie -> owner.getUUID().equals(zombie.getOwnerId()));
     }
 
-    private static boolean protest(ServerPlayer player, double scale) {
-        int missing = ModConfig.PROTEST_COUNT.get() - protesters(player).size();
+    static boolean protest(ServerPlayer player, double scale) {
+        var before = new HashSet<>(protesters(player));
+        int missing = ModConfig.PROTEST_COUNT.get() - before.size();
         if (missing <= 0) {
             player.displayClientMessage(Component.translatable("power.guerra_ezuberante.protest_full"), true);
             return false;
@@ -310,6 +317,8 @@ public final class ConvictionPowers {
         }
         sound(player, SoundEvents.ZOMBIE_AMBIENT, 1.2F, .7F);
         sound(player, SoundEvents.RAID_HORN.value(), .4F, 1.4F);
+        PowerEffects.manifestando(player, protesters(player).stream().filter(protester -> !before.contains(protester)).toList());
+        CastPose.MANIFESTANDO.play(player);
         return true;
     }
 
@@ -344,26 +353,6 @@ public final class ConvictionPowers {
             }
         }
         return created;
-    }
-
-    private static boolean generalStrike(ServerPlayer player, double scale) {
-        ServerLevel level = player.serverLevel();
-        double radius = ModConfig.STRIKE_RADIUS.get();
-        int ticks = (int) Math.round(ModConfig.STRIKE_TICKS.get() * scale);
-        for (LivingEntity victim : PowerTargets.enemiesAround(level, player, radius)) {
-            victim.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, ticks, 1), player);
-            victim.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, ticks, 0), player);
-            level.sendParticles(ParticleTypes.ANGRY_VILLAGER, victim.getX(), victim.getEyeY() + .4, victim.getZ(), 2, .2, .1, .2, 0);
-        }
-        for (double r = 1.5; r <= radius; r += 1.5) {
-            int points = (int) (r * 8);
-            for (int index = 0; index < points; index++) {
-                double angle = index * Math.PI * 2 / points;
-                level.sendParticles(RED, player.getX() + Math.cos(angle) * r, player.getY() + .3, player.getZ() + Math.sin(angle) * r, 1, 0, 0, 0, 0);
-            }
-        }
-        sound(player, SoundEvents.BELL_BLOCK, 1, .8F);
-        return true;
     }
 
     // ---------------------------------------------------------------- Direita

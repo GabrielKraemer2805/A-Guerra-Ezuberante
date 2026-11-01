@@ -119,6 +119,45 @@ public final class ClassScreenChecks {
                     results.put("treePoints", ProgressionClient.treePoints());
                     results.put("moral", ProgressionClient.moral());
                     mc.setScreen(null);
+                    var id = mc.player.getUUID();
+                    mc.getSingleplayerServer().execute(() -> {
+                        var player = mc.getSingleplayerServer().getPlayerList().getPlayer(id);
+                        Factions.assign(player, Faction.ESQUERDA);
+                        for (var node : new SkillTree.Node[]{SkillTree.Node.ESQ_VIRAR_O_VOTO, SkillTree.Node.ESQ_VOTO_DE_CONSCIENCIA,
+                                SkillTree.Node.ESQ_RAIZES, SkillTree.Node.ESQ_LIVE}) SkillTree.buy(player, node);
+                        Progression.select(player, io.github.omarflk.guerraezuberante.faction.EsquerdaPowers.LIVE);
+                    });
+                    next(7);
+                }
+                // 0.019: the Esquerda tree (4 branches) and the Lulista Manifestando.
+                case 7 -> {
+                    if (ProgressionClient.treePoints() != 4 || !ProgressionClient.owns(SkillTree.Node.ESQ_LIVE)) { if (ticks > 100) throw new IllegalStateException("Esquerda tree packets failed"); return; }
+                    if (!(mc.screen instanceof ProfileScreen)) { mc.setScreen(new ProfileScreen()); ticks = 0; return; }
+                    if (ticks < 15) return;
+                    org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), 0, 0);
+                    if (ticks < 20) return;
+                    capture("profile-arvore-esquerda");
+                    results.put("esquerdaTreePoints", ProgressionClient.treePoints());
+                    results.put("esquerdaSelected", ProgressionClient.selected());
+                    mc.setScreen(null);
+                    var id = mc.player.getUUID();
+                    mc.getSingleplayerServer().execute(() -> {
+                        var player = mc.getSingleplayerServer().getPlayerList().getPlayer(id);
+                        Factions.assign(player, Faction.LULISTA);
+                        for (var node : new SkillTree.Node[]{SkillTree.Node.LUL_FIM_DA_ESCALA, SkillTree.Node.LUL_FAZ_O_L, SkillTree.Node.LUL_MANIFESTANDO})
+                            SkillTree.buy(player, node);
+                    });
+                    next(8);
+                }
+                case 8 -> {
+                    if (!ProgressionClient.owns(SkillTree.Node.LUL_MANIFESTANDO) || ProgressionClient.treePoints() != 3) { if (ticks > 100) throw new IllegalStateException("Lulista Manifestando packets failed"); return; }
+                    if (!(mc.screen instanceof ProfileScreen)) { mc.setScreen(new ProfileScreen()); ticks = 0; return; }
+                    if (ticks < 15) return;
+                    org.lwjgl.glfw.GLFW.glfwSetCursorPos(mc.getWindow().getWindow(), 0, 0);
+                    if (ticks < 20) return;
+                    capture("profile-arvore-lulista");
+                    results.put("lulistaManifestando", true);
+                    mc.setScreen(null);
                     next(10);
                 }
                 // Class skills through the real input: Shift held, then a use click with the empty hand.

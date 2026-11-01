@@ -30,7 +30,8 @@ import java.util.List;
 
 /**
  * The faction castle: a square keep with four corner towers, a double door facing the village square,
- * a carpet to the throne and the faction's flags. The leader is spawned on the throne.
+ * a carpet to the throne and the faction's flags. The leader is spawned on the throne, and two armed guards of the faction
+ * on each tower (0.020).
  * Local coordinates follow {@link StructurePiece}: z = 0 is the gate side, blocks are authored facing NORTH.
  */
 public final class FactionCastlePiece extends StructurePiece {
@@ -268,6 +269,29 @@ public final class FactionCastlePiece extends StructurePiece {
             FactionVillageStructure.leader(faction).ifPresent(type ->
                     FactionVillageStructure.spawnAt(level, type, seatPos, getOrientation().getOpposite().toYRot()));
         }
+        if (io.github.omarflk.guerraezuberante.config.ModConfig.GUARDS_ENABLED.get()) {
+            for (BlockPos post : guardPosts()) {
+                if (!box.isInside(post)) { continue; }
+                // Facing out of the castle, away from its centre.
+                BlockPos center = getWorldPos(11, FLOOR, 11);
+                float yaw = (float) (Math.atan2(post.getZ() - center.getZ(), post.getX() - center.getX()) * 180 / Math.PI) - 90;
+                FactionVillageStructure.spawnAt(level, io.github.omarflk.guerraezuberante.registry.ModEntities.TOWER_GUARD.get(), post, yaw,
+                        entity -> ((io.github.omarflk.guerraezuberante.entity.TowerGuardEntity) entity).setup(faction, random));
+            }
+        }
+    }
+
+    /**
+     * Where the guards stand: on top of each tower, two opposite corners of the 3x3 inside the battlements, around the flag
+     * in the middle. World positions of the feet.
+     */
+    public List<BlockPos> guardPosts() {
+        var posts = new java.util.ArrayList<BlockPos>();
+        for (int[] top : new int[][]{{3, 3}, {20, 3}, {3, 20}, {20, 20}}) {
+            posts.add(getWorldPos(top[0] - 1, TOWER_TOP + 1, top[1] + 1).immutable());
+            posts.add(getWorldPos(top[0] + 1, TOWER_TOP + 1, top[1] - 1).immutable());
+        }
+        return posts;
     }
 
     private void door(WorldGenLevel level, BoundingBox box, int x, DoorHingeSide hinge) {

@@ -155,6 +155,17 @@ public final class FactionVillageGameTests {
         }
         h.assertTrue(flags >= 8, faction + " castle has " + flags + " flags");
     }
+    /** 0.020: two guards of the faction on each of the four towers, standing on their posts. */
+    private static void assertGuards(GameTestHelper h, Faction faction, FactionCastlePiece castle) {
+        var guards = h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.TowerGuardEntity.class, area(castle.getBoundingBox()));
+        var posts = castle.guardPosts();
+        h.assertTrue(guards.size() == 8, faction + " castle has " + guards.size() + " guards");
+        for (var guard : guards) {
+            h.assertTrue(guard.faction() == faction && guard.isPersistenceRequired() && guard.isArmed(), guard + " wrong faction, despawns or unarmed");
+            h.assertTrue(posts.contains(guard.blockPosition()), guard + " not on a tower post");
+            h.assertTrue(h.getLevel().getBlockState(guard.blockPosition().below()).isSolid(), guard + " not standing on the tower");
+        }
+    }
     private static void cleanUp(GameTestHelper h, StructureStart start) {
         h.getLevel().getEntitiesOfClass(Entity.class, area(start.getBoundingBox()), entity -> !(entity instanceof net.minecraft.world.entity.player.Player))
                 .forEach(Entity::discard);
@@ -163,9 +174,12 @@ public final class FactionVillageGameTests {
     @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400) public static void bolsonaristaVillageHasJairInCastleAndFlavioOutside(GameTestHelper h) {
         StructureStart start = generate(h, Faction.BOLSONARISTA, new ChunkPos(250, 250));
         try {
-            h.assertTrue(h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.npc.Villager.class, area(start.getBoundingBox()))
-                    .stream().noneMatch(io.github.omarflk.guerraezuberante.registry.ModVillagers::isPetista), "Petista outside a Lulista village");
+            var bolsonaristaVillagers = h.getLevel().getEntitiesOfClass(net.minecraft.world.entity.npc.Villager.class, area(start.getBoundingBox()));
+            h.assertTrue(!bolsonaristaVillagers.isEmpty() && bolsonaristaVillagers.stream().allMatch(io.github.omarflk.guerraezuberante.registry.ModVillagers::isBolsonarista),
+                    "Not every villager of the Bolsonarista village is a bolsonarista: " + bolsonaristaVillagers.stream()
+                            .map(villager -> net.minecraft.core.registries.BuiltInRegistries.VILLAGER_TYPE.getKey(villager.getVillagerData().getType()) + "@" + villager.blockPosition()).toList());
             FactionCastlePiece castle = castle(h, start);
+            assertGuards(h, Faction.BOLSONARISTA, castle);
             var level = h.getLevel();
             var jair = level.getEntitiesOfClass(JairBolsonaroEntity.class, area(start.getBoundingBox()));
             var flavio = level.getEntitiesOfClass(FlavioBolsonaroEntity.class, area(start.getBoundingBox()));
@@ -201,19 +215,22 @@ public final class FactionVillageGameTests {
             h.assertTrue(castle.getBoundingBox().isInside(renan.get(0).blockPosition()), "Renan outside the castle");
             h.assertFalse(castle.getBoundingBox().isInside(arthur.get(0).blockPosition()), "Arthur inside the castle");
             assertFlags(h, Faction.MISSAO, castle.getBoundingBox());
+            assertGuards(h, Faction.MISSAO, castle);
         } finally {
             cleanUp(h, start);
         }
         h.succeed();
     }
 
-    /** Factions without characters still get the village, castle and flags, but nobody on the throne. */
+    /** Factions without characters still get the village, castle, flags and tower guards, but nobody on the throne. */
     @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400) public static void centroVillageHasEmptyCastleAndGrayFlags(GameTestHelper h) {
         StructureStart start = generate(h, Faction.CENTRO, new ChunkPos(300, 250));
         try {
             FactionCastlePiece castle = castle(h, start);
-            var characters = h.getLevel().getEntitiesOfClass(RetaliatingCharacterEntity.class, area(start.getBoundingBox()));
+            var characters = h.getLevel().getEntitiesOfClass(RetaliatingCharacterEntity.class, area(start.getBoundingBox()),
+                    character -> !(character instanceof io.github.omarflk.guerraezuberante.entity.TowerGuardEntity));
             h.assertTrue(characters.isEmpty(), characters.size() + " characters in the Centro village");
+            assertGuards(h, Faction.CENTRO, castle);
             assertFlags(h, Faction.CENTRO, castle.getBoundingBox());
             h.assertTrue(ModWorldgen.CASTLE.get() == castle.getType(), "castle piece type");
         } finally {
@@ -230,6 +247,7 @@ public final class FactionVillageGameTests {
             var leaders=h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.LulaEntity.class, area(start.getBoundingBox()));
             h.assertTrue(leaders.size()==1 && castle.getBoundingBox().isInside(leaders.get(0).blockPosition()), "Lula missing or outside castle");
             assertFlags(h,Faction.LULISTA,castle.getBoundingBox());
+            assertGuards(h,Faction.LULISTA,castle);
             var haddad=h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.HaddadEntity.class, area(start.getBoundingBox()));
             var boulos=h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.BoulosEntity.class, area(start.getBoundingBox()));
             var dilma=h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.DilmaEntity.class, area(start.getBoundingBox()));
@@ -270,21 +288,35 @@ public final class FactionVillageGameTests {
             h.assertTrue(allies.get(0).isAlliedTo(comunistas.get(0)) && jones.get(0).isAlliedTo(comunistas.get(0)) && jones.get(0).isAlliedTo(allies.get(0)),
                     "Comunistas and allies are not on Jones' side");
             assertFlags(h,Faction.ESQUERDA,castle.getBoundingBox());
+            assertGuards(h,Faction.ESQUERDA,castle);
             System.out.println("ESQUERDA_VILLAGE comunistas="+comunistas.size());
         } finally { cleanUp(h,start); }
         h.succeed();
     }
 
     @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400)
-    public static void independentVillagesHaveCorrectFlagsAndNoCharacters(GameTestHelper h) {
-        for (Faction faction : new Faction[]{Faction.DIREITA}) {
-            StructureStart start=generate(h,faction,new ChunkPos(375,250));
-            try {
-                var castle=castle(h,start);
-                h.assertTrue(h.getLevel().getEntitiesOfClass(RetaliatingCharacterEntity.class,area(start.getBoundingBox())).isEmpty(), "Unexpected faction character");
-                assertFlags(h,faction,castle.getBoundingBox());
-            } finally { cleanUp(h,start); }
-        }
+    public static void direitaVillageHasEneiasInCastleAndAlliesOutside(GameTestHelper h) {
+        StructureStart start=generate(h,Faction.DIREITA,new ChunkPos(375,250));
+        try {
+            var castle=castle(h,start);
+            var level=h.getLevel();
+            var eneias=level.getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.EneiasEntity.class,area(start.getBoundingBox()));
+            var cury=level.getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.AugustoCuryEntity.class,area(start.getBoundingBox()));
+            h.assertTrue(eneias.size()==1 && castle.getBoundingBox().isInside(eneias.get(0).blockPosition()), "Eneias missing or outside the castle");
+            h.assertTrue(cury.size()==1 && cury.get(0).home()!=null && !castle.getBoundingBox().isInside(cury.get(0).blockPosition()), "Cury missing, without home or in the castle");
+            h.assertTrue(eneias.get(0).isAlliedTo(cury.get(0)) && cury.get(0).isAlliedTo(eneias.get(0)), "Eneias and Cury are not allies");
+            for (var type : List.of(io.github.omarflk.guerraezuberante.entity.RomeuZemaEntity.class, io.github.omarflk.guerraezuberante.entity.RonaldoCaiadoEntity.class)) {
+                var found=level.getEntitiesOfClass(type,area(start.getBoundingBox()));
+                h.assertTrue(found.size()==1 && found.get(0).home()!=null && !castle.getBoundingBox().isInside(found.get(0).blockPosition())
+                        && found.get(0).isAlliedTo(eneias.get(0)), type.getSimpleName()+" missing, without home, in the castle or not an ally");
+            }
+            assertFlags(h,Faction.DIREITA,castle.getBoundingBox());
+            assertGuards(h,Faction.DIREITA,castle);
+            var villagers=level.getEntitiesOfClass(net.minecraft.world.entity.npc.Villager.class,area(start.getBoundingBox()));
+            h.assertTrue(!villagers.isEmpty() && villagers.stream().allMatch(villager -> io.github.omarflk.guerraezuberante.registry.ModVillagers.faction(villager)==Faction.DIREITA),
+                    "The Direita villagers are not direitistas");
+            System.out.println("DIREITA_VILLAGE direitistas="+villagers.size());
+        } finally { cleanUp(h,start); }
         h.succeed();
     }
 

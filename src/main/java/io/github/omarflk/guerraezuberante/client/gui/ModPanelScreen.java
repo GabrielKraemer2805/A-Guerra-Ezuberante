@@ -45,9 +45,10 @@ public final class ModPanelScreen extends Screen {
     private int characterSelected;
     /** Text key prefix and entity id of each character tab, in tab order. */
     private static final String[] CHARACTER_KEYS = {"renan", "arthur_fighter", "arthur_summoner", "ucraniana", "lula", "jair", "flavio",
-            "haddad", "boulos", "dilma", "jones", "tabata", "marina", "ciro"};
+            "haddad", "boulos", "dilma", "jones", "tabata", "marina", "ciro", "eneias", "cury", "guarda", "zema", "caiado"};
     private static final String[] CHARACTER_ENTITIES = {"renan_santos", "arthur_do_val_combatente", "arthur_do_val_invocador", "combatente_ucraniana",
-            "lula", "jair_bolsonaro", "flavio_bolsonaro", "haddad", "guilherme_boulos", "dilma", "jones_manoel", "tabata_amaral", "marina_silva", "ciro_gomes"};
+            "lula", "jair_bolsonaro", "flavio_bolsonaro", "haddad", "guilherme_boulos", "dilma", "jones_manoel", "tabata_amaral", "marina_silva", "ciro_gomes",
+            "eneias", "augusto_cury", "guarda_da_torre", "romeu_zema", "ronaldo_caiado"};
     private int shownCooldown = -1;
     private Faction shownFaction;
 
@@ -103,7 +104,7 @@ public final class ModPanelScreen extends Screen {
                 paragraph(textWidth, "gui.guerra_ezuberante.arsenal");
             }
             case CHARACTERS -> {
-                // Three columns of short buttons, so the 14 characters still leave room for the text on a 240-pixel screen.
+                // Three columns of short buttons, so the 17 characters still leave room for the text on a 240-pixel screen.
                 int gap = 3, columns = 3;
                 int buttonWidth = (width - contentX - 24 - gap * (columns - 1)) / columns;
                 for (int index = 0; index < CHARACTER_KEYS.length; index++) {
@@ -144,6 +145,11 @@ public final class ModPanelScreen extends Screen {
                             : characterSelected == 11 ? ModEntities.TABATA_AMARAL.get().create(minecraft.level)
                             : characterSelected == 12 ? ModEntities.MARINA_SILVA.get().create(minecraft.level)
                             : characterSelected == 13 ? ModEntities.CIRO_GOMES.get().create(minecraft.level)
+                            : characterSelected == 14 ? ModEntities.ENEIAS.get().create(minecraft.level)
+                            : characterSelected == 15 ? ModEntities.AUGUSTO_CURY.get().create(minecraft.level)
+                            : characterSelected == 16 ? ModEntities.TOWER_GUARD.get().create(minecraft.level)
+                            : characterSelected == 17 ? ModEntities.ROMEU_ZEMA.get().create(minecraft.level)
+                            : characterSelected == 18 ? ModEntities.RONALDO_CAIADO.get().create(minecraft.level)
                             : ModEntities.FLAVIO_BOLSONARO.get().create(minecraft.level);
                 }
             }

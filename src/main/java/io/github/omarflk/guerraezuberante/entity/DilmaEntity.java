@@ -75,7 +75,7 @@ public final class DilmaEntity extends LulistaAllyEntity {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return createMobAttributes().add(Attributes.MAX_HEALTH, 40).add(Attributes.ATTACK_DAMAGE, 2)
+        return createMobAttributes().add(Attributes.MAX_HEALTH, 150).add(Attributes.ATTACK_DAMAGE, 2)
                 .add(Attributes.MOVEMENT_SPEED, .25).add(Attributes.FOLLOW_RANGE, 16);
     }
 
@@ -323,6 +323,8 @@ public final class DilmaEntity extends LulistaAllyEntity {
         windTarget = null;
         entityData.set(WIND_START, -1000L);
     }
+
+    @Override protected double configuredHealth() { return io.github.omarflk.guerraezuberante.config.ModConfig.DILMA_HEALTH.get(); }
 
     @Override
     public void tick() {

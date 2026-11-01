@@ -44,7 +44,7 @@ public final class CiroGomesEntity extends EsquerdaAllyEntity {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return createMobAttributes().add(Attributes.MAX_HEALTH, 40).add(Attributes.ATTACK_DAMAGE, 5)
+        return createMobAttributes().add(Attributes.MAX_HEALTH, 100).add(Attributes.ATTACK_DAMAGE, 5)
                 .add(Attributes.MOVEMENT_SPEED, .25).add(Attributes.FOLLOW_RANGE, 16).add(Attributes.KNOCKBACK_RESISTANCE, .3);
     }
 
@@ -54,6 +54,8 @@ public final class CiroGomesEntity extends EsquerdaAllyEntity {
     @Override public boolean isActionLocked() { return isInParis(); }
     @Override public boolean isPickable() { return !isInParis() && super.isPickable(); }
     @Override public boolean isPushable() { return !isInParis() && super.isPushable(); }
+
+    @Override protected double configuredHealth() { return io.github.omarflk.guerraezuberante.config.ModConfig.CIRO_HEALTH.get(); }
 
     @Override
     public void tick() {
@@ -96,11 +98,11 @@ public final class CiroGomesEntity extends EsquerdaAllyEntity {
             pushed++;
         }
         if (level() instanceof ServerLevel server) {
-            server.sendParticles(ParticleTypes.ANGRY_VILLAGER, getX(), getEyeY() + .5, getZ(), 6, .4, .2, .4, 0);
             server.sendParticles(ParticleTypes.SWEEP_ATTACK, getX(), getY() + 1, getZ(), 8, 1.5, .2, 1.5, 0);
         }
+        io.github.omarflk.guerraezuberante.faction.PowerEffects.pavioCurto(this, ModConfig.CIRO_TEMPER_RADIUS.get());
         playSound(SoundEvents.RAVAGER_ROAR, 1, 1.3F);
-        startCastPose();
+        startCastPose(io.github.omarflk.guerraezuberante.faction.CastPose.PAVIO_CURTO);
         nextTemper = level().getGameTime() + ModConfig.CIRO_TEMPER_COOLDOWN.get();
         return pushed;
     }
@@ -115,9 +117,8 @@ public final class CiroGomesEntity extends EsquerdaAllyEntity {
         // Invulnerable entities are not valid targets (canBeSeenAsEnemy), so nothing keeps chasing him.
         setInvulnerable(true);
         dropPursuers();
-        if (level() instanceof ServerLevel server) {
-            server.sendParticles(ParticleTypes.PORTAL, getX(), getY() + 1, getZ(), 60, .4, .8, .4, .6);
-        }
+        io.github.omarflk.guerraezuberante.faction.PowerEffects.paris(this, true);
+        startCastPose(io.github.omarflk.guerraezuberante.faction.CastPose.PARIS);
         playSound(SoundEvents.ENDERMAN_TELEPORT, 1, 1);
         news("entity.guerra_ezuberante.ciro_gomes.paris");
     }
@@ -127,9 +128,7 @@ public final class CiroGomesEntity extends EsquerdaAllyEntity {
         setInvisible(false);
         setInvulnerable(false);
         setHealth(Math.max(getHealth(), getMaxHealth() / 2));
-        if (level() instanceof ServerLevel server) {
-            server.sendParticles(ParticleTypes.PORTAL, getX(), getY() + 1, getZ(), 60, .4, .8, .4, .6);
-        }
+        io.github.omarflk.guerraezuberante.faction.PowerEffects.paris(this, false);
         playSound(SoundEvents.ENDERMAN_TELEPORT, 1, 1.3F);
         news("entity.guerra_ezuberante.ciro_gomes.back");
     }

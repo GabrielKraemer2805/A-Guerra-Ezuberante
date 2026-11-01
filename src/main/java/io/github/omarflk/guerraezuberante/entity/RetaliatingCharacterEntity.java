@@ -167,6 +167,8 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
         return faction() != null && other instanceof RetaliatingCharacterEntity character && character.faction() == faction()
                 || faction() == Faction.LULISTA && other instanceof PetistaEntity
                 || faction() == Faction.ESQUERDA && other instanceof ComunistaEntity
+                || faction() == Faction.BOLSONARISTA && other instanceof BolsonaristaEntity
+                || faction() == Faction.DIREITA && other instanceof DireitistaEntity
                 || faction() != null && other instanceof Villager villager && ModVillagers.faction(villager) == faction()
                 || faction() != null && other instanceof ManifestanteEntity crowd && crowd.getOwner() instanceof RetaliatingCharacterEntity leader
                 && leader.faction() == faction()
@@ -179,11 +181,16 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
      */
     public List<LivingEntity> hostilesAround(double radius) {
         return level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(radius),
-                other -> other.distanceToSqr(this) <= radius * radius && isValidAggressor(other)
-                        && (other == getTarget() || other instanceof net.minecraft.world.entity.monster.Enemy && !(other instanceof net.minecraft.world.entity.monster.Creeper)
-                        || isRival(other) || other instanceof net.minecraft.world.entity.Mob mob && mob.getTarget() == this
-                        || other instanceof Player player && faction() != null && io.github.omarflk.guerraezuberante.faction.Factions.of(player)
-                                .filter(faction -> faction != faction()).isPresent()));
+                other -> other.distanceToSqr(this) <= radius * radius && isFoe(other));
+    }
+
+    /** Whether an area power of this character may hit the entity; the rule of {@link #hostilesAround}. */
+    public boolean isFoe(LivingEntity other) {
+        return isValidAggressor(other)
+                && (other == getTarget() || other instanceof net.minecraft.world.entity.monster.Enemy && !(other instanceof net.minecraft.world.entity.monster.Creeper)
+                || isRival(other) || other instanceof net.minecraft.world.entity.Mob mob && mob.getTarget() == this
+                || other instanceof Player player && faction() != null && io.github.omarflk.guerraezuberante.faction.Factions.of(player)
+                        .filter(faction -> faction != faction()).isPresent());
     }
 
     protected boolean isValidAggressor(LivingEntity attacker) {
@@ -359,6 +366,23 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
         combatAudioCooldown = Math.max(0, Math.min(12000, tag.getInt("CombatAudioCooldown")));
         lastReaction = tag.getString("LastReaction");
         endRetaliation();
+        applyConfiguredHealth();
+    }
+
+    /** Max health of a secondary character from the server config; 0 keeps the registered value (bosses, troops). */
+    protected double configuredHealth() { return 0; }
+
+    /**
+     * Gives the character its configured max health, keeping the share of health it had: a character saved with an
+     * older value (or before a config change) is updated when it loads, a new one starts full.
+     */
+    protected void applyConfiguredHealth() {
+        double wanted = configuredHealth();
+        var health = getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
+        if (wanted <= 0 || health == null || health.getBaseValue() == wanted) { return; }
+        float share = getMaxHealth() > 0 ? getHealth() / getMaxHealth() : 1;
+        health.setBaseValue(wanted);
+        setHealth(share * getMaxHealth());
     }
 
     @Override

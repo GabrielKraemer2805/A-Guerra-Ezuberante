@@ -9,7 +9,11 @@ public final class CharacterAnimationController extends AnimationController<Reta
     private static final java.util.Map<String, RawAnimation> CLIPS = new java.util.HashMap<>();
     static {
         for (String name : java.util.List.of("idle", "walk", "punch_left", "punch_right", "sword_attack", "cast", "hurt", "ukrainian_emerge",
-                "rifle_idle", "rifle_prepare", "rifle_aim", "rifle_walk", "rifle_fire", "rifle_hurt", "mandioca_throw", "estocar_vento")) {
+                "rifle_idle", "rifle_prepare", "rifle_aim", "rifle_walk", "rifle_fire", "rifle_hurt", "mandioca_throw", "estocar_vento",
+                // 0.019: the Esquerda power gestures (CastPose names).
+                "manifestando", "virar_o_voto", "voto_de_consciencia", "raizes", "sumico", "pavio_curto", "paris", "live", "inverno", "comite",
+                // 0.022: Romeu Zema's and Ronaldo Caiado's.
+                "liquidacao", "laco", "boiada")) {
             var animation = RawAnimation.begin();
             CLIPS.put(name, java.util.Set.of("idle","walk","rifle_idle","rifle_aim","rifle_walk").contains(name)
                     ? animation.thenLoop("animation.guerra." + name) : animation.thenPlay("animation.guerra." + name));
@@ -35,7 +39,7 @@ public final class CharacterAnimationController extends AnimationController<Reta
             animation = "ukrainian_emerge";
         } else if (entity instanceof ArthurDoValEntity arthur && arthur.isActionLocked()) {
             animation = "cast";
-        } else if (entity instanceof RenanSantosEntity renan && renan.isArmed()) {
+        } else if (entity instanceof RifleUser renan && renan.isArmed()) {
             if(renan.rifleShotAge(partialTick)<9) {
                 if(lastShot!=renan.rifleShotToken()) { forceAnimationReset();lastShot=renan.rifleShotToken(); }
                 animation="rifle_fire";
@@ -44,12 +48,12 @@ public final class CharacterAnimationController extends AnimationController<Reta
             else if(state.isMoving()) animation="rifle_walk";
             else animation=renan.isRifleAiming()?"rifle_aim":"rifle_idle";
         } else if (entity instanceof JonesManoelEntity jones && jones.liveAge(partialTick) < jones.liveLength()) {
-            // The lecture: the cast gestures over and over.
+            // The lecture: phone up, the other hand explaining, one second over and over.
             if (lastCast != jones.liveToken()) { forceAnimationReset(); lastCast = jones.liveToken(); }
-            animation = "cast";
-        } else if (entity instanceof EsquerdaAllyEntity ally && ally.castAge(partialTick) < EsquerdaAllyEntity.CAST_LENGTH) {
-            if (lastCast != ally.castToken()) { forceAnimationReset(); lastCast = ally.castToken(); }
-            animation = "cast";
+            animation = "live";
+        } else if (entity instanceof PosingCharacter posing && posing.castAge(partialTick) < posing.castPose().ticks()) {
+            if (lastCast != posing.castToken()) { forceAnimationReset(); lastCast = posing.castToken(); }
+            animation = posing.castPose().name().toLowerCase(java.util.Locale.ROOT);
         } else if (entity instanceof DilmaEntity dilma && dilma.windAge(partialTick) < DilmaEntity.WIND_CAST) {
             if (lastWind != dilma.windToken()) { forceAnimationReset(); lastWind = dilma.windToken(); }
             animation = "estocar_vento";
@@ -58,7 +62,7 @@ public final class CharacterAnimationController extends AnimationController<Reta
                 forceAnimationReset();
                 lastAttack = entity.attackAnimationToken();
             }
-            animation = entity instanceof DilmaEntity ? "mandioca_throw" : !entity.getMainHandItem().isEmpty() ? "sword_attack"
+            animation = entity instanceof DilmaEntity || entity instanceof EneiasEntity ? "mandioca_throw" : !entity.getMainHandItem().isEmpty() ? "sword_attack"
                     : entity.isLeftPunch() ? "punch_left" : "punch_right";
         } else if (entity.hurtTime > 0) {
             animation = "hurt";
@@ -79,7 +83,7 @@ public final class CharacterAnimationController extends AnimationController<Reta
         if (entity instanceof ArthurDoValEntity arthur && arthur.isActionLocked()) {
             return Math.max(0, Math.min(19.999, arthur.castAnimationAge(partialTick)));
         }
-        if(entity instanceof RenanSantosEntity renan && renan.isArmed()) {
+        if(entity instanceof RifleUser renan && renan.isArmed()) {
             if(renan.rifleShotAge(partialTick)<9)return Math.max(0,renan.rifleShotAge(partialTick));
             if(entity.hurtTime>0)return Math.min(9.999,10-entity.hurtTime+partialTick);
             if(renan.isRifleAiming() && renan.rifleAimAge(partialTick)<12)return Math.max(0,renan.rifleAimAge(partialTick));
@@ -91,8 +95,8 @@ public final class CharacterAnimationController extends AnimationController<Reta
         if (entity instanceof JonesManoelEntity jones && jones.liveAge(partialTick) < jones.liveLength()) {
             return Math.max(0, jones.liveAge(partialTick)) % 20;
         }
-        if (entity instanceof EsquerdaAllyEntity ally && ally.castAge(partialTick) < EsquerdaAllyEntity.CAST_LENGTH) {
-            return Math.max(0, Math.min(19.999, ally.castAge(partialTick)));
+        if (entity instanceof PosingCharacter posing && posing.castAge(partialTick) < posing.castPose().ticks()) {
+            return Math.max(0, Math.min(posing.castPose().ticks() - .001, posing.castAge(partialTick)));
         }
         if (entity.attackAnimationAge(partialTick) < RetaliatingCharacterEntity.ATTACK_LENGTH) {
             return Math.max(0, entity.attackAnimationAge(partialTick));

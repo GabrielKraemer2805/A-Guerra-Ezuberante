@@ -9,11 +9,16 @@ import software.bernie.geckolib.constant.DataTickets;
 
 /** One articulated classic 64x64 UV model, shared without modifying the author's textures. */
 public final class CharacterGeoModel<T extends RetaliatingCharacterEntity> extends GeoModel<T> {
-    private final ResourceLocation texture;
-    public CharacterGeoModel(String textureName) { texture = resource("textures/entity/" + textureName + ".png"); }
+    private final java.util.function.Function<T, ResourceLocation> texture;
+    public CharacterGeoModel(String textureName) {
+        ResourceLocation fixed = resource("textures/entity/" + textureName + ".png");
+        texture = entity -> fixed;
+    }
+    /** For characters whose skin changes per entity (the tower guards). */
+    public CharacterGeoModel(java.util.function.Function<T, ResourceLocation> texture) { this.texture = texture; }
     private static ResourceLocation resource(String path) { return new ResourceLocation(GuerraEzuberanteMod.MOD_ID, path); }
     @Override public ResourceLocation getModelResource(T entity) { return resource("geo/humanoid.geo.json"); }
-    @Override public ResourceLocation getTextureResource(T entity) { return texture; }
+    @Override public ResourceLocation getTextureResource(T entity) { return texture.apply(entity); }
     @Override public ResourceLocation getAnimationResource(T entity) { return resource("animations/humanoid.animation.json"); }
     @Override public void setCustomAnimations(T entity, long instanceId, AnimationState<T> state) {
         super.setCustomAnimations(entity, instanceId, state);
@@ -23,8 +28,8 @@ public final class CharacterGeoModel<T extends RetaliatingCharacterEntity> exten
             head.setRotX(head.getRotX() + (float)Math.toRadians(data.headPitch()));
             head.setRotY(head.getRotY() + (float)Math.toRadians(data.netHeadYaw()));
         }
-        if(entity instanceof io.github.omarflk.guerraezuberante.entity.RenanSantosEntity renan && renan.isArmed() && renan.isRifleAiming()) {
-            float pitch=(float)Math.toRadians(renan.getXRot());
+        if(entity instanceof io.github.omarflk.guerraezuberante.entity.RifleUser renan && renan.isArmed() && renan.isRifleAiming()) {
+            float pitch=(float)Math.toRadians(entity.getXRot());
             for(String name:java.util.List.of("right_arm","left_arm")) {
                 var arm=getAnimationProcessor().getBone(name);if(arm!=null)arm.setRotX(arm.getRotX()-pitch);
             }

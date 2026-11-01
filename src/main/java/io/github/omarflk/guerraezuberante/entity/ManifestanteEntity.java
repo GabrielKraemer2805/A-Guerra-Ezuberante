@@ -1,10 +1,18 @@
 package io.github.omarflk.guerraezuberante.entity;
 
+import io.github.omarflk.guerraezuberante.faction.Faction;
+import io.github.omarflk.guerraezuberante.faction.Factions;
 import io.github.omarflk.guerraezuberante.faction.PowerTargets;
 import io.github.omarflk.guerraezuberante.summon.OwnedSummon;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,12 +32,19 @@ import java.util.EnumSet;
 import java.util.UUID;
 
 /**
- * Esquerda "Manifestando" (and Lula's "Manifestação"): a red zombie that behaves like a tamed wolf.
+ * Esquerda "Manifestando" (and Lula's "Manifestação"): a protester that behaves like a tamed wolf. It looks like the
+ * villagers of its owner's faction (petistas for the Lulistas, comunistas for the Esquerda Independente, bolsonaristas for
+ * the Bolsonaristas, one of their skins at random) and keeps the old red zombie for the other factions (the Invocador bodyguard).
  * The owner is a player or a mod character; a character's allies are the crowd's allies too. It follows its owner, attacks whoever
  * hurt the owner or whatever the owner attacked, and never targets the owner's faction. Never saved, never
  * burns, never converts villagers, drops nothing and vanishes when its time is up or its owner is gone.
  */
 public final class ManifestanteEntity extends Zombie implements OwnedSummon {
+    /** How it looks: the red zombie, a petista or a comunista. */
+    public enum Look { ZOMBIE, PETISTA, COMUNISTA, BOLSONARISTA, DIREITISTA }
+
+    private static final EntityDataAccessor<Integer> LOOK = SynchedEntityData.defineId(ManifestanteEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> SKIN = SynchedEntityData.defineId(ManifestanteEntity.class, EntityDataSerializers.INT);
     private UUID ownerId;
     private int lifeTicks;
 
@@ -45,8 +60,29 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
                 .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE, 0D);
     }
 
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(LOOK, Look.ZOMBIE.ordinal());
+        entityData.define(SKIN, 0);
+    }
+
+    public Look look() { return Look.values()[Math.floorMod(entityData.get(LOOK), Look.values().length)]; }
+    /** Skin number inside the faction's set; the renderer wraps it to the set size. */
+    public int skin() { return entityData.get(SKIN); }
+
+    /** The look of a crowd called by this owner. */
+    public static Look lookFor(LivingEntity owner) {
+        Faction faction = owner instanceof Player player ? Factions.of(player).orElse(null)
+                : owner instanceof RetaliatingCharacterEntity character ? character.faction() : null;
+        return faction == Faction.LULISTA ? Look.PETISTA : faction == Faction.ESQUERDA ? Look.COMUNISTA
+                : faction == Faction.BOLSONARISTA ? Look.BOLSONARISTA : faction == Faction.DIREITA ? Look.DIREITISTA : Look.ZOMBIE;
+    }
+
     public void bindTo(LivingEntity owner, int lifetimeTicks, double damageScale) {
         ownerId = owner.getUUID();
+        entityData.set(LOOK, lookFor(owner).ordinal());
+        entityData.set(SKIN, random.nextInt(64));
         lifeTicks = lifetimeTicks;
         var attack = getAttribute(Attributes.ATTACK_DAMAGE);
         if (attack != null) { attack.setBaseValue(attack.getBaseValue() * damageScale); }
@@ -134,7 +170,7 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
     public void tick() {
         super.tick();
         if (!(level() instanceof ServerLevel server) || !isAlive()) { return; }
-        if (tickCount == 1) {
+        if (tickCount == 1 && look() == Look.ZOMBIE) {
             server.sendParticles(new DustParticleOptions(new Vector3f(.9F, .05F, .05F), 1.2F), getX(), getY() + 1, getZ(), 12, .3, .6, .3, 0);
         }
         if (--lifeTicks <= 0) { vanish(server); return; }
@@ -152,6 +188,11 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
         server.sendParticles(ParticleTypes.POOF, getX(), getY() + .8D, getZ(), 6, .2, .3, .2, .01);
         discard();
     }
+
+    /** Petistas and comunistas sound like villagers, not like zombies. */
+    @Override protected SoundEvent getAmbientSound() { return look() == Look.ZOMBIE ? super.getAmbientSound() : SoundEvents.VILLAGER_AMBIENT; }
+    @Override protected SoundEvent getHurtSound(DamageSource source) { return look() == Look.ZOMBIE ? super.getHurtSound(source) : SoundEvents.VILLAGER_HURT; }
+    @Override protected SoundEvent getDeathSound() { return look() == Look.ZOMBIE ? super.getDeathSound() : SoundEvents.VILLAGER_DEATH; }
 
     @Override protected boolean isSunSensitive() { return false; }
     @Override protected boolean convertsInWater() { return false; }

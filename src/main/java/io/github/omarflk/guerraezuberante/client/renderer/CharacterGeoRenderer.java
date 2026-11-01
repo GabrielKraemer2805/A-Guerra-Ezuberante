@@ -15,7 +15,11 @@ import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer;
 
 public class CharacterGeoRenderer<T extends RetaliatingCharacterEntity> extends GeoEntityRenderer<T> {
     public CharacterGeoRenderer(EntityRendererProvider.Context context, String texture, float scale) {
-        super(context, new CharacterGeoModel<>(texture));
+        this(context, new CharacterGeoModel<>(texture), scale);
+    }
+
+    public CharacterGeoRenderer(EntityRendererProvider.Context context, CharacterGeoModel<T> model, float scale) {
+        super(context, model);
         shadowRadius = 0.35F * scale;
         withScale(scale);
         addRenderLayer(new BlockAndItemGeoLayer<T>(this) {
@@ -32,7 +36,7 @@ public class CharacterGeoRenderer<T extends RetaliatingCharacterEntity> extends 
                 pose.pushPose();
                 pose.mulPose(Axis.XP.rotationDegrees(-90));
                 pose.translate(0, 0.05, -0.1);
-                if(entity instanceof io.github.omarflk.guerraezuberante.entity.RenanSantosEntity renan && renan.isArmed()) {
+                if(entity instanceof io.github.omarflk.guerraezuberante.entity.RifleUser renan && renan.isArmed()) {
                     pose.mulPose(Axis.YP.rotationDegrees(8));
                     pose.translate(0,.02,0);
                 }

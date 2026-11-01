@@ -80,6 +80,16 @@ minecraft {
                 property 'guerra.esquerdaTest', 'true'
                 mods { "${mod_id}" { source sourceSets.gameTest } }
             }
+            if (project.hasProperty('direitaTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.direitaTest', 'true'
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
+            if (project.hasProperty('esquerdaPowersTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.esquerdaPowersTest', 'true'
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
             if (project.hasProperty('classTest')) {
                 args '--width', '1280', '--height', '720'
                 property 'guerra.classTest', 'true'

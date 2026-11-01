@@ -36,7 +36,7 @@ public final class GeckoSprintGameTests {
         h.assertTrue(!fighter.isSummoner() && mage.isSummoner(),"Variant identity wrong");
         h.assertTrue(fighter.getMainHandItem().is(ModItems.UKRAINIAN_SWORD.get()) && mage.getMainHandItem().isEmpty(),"Variant equipment wrong");
         for(var a:java.util.List.of(fighter,mage)) {
-            h.assertTrue(a.getMaxHealth()==32 && a.getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue()==5
+            h.assertTrue(a.getMaxHealth()==80 && a.getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue()==5
                     && a.getAttribute(Attributes.MOVEMENT_SPEED).getBaseValue()==.24,"Arthur base stats changed");
             h.assertTrue(Math.abs(a.getBbHeight()-1.584)<.001,"Arthur scale changed");
             h.assertTrue(a instanceof software.bernie.geckolib.animatable.GeoEntity,"Not a Gecko entity");
@@ -103,7 +103,8 @@ public final class GeckoSprintGameTests {
         var a=arthur(h,false);a.setNoAi(true);
         var c=target(h,a.getX()+2.3,a.getY(),a.getZ());
         for(int z=7;z<=9;z++)for(int y=1;y<=3;y++)h.setBlock(new BlockPos(9,y,z),Blocks.STONE);
-        h.runAfterDelay(2,()->{h.assertTrue(!a.doHurtTarget(c) && c.getHealth()==1024,"Attack crossed wall");h.succeed();});
+        // Health compared around the hit only: a stray shot from a neighbouring test must not count as crossing the wall.
+        h.runAfterDelay(2,()->{float before=c.getHealth();h.assertTrue(!a.doHurtTarget(c) && c.getHealth()==before,"Attack crossed wall");h.succeed();});
     }
     @GameTest(template="empty")
     public static void swordArthurPreservesFiveDamageAndNormalDurability(GameTestHelper h) {

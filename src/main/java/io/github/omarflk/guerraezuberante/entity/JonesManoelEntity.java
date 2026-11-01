@@ -1,11 +1,12 @@
 package io.github.omarflk.guerraezuberante.entity;
 
 import io.github.omarflk.guerraezuberante.config.ModConfig;
+import io.github.omarflk.guerraezuberante.faction.CastPose;
 import io.github.omarflk.guerraezuberante.faction.ConvictionPowers;
+import io.github.omarflk.guerraezuberante.faction.PowerEffects;
 import io.github.omarflk.guerraezuberante.faction.Faction;
 import io.github.omarflk.guerraezuberante.registry.ModEffects;
 import io.github.omarflk.guerraezuberante.registry.ModSounds;
-import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -24,8 +25,6 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
@@ -38,9 +37,11 @@ import java.util.List;
  *     <li><b>Comitê Central</b>: below half health, comrades (Manifestantes) come to his side.</li>
  * </ul>
  */
-public final class JonesManoelEntity extends SpecialDeathEntity {
+public final class JonesManoelEntity extends SpecialDeathEntity implements PosingCharacter {
     private static final EntityDataAccessor<Long> LIVE_START = SynchedEntityData.defineId(JonesManoelEntity.class, EntityDataSerializers.LONG);
     private static final EntityDataAccessor<Integer> LIVE_LENGTH = SynchedEntityData.defineId(JonesManoelEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Long> CAST_START = SynchedEntityData.defineId(JonesManoelEntity.class, EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<Integer> CAST_POSE = SynchedEntityData.defineId(JonesManoelEntity.class, EntityDataSerializers.INT);
     private long nextLive, nextFreeze, nextCommittee;
     private int liveRemaining;
 
@@ -67,11 +68,23 @@ public final class JonesManoelEntity extends SpecialDeathEntity {
         super.defineSynchedData();
         entityData.define(LIVE_START, -1000L);
         entityData.define(LIVE_LENGTH, 60);
+        entityData.define(CAST_START, -1000L);
+        entityData.define(CAST_POSE, 0);
     }
 
     public float liveAge(float partialTick) { return level().getGameTime() - entityData.get(LIVE_START) + partialTick; }
     public int liveLength() { return entityData.get(LIVE_LENGTH); }
     public long liveToken() { return entityData.get(LIVE_START); }
+    /** Inverno Siberiano and Comitê Central strike their pose; the Live has its own clock above. */
+    @Override public float castAge(float partialTick) { return level().getGameTime() - entityData.get(CAST_START) + partialTick; }
+    @Override public long castToken() { return entityData.get(CAST_START); }
+    @Override public CastPose castPose() { return CastPose.byOrdinal(entityData.get(CAST_POSE)).orElse(CastPose.INVERNO); }
+
+    private void startCastPose(CastPose pose) {
+        entityData.set(CAST_POSE, pose.ordinal());
+        entityData.set(CAST_START, level().getGameTime());
+    }
+
     public boolean isLecturing() { return level().isClientSide ? liveAge(0) < liveLength() : liveRemaining > 0; }
 
     /** Standing still for the whole lecture. */
@@ -119,7 +132,7 @@ public final class JonesManoelEntity extends SpecialDeathEntity {
         int elapsed = liveLength() - liveRemaining;
         setDeltaMovement(0, getDeltaMovement().y, 0);
         if (getTarget() != null) { getLookControl().setLookAt(getTarget(), 30, 30); }
-        server.sendParticles(ParticleTypes.ENCHANT, getX(), getY() + 2.2, getZ(), 6, .6, .3, .6, .4);
+        PowerEffects.liveFrame(this, elapsed);
         if (elapsed % 20 == 0) {
             for (LivingEntity victim : hostilesAround(ModConfig.JONES_LIVE_RADIUS.get())) {
                 victim.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 1), this);
@@ -139,14 +152,8 @@ public final class JonesManoelEntity extends SpecialDeathEntity {
         target.addEffect(new MobEffectInstance(ModEffects.PARALYZED.get(), ticks, 0), this);
         // The powder-snow frost: frozen screen and shaking; it thaws 2 per tick, so it lasts about as long as the paralysis.
         if (target.canFreeze()) { target.setTicksFrozen(Math.max(target.getTicksFrozen(), target.getTicksRequiredToFreeze() + 2 * ticks)); }
-        server.sendParticles(ParticleTypes.SNOWFLAKE, target.getX(), target.getY() + 1, target.getZ(), 40, .5, .8, .5, .05);
-        server.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.PACKED_ICE.defaultBlockState()),
-                target.getX(), target.getY() + 1, target.getZ(), 30, .4, .8, .4, .1);
-        Vec3 from = getEyePosition(), to = target.getBoundingBox().getCenter();
-        for (int step = 1; step < 10; step++) {
-            Vec3 at = from.lerp(to, step / 10D);
-            server.sendParticles(ParticleTypes.SNOWFLAKE, at.x, at.y, at.z, 2, .05, .05, .05, 0);
-        }
+        PowerEffects.inverno(this, target);
+        startCastPose(CastPose.INVERNO);
         playSound(SoundEvents.POWDER_SNOW_PLACE, 1.4F, .6F);
         playSound(SoundEvents.GLASS_PLACE, 1, .5F);
         nextFreeze = level().getGameTime() + ModConfig.JONES_FREEZE_COOLDOWN.get();
@@ -157,9 +164,12 @@ public final class JonesManoelEntity extends SpecialDeathEntity {
     /** Comitê Central: comrades up to the configured count. Public for GameTests. */
     public int callCommittee() {
         if (!(level() instanceof ServerLevel server) || deathState() != ALIVE) { return 0; }
-        int missing = ModConfig.JONES_COMMITTEE_COUNT.get() - ConvictionPowers.protesters(this).size();
+        var before = new java.util.HashSet<>(ConvictionPowers.protesters(this));
+        int missing = ModConfig.JONES_COMMITTEE_COUNT.get() - before.size();
         int created = missing <= 0 ? 0 : ConvictionPowers.spawnProtesters(server, this, missing, 1);
         if (created > 0) {
+            PowerEffects.comite(this, ConvictionPowers.protesters(this).stream().filter(comrade -> !before.contains(comrade)).toList());
+            startCastPose(CastPose.COMITE);
             nextCommittee = level().getGameTime() + ModConfig.JONES_COMMITTEE_COOLDOWN.get();
             playSound(SoundEvents.RAID_HORN.value(), .6F, 1.6F);
         }
