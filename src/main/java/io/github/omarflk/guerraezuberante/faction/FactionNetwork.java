@@ -25,7 +25,7 @@ public final class FactionNetwork {
      * 4: village music (0.014.3). 5: classes, skill tree and moral bar (0.017).
      * 6: up to 10 power slots, a 64-bit node mask (Esquerda tree and Lulista Manifestando) and cast poses (0.019).
      */
-    private static final String VERSION = "9";
+    private static final String VERSION = "10";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(GuerraEzuberanteMod.MOD_ID, "faction"), () -> VERSION, VERSION::equals, VERSION::equals);
     /** ordinal -1 means "no faction". */
@@ -65,7 +65,45 @@ public final class FactionNetwork {
         CHANNEL.sendToServer(new MissionAction(action));
     }
 
+    /** A new post on the timeline, or (replace) the whole of it on login. */
+    public record FeedSync(java.util.List<io.github.omarflk.guerraezuberante.social.Feed.Post> posts, boolean replace) {}
+
+    public static void sendPost(ServerPlayer player, io.github.omarflk.guerraezuberante.social.Feed.Post post) {
+        send(player, new FeedSync(java.util.List.of(post), false));
+    }
+
+    public static void sendPosts(ServerPlayer player, java.util.List<io.github.omarflk.guerraezuberante.social.Feed.Post> posts) {
+        send(player, new FeedSync(posts, true));
+    }
+
     public static void register() {
+        CHANNEL.messageBuilder(FeedSync.class, 16, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder((packet, buffer) -> {
+                    buffer.writeBoolean(packet.replace());
+                    buffer.writeVarInt(packet.posts().size());
+                    for (var post : packet.posts()) {
+                        buffer.writeVarInt(post.author() + 1); buffer.writeUtf(post.player(), 64); buffer.writeVarInt(post.faction());
+                        buffer.writeUtf(post.text(), 128); buffer.writeUtf(post.arg(), 128); buffer.writeBoolean(post.argIsKey());
+                        buffer.writeLong(post.time()); buffer.writeVarInt(post.likes());
+                    }
+                })
+                .decoder(buffer -> {
+                    boolean replace = buffer.readBoolean();
+                    int size = Math.min(buffer.readVarInt(), io.github.omarflk.guerraezuberante.social.Feed.MAX_POSTS);
+                    var posts = new java.util.ArrayList<io.github.omarflk.guerraezuberante.social.Feed.Post>();
+                    for (int index = 0; index < size; index++) {
+                        posts.add(new io.github.omarflk.guerraezuberante.social.Feed.Post(buffer.readVarInt() - 1, buffer.readUtf(64), buffer.readVarInt(),
+                                buffer.readUtf(128), buffer.readUtf(128), buffer.readBoolean(), buffer.readLong(), buffer.readVarInt()));
+                    }
+                    return new FeedSync(posts, replace);
+                })
+                .consumerMainThread((packet, context) -> {
+                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+                        if (packet.replace()) { io.github.omarflk.guerraezuberante.client.FeedClient.replace(packet.posts()); }
+                        else { packet.posts().forEach(io.github.omarflk.guerraezuberante.client.FeedClient::add); }
+                    });
+                    context.get().setPacketHandled(true);
+                }).add();
         CHANNEL.messageBuilder(MissionSync.class, 14, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder((packet, buffer) -> { buffer.writeVarInt(packet.mission() + 1); buffer.writeBoolean(packet.active());
                     buffer.writeVarInt(packet.progress()); buffer.writeVarInt(packet.done()); buffer.writeBoolean(packet.open()); })

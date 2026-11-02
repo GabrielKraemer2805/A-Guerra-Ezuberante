@@ -268,6 +268,31 @@ public final class SkinVisualChecks {
                 case 12 -> {
                     if (ticks < 10) return;
                     mc.setScreen(null);
+                    server(() -> {
+                        ServerPlayer player = serverPlayer();
+                        // Enough posts to fill the screen, with Bolsonaro's thumbs-up among them.
+                        for (int i = 0; i < 6; i++) {
+                            io.github.omarflk.guerraezuberante.social.Feed.missionDone(player, Faction.BOLSONARISTA, io.github.omarflk.guerraezuberante.mission.Mission.BOL_MINERIO);
+                        }
+                        io.github.omarflk.guerraezuberante.social.Feed.get(player.server).posts();
+                    });
+                    next(13);
+                }
+                case 13 -> {
+                    if (ticks < 20) return;
+                    if (io.github.omarflk.guerraezuberante.client.FeedClient.posts().size() < 12) { errors.add("The timeline did not reach the client: " + io.github.omarflk.guerraezuberante.client.FeedClient.posts().size()); }
+                    mc.setScreen(io.github.omarflk.guerraezuberante.client.screen.ProfileScreen.onTimeline());
+                    next(14);
+                }
+                case 14 -> {
+                    if (ticks < 20) return;
+                    Screenshot.grab(mc.gameDirectory, "skin-twitter.png", mc.getMainRenderTarget(), ignored -> {});
+                    results.put("twitter", "captured");
+                    next(15);
+                }
+                case 15 -> {
+                    if (ticks < 10) return;
+                    mc.setScreen(null);
                     finish(null);
                 }
                 default -> {}

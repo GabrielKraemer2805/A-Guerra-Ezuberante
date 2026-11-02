@@ -158,6 +158,7 @@ public final class Missions {
         }
         player.sendSystemMessage(Component.translatable("mission.guerra_ezuberante.completed", Component.translatable(done.key("title")).withStyle(ChatFormatting.GOLD)));
         player.sendSystemMessage(Component.translatable(done.key("done")).withStyle(ChatFormatting.YELLOW));
+        io.github.omarflk.guerraezuberante.social.Feed.missionDone(player, faction, done);
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, .7F, 1);
         return true;
     }

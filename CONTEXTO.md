@@ -1,5 +1,12 @@
 # Contexto de trabalho — Guerra Ezuberante
 
+## Aba Twitter/X — 0.026.0 (02/11/2026)
+
+- Fase 4 de 6 (ver 0.023.0), branch `feat/generais-exercito`. A aba é identificada na tela como paródia, com posts fictícios escritos para o jogo.
+- **Feed** (`social/Feed`, `SavedData` do mundo, até 60 posts, compartilhado entre os jogadores): cada missão entregue gera o post do jogador, um de um político do partido (`social/Author`, duas falas por autor) e, com 40% de chance, a provocação de um rival. Sem texto livre do jogador, decisão combinada com o colaborador. Protocolo do canal `faction` 9 → **10**.
+- **Tela:** quarta aba do J (`ProfileScreen.renderFeed`), com rolagem, cabeça da skin como avatar e curtidas sorteadas. O joinha é um sprite desenhado (`{joinha}` no texto), porque a fonte do jogo não tem esse emoji; só o Jair o usa.
+- Testes: `FeedGameTests` (2) e captura em `SkinVisualChecks`. A captura não sorteou uma fala com joinha, então o sprite só fica visto no teste do colaborador. A instabilidade registrada na 0.025.0 continua sem causa conhecida.
+
 ## Base militar, generais e missões — 0.025.0 (02/11/2026)
 
 - Fase 3 de 6 (ver 0.023.0), branch `feat/generais-exercito`.

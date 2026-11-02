@@ -31,7 +31,7 @@ public final class ProfileScreen extends Screen {
     private static final int[] MORAL_COLORS = {0xFFB91C1C, 0xFFF87171, 0xFF9CA3AF, 0xFFFACC15, 0xFF2563EB, 0xFF16A34A};
     /** Compact enough for 240 scaled pixels of height (720p window with automatic GUI scale). */
     private static final int ROW = 16, CONTENT = 44, PANEL_HEIGHT = CONTENT + 178, NODE_HEIGHT = 18, NODE_ROW = 24;
-    private enum Tab { PERFIL, ARVORE, MISSOES }
+    private enum Tab { PERFIL, ARVORE, MISSOES, TWITTER }
     /** Screen rectangle of a tree node (height {@link #NODE_HEIGHT}). */
     private record Box(int x, int y, int w) {
         boolean contains(double mouseX, double mouseY) { return mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + NODE_HEIGHT; }
@@ -39,6 +39,9 @@ public final class ProfileScreen extends Screen {
     }
     private static final int MIN_TREE_COLUMN = 74;
     private int treeScroll;
+    private int feedScroll, feedHeight;
+    /** Marks a line that ends in the thumbs-up, drawn as a small sprite because the game's font has no such emoji. */
+    private static final String THUMB = "{joinha}";
     private static Tab tab = Tab.PERFIL;
     private int left, top, panelWidth, panelHeight;
     private Faction faction;
@@ -132,7 +135,7 @@ public final class ProfileScreen extends Screen {
             return;
         }
         Component tooltip = tab == Tab.PERFIL ? renderProfile(graphics, mouseX, mouseY)
-                : tab == Tab.MISSOES ? renderMissions(graphics) : renderTree(graphics, mouseX, mouseY);
+                : tab == Tab.MISSOES ? renderMissions(graphics) : tab == Tab.TWITTER ? renderFeed(graphics) : renderTree(graphics, mouseX, mouseY);
         super.render(graphics, mouseX, mouseY, partialTick);
         if (tooltip != null) {
             graphics.renderTooltip(font, font.split(tooltip, 220), mouseX, mouseY);
@@ -276,6 +279,10 @@ public final class ProfileScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+        if (tab == Tab.TWITTER) {
+            feedScroll = Math.max(0, Math.min(Math.max(0, feedHeight - feedViewport()), feedScroll - (int) Math.round(delta * 24)));
+            return true;
+        }
         if (tab == Tab.ARVORE && maxTreeScroll() > 0) {
             treeScroll = Math.max(0, Math.min(maxTreeScroll(), treeScroll - (int) Math.round(delta * 40)));
             return true;
@@ -363,6 +370,89 @@ public final class ProfileScreen extends Screen {
         graphics.drawString(font, Component.translatable("gui.guerra_ezuberante.tree.selected", ModKeyBindings.USE_POWER.getTranslatedKeyMessage(),
                 faction.powerName(selected), seconds(ProgressionClient.remaining(selected))), left + 10, treeTop() + 6 * NODE_ROW + 2, TEXT);
         return tooltip;
+    }
+
+    /** Opens the J profile on the timeline; for the visual test. */
+    public static ProfileScreen onTimeline() {
+        tab = Tab.TWITTER;
+        return new ProfileScreen();
+    }
+
+    private int feedViewport() { return panelHeight - CONTENT - 16; }
+
+    private net.minecraft.resources.ResourceLocation playerSkin(String name) {
+        var connection = minecraft.getConnection();
+        var info = connection == null ? null : connection.getPlayerInfo(name);
+        return info != null ? info.getSkinLocation() : net.minecraft.client.resources.DefaultPlayerSkin.getDefaultSkin();
+    }
+
+    /** The head of a skin, base and hat layers, from the classic atlas. */
+    private void avatar(GuiGraphics graphics, net.minecraft.resources.ResourceLocation skin, int x, int y) {
+        graphics.blit(skin, x, y, 16, 16, 8, 8, 8, 8, 64, 64);
+        graphics.blit(skin, x, y, 16, 16, 40, 8, 8, 8, 64, 64);
+    }
+
+    /** A small yellow thumbs-up, pixel by pixel. */
+    private static void thumb(GuiGraphics graphics, int x, int y) {
+        int color = 0xFFFACC15, shade = 0xFFCA8A04;
+        graphics.fill(x + 2, y, x + 4, y + 3, color);
+        graphics.fill(x + 1, y + 3, x + 7, y + 8, color);
+        graphics.fill(x, y + 3, x + 1, y + 8, shade);
+        graphics.fill(x + 7, y + 4, x + 8, y + 7, shade);
+    }
+
+    /** 0.026: the fictional X. Newest post on top, scrolled with the mouse wheel. */
+    private Component renderFeed(GuiGraphics graphics) {
+        int x = left + 10, w = panelWidth - 20, top0 = top + CONTENT;
+        graphics.drawString(font, Component.translatable("gui.guerra_ezuberante.feed.parody"), x, top0, MUTED);
+        int viewTop = top0 + 12, viewBottom = viewTop + feedViewport() - 12;
+        var posts = io.github.omarflk.guerraezuberante.client.FeedClient.posts();
+        if (posts.isEmpty()) {
+            for (var line : font.split(Component.translatable("gui.guerra_ezuberante.feed.empty"), w)) { graphics.drawString(font, line, x, viewTop + 4, TEXT); viewTop += 10; }
+            return null;
+        }
+        long now = minecraft.level == null ? 0 : minecraft.level.getGameTime();
+        graphics.enableScissor(x - 2, viewTop, x + w + 2, viewBottom);
+        int y = viewTop - feedScroll, total = 0;
+        for (int index = posts.size() - 1; index >= 0; index--) {
+            var post = posts.get(index);
+            var author = io.github.omarflk.guerraezuberante.social.Author.byOrdinal(post.author());
+            String name = author.map(io.github.omarflk.guerraezuberante.social.Author::displayName).orElse(post.player());
+            String handle = "@" + author.map(io.github.omarflk.guerraezuberante.social.Author::handle).orElse(post.player().toLowerCase(java.util.Locale.ROOT));
+            Component arg = post.argIsKey() ? Component.translatable(post.arg()) : Component.literal(post.arg());
+            String raw = Component.translatable(post.text(), arg).getString();
+            boolean hasThumb = raw.contains(THUMB);
+            var lines = font.split(Component.literal(raw.replace(THUMB, "").stripTrailing()), w - 26);
+            int height = 16 + Math.max(1, lines.size()) * 10 + 8;
+            if (y + height > viewTop && y < viewBottom) {
+                int color = Faction.byOrdinal(post.faction()).map(faction -> faction.color().getColor()).orElse(0xFFFFFF) == null ? 0xFFFFFF
+                        : Faction.byOrdinal(post.faction()).map(faction -> faction.color().getColor()).orElse(0xFFFFFF);
+                graphics.fill(x, y, x + w, y + height - 3, 0xFF171A20);
+                graphics.fill(x, y, x + 2, y + height - 3, 0xFF000000 | color);
+                avatar(graphics, author.map(value -> new net.minecraft.resources.ResourceLocation(io.github.omarflk.guerraezuberante.GuerraEzuberanteMod.MOD_ID,
+                        "textures/entity/" + value.texture() + ".png")).orElseGet(() -> playerSkin(post.player())), x + 5, y + 3);
+                graphics.drawString(font, name, x + 25, y + 3, 0xFFFFFFFF);
+                String ago = Component.translatable("gui.guerra_ezuberante.feed.ago", Math.max(0, (now - post.time()) / 1200)).getString();
+                graphics.drawString(font, ago, x + w - 3 - font.width(ago), y + 3, MUTED);
+                graphics.drawString(font, handle, x + 25, y + 12, MUTED);
+                int textY = y + 22;
+                int lastEnd = x + 25;
+                for (var line : lines) {
+                    graphics.drawString(font, line, x + 25, textY, TEXT);
+                    lastEnd = x + 25 + font.width(line);
+                    textY += 10;
+                }
+                if (hasThumb) { thumb(graphics, lastEnd + 3, textY - 10); }
+                String likes = "♥ " + post.likes();
+                graphics.drawString(font, likes, x + w - 3 - font.width(likes), y + 12, MUTED);
+            }
+            y += height;
+            total += height;
+        }
+        graphics.disableScissor();
+        feedHeight = total + 12;
+        feedScroll = Math.min(feedScroll, Math.max(0, feedHeight - feedViewport()));
+        return null;
     }
 
     /** 0.025: where the player stands in the party story; the missions themselves are handled with the general. */
