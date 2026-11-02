@@ -36,6 +36,11 @@ public final class ModConfig {
             PL_OCCUPATION_COOLDOWN,PL_OCCUPATION_TICKS,PD_BOMB_COOLDOWN,PD_DIPLOMA_COOLDOWN,PD_DIPLOMA_COUNT,PD_SHOUT_COOLDOWN,
             PD_SHOOTER_COOLDOWN,PD_SHOOTER_COUNT,PD_BOMB_DRONE_COOLDOWN,PD_REGEN_COOLDOWN,PD_DRONE_LIFETIME;
     /** 0.022: Romeu Zema and Ronaldo Caiado, characters of the Direita village, and their powers in the Direita tree. */
+    /** 0.023: the characters of {@link io.github.omarflk.guerraezuberante.faction.Figure} and their powers. */
+    public static final java.util.Map<io.github.omarflk.guerraezuberante.faction.Figure, ForgeConfigSpec.DoubleValue> FIGURE_HEALTH = new java.util.EnumMap<>(io.github.omarflk.guerraezuberante.faction.Figure.class);
+    public static final java.util.Map<io.github.omarflk.guerraezuberante.faction.FigurePower, ForgeConfigSpec.IntValue> FIGURE_COOLDOWN = new java.util.EnumMap<>(io.github.omarflk.guerraezuberante.faction.FigurePower.class);
+    public static final java.util.Map<io.github.omarflk.guerraezuberante.faction.FigurePower, ForgeConfigSpec.DoubleValue> FIGURE_VALUE = new java.util.EnumMap<>(io.github.omarflk.guerraezuberante.faction.FigurePower.class);
+    public static final ForgeConfigSpec.DoubleValue FIGURE_BACKFIRE_CHANCE;
     public static final ForgeConfigSpec.IntValue ZEMA_SALE_COOLDOWN,ZEMA_PRIVATIZE_COOLDOWN,CAIADO_LASSO_COOLDOWN,CAIADO_STAMPEDE_COOLDOWN,
             SALE_COUNT,PRIVATIZE_PARALYSIS_TICKS,STAMPEDE_COUNT,STAMPEDE_TICKS,PD_SALE_COOLDOWN,PD_PRIVATIZE_COOLDOWN,PD_LASSO_COOLDOWN,
             PD_STAMPEDE_COOLDOWN;
@@ -545,6 +550,16 @@ public final class ModConfig {
                 .defineInRange("power_use_pull",1,0,100);
         MORAL_KILL=builder.comment("Each kill of a player or character of a faction pushes the bar this much away from that faction.")
                 .defineInRange("kill_push",4,0,100);
+        builder.pop();
+        builder.comment("0.023 characters: health, and each power's cooldown and damage (healing for Micheque). Shared by the characters and the players of the trees.").push("figures");
+        for (var figure : io.github.omarflk.guerraezuberante.faction.Figure.values()) {
+            FIGURE_HEALTH.put(figure, builder.defineInRange(figure.id() + "_max_health", 100D, 1D, 1024D));
+        }
+        for (var power : io.github.omarflk.guerraezuberante.faction.FigurePower.values()) {
+            FIGURE_COOLDOWN.put(power, builder.defineInRange(power.id() + "_cooldown_ticks", power.defaultCooldown(), 20, 72000));
+            FIGURE_VALUE.put(power, builder.defineInRange(power.id() + "_value", power.defaultValue(), 0D, 1024D));
+        }
+        FIGURE_BACKFIRE_CHANCE = builder.comment("Chance of Inimiga das Feministas coming back on whoever uses it.").defineInRange("inimiga_backfire_chance", .25D, 0D, 1D);
         builder.pop();
         SPEC = builder.build();
     }

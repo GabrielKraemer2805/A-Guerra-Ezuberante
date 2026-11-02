@@ -63,6 +63,16 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.DiplomaProjectile>> DIPLOMA = REGISTER.register(
             "diploma", () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.DiplomaProjectile>of(io.github.omarflk.guerraezuberante.entity.DiplomaProjectile::new, MobCategory.MISC)
                     .sized(.3F,.3F).clientTrackingRange(8).updateInterval(1).build(GuerraEzuberanteMod.MOD_ID+":diploma"));
+    /** 0.023: every character of {@link io.github.omarflk.guerraezuberante.faction.Figure} shares one entity class. */
+    private static final java.util.Map<io.github.omarflk.guerraezuberante.faction.Figure, RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.FigureEntity>>> FIGURES = new java.util.EnumMap<>(io.github.omarflk.guerraezuberante.faction.Figure.class);
+    static {
+        for (var figure : io.github.omarflk.guerraezuberante.faction.Figure.values()) {
+            FIGURES.put(figure, REGISTER.register(figure.id(), () -> EntityType.Builder.<io.github.omarflk.guerraezuberante.entity.FigureEntity>of(
+                            (type, level) -> new io.github.omarflk.guerraezuberante.entity.FigureEntity(type, level, figure), MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":"+figure.id())));
+        }
+    }
+    public static RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.FigureEntity>> figure(io.github.omarflk.guerraezuberante.faction.Figure figure) { return FIGURES.get(figure); }
     /** 0.022: Romeu Zema and Ronaldo Caiado of the Direita; the appliances and oxen of their powers are never saved. */
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.RomeuZemaEntity>> ROMEU_ZEMA = REGISTER.register(
             "romeu_zema", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.RomeuZemaEntity::new, MobCategory.CREATURE)

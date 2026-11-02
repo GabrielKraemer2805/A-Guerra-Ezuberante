@@ -36,7 +36,9 @@ public enum Faction {
      */
     public int powerCount() {
         return switch (this) {
-            case LULISTA -> 8;
+            case LULISTA -> 10;
+            case BOLSONARISTA -> 17;
+            case MISSAO -> 7;
             case ESQUERDA -> 10;
             case DIREITA -> 13;
             default -> 3;

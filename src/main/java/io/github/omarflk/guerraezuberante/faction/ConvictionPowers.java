@@ -66,6 +66,8 @@ public final class ConvictionPowers {
     private static final DustParticleOptions YELLOW = new DustParticleOptions(new Vector3f(1F, .85F, .1F), 1.2F);
 
     public static int cooldown(Faction faction, int slot) {
+        var figure = FigurePower.of(faction, slot);
+        if (figure.isPresent()) { return ModConfig.FIGURE_COOLDOWN.get(figure.get()).get(); }
         return switch (faction) {
             case LULISTA -> slot == 1 ? ModConfig.STOMP_COOLDOWN.get() : slot == 2 ? ModConfig.FAZ_O_L_COOLDOWN.get()
                     : slot == 3 ? ModConfig.PROTEST_COOLDOWN.get() : LulistaPowers.cooldown(slot);
@@ -80,6 +82,8 @@ public final class ConvictionPowers {
     /** Returns true when the power fired. Refusals (no space, no targets) never start the cooldown. */
     public static boolean fire(ServerPlayer player, Faction faction, int slot) {
         double scale = Progression.powerScale(player, slot);
+        var figure = FigurePower.of(faction, slot);
+        if (figure.isPresent()) { return FigurePowers.firePlayer(player, figure.get(), scale); }
         return switch (faction) {
             case LULISTA -> slot == 1 ? endOfShift(player, scale) : slot == 2 ? fazOL(player, scale)
                     : slot == 3 ? protest(player, scale) : LulistaPowers.fire(player, slot, scale);

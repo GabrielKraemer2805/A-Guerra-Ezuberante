@@ -51,6 +51,9 @@ public final class GuerraEzuberanteMod {
         event.put(ModEntities.BOLSONARISTA.get(), net.minecraft.world.entity.npc.Villager.createAttributes().build());
         event.put(ModEntities.ENEIAS.get(), io.github.omarflk.guerraezuberante.entity.EneiasEntity.createAttributes().build());
         event.put(ModEntities.AUGUSTO_CURY.get(), io.github.omarflk.guerraezuberante.entity.AugustoCuryEntity.createAttributes().build());
+        for (var figure : io.github.omarflk.guerraezuberante.faction.Figure.values()) {
+            event.put(ModEntities.figure(figure).get(), io.github.omarflk.guerraezuberante.entity.FigureEntity.createAttributes().build());
+        }
         event.put(ModEntities.ROMEU_ZEMA.get(), io.github.omarflk.guerraezuberante.entity.RomeuZemaEntity.createAttributes().build());
         event.put(ModEntities.RONALDO_CAIADO.get(), io.github.omarflk.guerraezuberante.entity.RonaldoCaiadoEntity.createAttributes().build());
         event.put(ModEntities.STAMPEDE_OX.get(), net.minecraft.world.entity.animal.Cow.createAttributes().build());

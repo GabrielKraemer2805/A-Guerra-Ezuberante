@@ -19,7 +19,11 @@ sys.path.insert(0, str(HERE))
 from render_skin import CUBES, ROOT  # noqa: E402
 
 TEXTURES = ROOT / "src/main/resources/assets/guerra_ezuberante/textures/entity"
-NAMES = ["marina_silva", "tabata_amaral", "haddad", "jones_manoel", "dilma"]
+NAMES = ["marina_silva", "tabata_amaral", "haddad", "jones_manoel", "dilma", "guilherme_boulos", "tarcisio_freitas", "jair_renan",
+         "eduardo_bolsonaro", "michelle_bolsonaro", "eduarda_campopiano", "nikolas_ferreira", "lucas_pavanato", "kim_kataguiri",
+         "guto_zacarias", "andre_janones"]
+# Sem skin anterior no mod: a fonte em assets-entrada nao leva o sufixo _refatorada.
+NEW = NAMES[6:]
 # Atlas: caixa = (u, v, largura, altura, profundidade)
 BASE = {"cabeca": (0, 0, 8, 8, 8), "tronco": (16, 16, 8, 12, 4), "braco_d": (40, 16, 4, 12, 4),
         "braco_e": (32, 48, 4, 12, 4), "perna_d": (0, 16, 4, 12, 4), "perna_e": (16, 48, 4, 12, 4)}
@@ -137,6 +141,8 @@ def main():
         lines += [f"## {label}", ""]
         for n in NAMES:
             f = finder(n)
+            if not Path(f).exists():
+                continue
             fails, notes = check(f)
             hand_notes = [x for x in notes if "mao" in x]
             status = "APROVADA" if not fails and not hand_notes else "REPROVADA"
@@ -157,7 +163,7 @@ def main():
     lines += ["", "## Integracao: textura do jogo igual a skin refatorada", ""]
     for n in NAMES:
         same = sha(TEXTURES / f"{n}.png") == sha(HERE / n / f"{n}_skin_64x64.png")
-        src = ROOT / "assets-entrada/skins" / f"{n}_skin_64x64_refatorada.png"
+        src = ROOT / "assets-entrada/skins" / (f"{n}_skin_64x64.png" if n in NEW else f"{n}_skin_64x64_refatorada.png")
         src_ok = src.exists() and sha(src) == sha(TEXTURES / f"{n}.png")
         lines.append(f"- {n}: textura {'igual' if same else 'DIFERENTE'}; fonte em assets-entrada {'igual' if src_ok else 'DIFERENTE/AUSENTE'}")
         if "--integrada" in sys.argv and not (same and src_ok):

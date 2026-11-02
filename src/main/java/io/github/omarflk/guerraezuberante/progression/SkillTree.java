@@ -29,7 +29,7 @@ public final class SkillTree {
     public enum Kind { POWER, POTENCIA, RECARGA, CLASSE }
 
     /** GENERIC: Bolsonarista, Missão and Centro. The others have trees of their own, drawn in 4 columns. */
-    public enum Tree { GENERIC, LULISTA, ESQUERDA, DIREITA }
+    public enum Tree { GENERIC, LULISTA, ESQUERDA, DIREITA, BOLSONARISTA, MISSAO }
 
     /**
      * Ids are stable (saved). Requirements are "any of" and always point to earlier nodes. Row and column place the
@@ -48,7 +48,7 @@ public final class SkillTree {
 
         // Lulista (0.020): Chuva de Feijão at the root; Lula, Dilma, Haddad and Boulos branches.
         LUL_RAIZ_POTENCIA("lul_raiz_potencia", 1, Kind.POTENCIA, Tree.LULISTA, "Feijão", 0, 0, new int[]{0}),
-        LUL_RAIZ_RECARGA("lul_raiz_recarga", 1, Kind.RECARGA, Tree.LULISTA, "Feijão", 0, 3, new int[]{0}),
+        LUL_RAIZ_RECARGA("lul_raiz_recarga", 1, Kind.RECARGA, Tree.LULISTA, "Feijão", 0, 4, new int[]{0}),
         LUL_FIM_DA_ESCALA("lul_fim_da_escala", 2, Kind.POWER, Tree.LULISTA, "", 1, 0, new int[]{1}),
         LUL_MANDIOCAS("lul_mandiocas", 1, Kind.POWER, Tree.LULISTA, "", 1, 1, new int[]{4}),
         LUL_TAPAS("lul_tapas_na_cara", 1, Kind.POWER, Tree.LULISTA, "", 1, 2, new int[]{6}),
@@ -117,7 +117,51 @@ public final class SkillTree {
         ESQ_JONES_POTENCIA("esq_jones_potencia", 1, Kind.POTENCIA, Tree.ESQUERDA, "Jones", 4, 3, new int[]{7, 8, 9}, ESQ_COMITE),
         ESQ_CLASSE("esq_classe", 2, Kind.CLASSE, Tree.ESQUERDA, "", 5, 1, new int[0],
                 ESQ_VOTO_DE_CONSCIENCIA, ESQ_SUMICO, ESQ_PARIS, ESQ_INVERNO),
-        ESQ_JONES_RECARGA("esq_jones_recarga", 1, Kind.RECARGA, Tree.ESQUERDA, "Jones", 5, 3, new int[]{7, 8, 9}, ESQ_JONES_POTENCIA);
+        ESQ_JONES_RECARGA("esq_jones_recarga", 1, Kind.RECARGA, Tree.ESQUERDA, "Jones", 5, 3, new int[]{7, 8, 9}, ESQ_JONES_POTENCIA),
+
+        // 0.023: BOLSONARISTA, one column per new character; the older nodes keep their places.
+        BOL_ALAGAMENTO("bol_alagamento", 1, Kind.POWER, Tree.BOLSONARISTA, "", 1, 3, new int[]{3}),
+        BOL_SABESP("bol_sabesp", 2, Kind.POWER, Tree.BOLSONARISTA, "", 2, 3, new int[]{4}, BOL_ALAGAMENTO),
+        BOL_TARCISIO_POTENCIA("bol_tarcisio_potencia", 1, Kind.POTENCIA, Tree.BOLSONARISTA, "Tarcísio", 3, 3, new int[]{3, 4}, BOL_SABESP),
+        BOL_TARCISIO_RECARGA("bol_tarcisio_recarga", 1, Kind.RECARGA, Tree.BOLSONARISTA, "Tarcísio", 4, 3, new int[]{3, 4}, BOL_TARCISIO_POTENCIA),
+        BOL_CARRO_DE_PRESENTE("bol_carro_de_presente", 1, Kind.POWER, Tree.BOLSONARISTA, "", 1, 4, new int[]{5}),
+        BOL_SOU_O_04("bol_sou_o_04", 2, Kind.POWER, Tree.BOLSONARISTA, "", 2, 4, new int[]{6}, BOL_CARRO_DE_PRESENTE),
+        BOL_JAIR_RENAN_POTENCIA("bol_jair_renan_potencia", 1, Kind.POTENCIA, Tree.BOLSONARISTA, "Renan", 3, 4, new int[]{5, 6}, BOL_SOU_O_04),
+        BOL_JAIR_RENAN_RECARGA("bol_jair_renan_recarga", 1, Kind.RECARGA, Tree.BOLSONARISTA, "Renan", 4, 4, new int[]{5, 6}, BOL_JAIR_RENAN_POTENCIA),
+        BOL_TARIFACO("bol_tarifaco", 1, Kind.POWER, Tree.BOLSONARISTA, "", 1, 5, new int[]{7}),
+        BOL_AUTOEXILIO("bol_autoexilio", 2, Kind.POWER, Tree.BOLSONARISTA, "", 2, 5, new int[]{8}, BOL_TARIFACO),
+        BOL_EDUARDO_POTENCIA("bol_eduardo_potencia", 1, Kind.POTENCIA, Tree.BOLSONARISTA, "Eduardo", 3, 5, new int[]{7, 8}, BOL_AUTOEXILIO),
+        BOL_EDUARDO_RECARGA("bol_eduardo_recarga", 1, Kind.RECARGA, Tree.BOLSONARISTA, "Eduardo", 4, 5, new int[]{7, 8}, BOL_EDUARDO_POTENCIA),
+        BOL_FIZ_O_L("bol_fiz_o_l", 1, Kind.POWER, Tree.BOLSONARISTA, "", 1, 6, new int[]{9}),
+        BOL_MICHEQUE("bol_micheque", 2, Kind.POWER, Tree.BOLSONARISTA, "", 2, 6, new int[]{10}, BOL_FIZ_O_L),
+        BOL_MICHELLE_POTENCIA("bol_michelle_potencia", 1, Kind.POTENCIA, Tree.BOLSONARISTA, "Michelle", 3, 6, new int[]{9, 10}, BOL_MICHEQUE),
+        BOL_MICHELLE_RECARGA("bol_michelle_recarga", 1, Kind.RECARGA, Tree.BOLSONARISTA, "Michelle", 4, 6, new int[]{9, 10}, BOL_MICHELLE_POTENCIA),
+        BOL_INIMIGA_DAS_FEMINISTAS("bol_inimiga_das_feministas", 1, Kind.POWER, Tree.BOLSONARISTA, "", 1, 7, new int[]{11}),
+        BOL_PODCAST_SEM_FILTRO("bol_podcast_sem_filtro", 2, Kind.POWER, Tree.BOLSONARISTA, "", 2, 7, new int[]{12}, BOL_INIMIGA_DAS_FEMINISTAS),
+        BOL_CAMPOPIANO_POTENCIA("bol_campopiano_potencia", 1, Kind.POTENCIA, Tree.BOLSONARISTA, "Duda", 3, 7, new int[]{11, 12}, BOL_PODCAST_SEM_FILTRO),
+        BOL_CAMPOPIANO_RECARGA("bol_campopiano_recarga", 1, Kind.RECARGA, Tree.BOLSONARISTA, "Duda", 4, 7, new int[]{11, 12}, BOL_CAMPOPIANO_POTENCIA),
+        BOL_FAKE_NEWS_DO_PIX("bol_fake_news_do_pix", 1, Kind.POWER, Tree.BOLSONARISTA, "", 1, 8, new int[]{13}),
+        BOL_CAMINHADA("bol_caminhada", 2, Kind.POWER, Tree.BOLSONARISTA, "", 2, 8, new int[]{14}, BOL_FAKE_NEWS_DO_PIX),
+        BOL_NIKOLAS_POTENCIA("bol_nikolas_potencia", 1, Kind.POTENCIA, Tree.BOLSONARISTA, "Nikolas", 3, 8, new int[]{13, 14}, BOL_CAMINHADA),
+        BOL_NIKOLAS_RECARGA("bol_nikolas_recarga", 1, Kind.RECARGA, Tree.BOLSONARISTA, "Nikolas", 4, 8, new int[]{13, 14}, BOL_NIKOLAS_POTENCIA),
+        BOL_FISCAL_DE_BANHEIRO("bol_fiscal_de_banheiro", 1, Kind.POWER, Tree.BOLSONARISTA, "", 1, 9, new int[]{15}),
+        BOL_PROVOCACAO("bol_provocacao", 2, Kind.POWER, Tree.BOLSONARISTA, "", 2, 9, new int[]{16}, BOL_FISCAL_DE_BANHEIRO),
+        BOL_PAVANATO_POTENCIA("bol_pavanato_potencia", 1, Kind.POTENCIA, Tree.BOLSONARISTA, "Pavanato", 3, 9, new int[]{15, 16}, BOL_PROVOCACAO),
+        BOL_PAVANATO_RECARGA("bol_pavanato_recarga", 1, Kind.RECARGA, Tree.BOLSONARISTA, "Pavanato", 4, 9, new int[]{15, 16}, BOL_PAVANATO_POTENCIA),
+        // 0.023: MISSAO, one column per new character; the older nodes keep their places.
+        MIS_FURA_POLARIZACAO("mis_fura_polarizacao", 1, Kind.POWER, Tree.MISSAO, "", 1, 3, new int[]{3}),
+        MIS_PROGRAMA_CANCELADO("mis_programa_cancelado", 2, Kind.POWER, Tree.MISSAO, "", 2, 3, new int[]{4}, MIS_FURA_POLARIZACAO),
+        MIS_KIM_POTENCIA("mis_kim_potencia", 1, Kind.POTENCIA, Tree.MISSAO, "Kim", 3, 3, new int[]{3, 4}, MIS_PROGRAMA_CANCELADO),
+        MIS_KIM_RECARGA("mis_kim_recarga", 1, Kind.RECARGA, Tree.MISSAO, "Kim", 4, 3, new int[]{3, 4}, MIS_KIM_POTENCIA),
+        MIS_FLAGRANTE("mis_flagrante", 1, Kind.POWER, Tree.MISSAO, "", 1, 4, new int[]{5}),
+        MIS_CORTE_PRO_TIKTOK("mis_corte_pro_tiktok", 2, Kind.POWER, Tree.MISSAO, "", 2, 4, new int[]{6}, MIS_FLAGRANTE),
+        MIS_GUTO_POTENCIA("mis_guto_potencia", 1, Kind.POTENCIA, Tree.MISSAO, "Guto", 3, 4, new int[]{5, 6}, MIS_CORTE_PRO_TIKTOK),
+        MIS_GUTO_RECARGA("mis_guto_recarga", 1, Kind.RECARGA, Tree.MISSAO, "Guto", 4, 4, new int[]{5, 6}, MIS_GUTO_POTENCIA),
+        // 0.023: LULISTA, one column per new character; the older nodes keep their places.
+        LUL_GRANDE_MANIFESTACAO("lul_grande_manifestacao", 1, Kind.POWER, Tree.LULISTA, "", 1, 4, new int[]{8}),
+        LUL_TEXTAO("lul_textao", 2, Kind.POWER, Tree.LULISTA, "", 2, 4, new int[]{9}, LUL_GRANDE_MANIFESTACAO),
+        LUL_JANONES_POTENCIA("lul_janones_potencia", 1, Kind.POTENCIA, Tree.LULISTA, "Janones", 3, 4, new int[]{8, 9}, LUL_TEXTAO),
+        LUL_JANONES_RECARGA("lul_janones_recarga", 1, Kind.RECARGA, Tree.LULISTA, "Janones", 4, 4, new int[]{8, 9}, LUL_JANONES_POTENCIA);
 
         private final String id, label;
         private final int cost, row, column;
@@ -177,6 +221,8 @@ public final class SkillTree {
                 case LULISTA -> faction == Faction.LULISTA;
                 case ESQUERDA -> faction == Faction.ESQUERDA;
                 case DIREITA -> faction == Faction.DIREITA;
+                case BOLSONARISTA -> faction == Faction.BOLSONARISTA;
+                case MISSAO -> faction == Faction.MISSAO;
             };
         }
 
@@ -207,14 +253,15 @@ public final class SkillTree {
     }
 
     /** Trees of their own are drawn in equal columns with the root over the middle ones. */
-    public static boolean wide(Faction faction) { return treeOf(faction) != Tree.GENERIC; }
+    public static boolean wide(Faction faction) { return columns(faction) > 3; }
 
     /** Columns of the faction's tree: 3 for the generic one, 5 for the Direita (0.022), 4 for the others. */
     public static int columns(Faction faction) {
-        return switch (treeOf(faction)) {
-            case GENERIC -> 3;
-            case DIREITA -> 5;
-            default -> 4;
+        return switch (faction) {
+            case BOLSONARISTA -> 10;
+            case MISSAO, LULISTA, DIREITA -> 5;
+            case ESQUERDA -> 4;
+            case CENTRO -> 3;
         };
     }
 

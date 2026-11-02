@@ -37,6 +37,14 @@ public final class ModItems {
             () -> new ForgeSpawnEggItem(ModEntities.ENEIAS,0x1D4ED8,0xF5F5F5,new Item.Properties()));
     public static final RegistryObject<Item> AUGUSTO_CURY_SPAWN_EGG = REGISTER.register("augusto_cury_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.AUGUSTO_CURY,0x1E293B,0x60A5FA,new Item.Properties()));
+    private static final java.util.Map<io.github.omarflk.guerraezuberante.faction.Figure, RegistryObject<Item>> FIGURE_EGGS = new java.util.EnumMap<>(io.github.omarflk.guerraezuberante.faction.Figure.class);
+    static {
+        for (var figure : io.github.omarflk.guerraezuberante.faction.Figure.values()) {
+            FIGURE_EGGS.put(figure, REGISTER.register(figure.id() + "_spawn_egg",
+                    () -> new ForgeSpawnEggItem(ModEntities.figure(figure), figure.eggBase(), figure.eggSpots(), new Item.Properties())));
+        }
+    }
+    public static RegistryObject<Item> figureEgg(io.github.omarflk.guerraezuberante.faction.Figure figure) { return FIGURE_EGGS.get(figure); }
     public static final RegistryObject<Item> ROMEU_ZEMA_SPAWN_EGG = REGISTER.register("romeu_zema_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.ROMEU_ZEMA,0xF97316,0xE5E7EB,new Item.Properties()));
     public static final RegistryObject<Item> RONALDO_CAIADO_SPAWN_EGG = REGISTER.register("ronaldo_caiado_spawn_egg",

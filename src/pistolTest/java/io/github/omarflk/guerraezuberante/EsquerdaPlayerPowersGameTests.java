@@ -137,7 +137,7 @@ public final class EsquerdaPlayerPowersGameTests {
         for (int i = 0; i < 10; i++) Progression.spend(player, Stat.CONVICCAO);
         try {
             // 0.020: Lula's branch of the Lulista tree: Fim da Escala, Faz o L, Manifestando.
-            h.assertTrue(Faction.LULISTA.powerCount() == 8 && !SkillTree.buy(player, Node.LUL_MANIFESTANDO) && !SkillTree.buy(player, Node.P2),
+            h.assertTrue(Faction.LULISTA.powerCount() == 10 && !SkillTree.buy(player, Node.LUL_MANIFESTANDO) && !SkillTree.buy(player, Node.P2),
                     "Manifestando without Faz o L, or a generic node in the Lulista tree");
             h.assertTrue(SkillTree.buy(player, Node.LUL_FIM_DA_ESCALA) && SkillTree.buy(player, Node.LUL_FAZ_O_L) && SkillTree.buy(player, Node.LUL_MANIFESTANDO)
                     && Progression.isUnlocked(player, 3) && SkillTree.available(player) == 3, "Lulista Manifestando path wrong");

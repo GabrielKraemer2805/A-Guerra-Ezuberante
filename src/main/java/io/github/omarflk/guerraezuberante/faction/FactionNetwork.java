@@ -25,7 +25,7 @@ public final class FactionNetwork {
      * 4: village music (0.014.3). 5: classes, skill tree and moral bar (0.017).
      * 6: up to 10 power slots, a 64-bit node mask (Esquerda tree and Lulista Manifestando) and cast poses (0.019).
      */
-    private static final String VERSION = "7";
+    private static final String VERSION = "8";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(GuerraEzuberanteMod.MOD_ID, "faction"), () -> VERSION, VERSION::equals, VERSION::equals);
     /** ordinal -1 means "no faction". */

@@ -69,12 +69,17 @@ public final class FactionVillageStructure extends Structure {
         return Optional.ofNullable(type).map(Supplier::get);
     }
 
+    private static EntityType<?> figure(io.github.omarflk.guerraezuberante.faction.Figure figure) { return ModEntities.figure(figure).get(); }
+
     /** The other characters, one each, around the village square. */
     public static List<EntityType<?>> members(Faction faction) {
         return switch (faction) {
-            case LULISTA -> List.of(ModEntities.HADDAD.get(), ModEntities.BOULOS.get(), ModEntities.DILMA.get());
-            case BOLSONARISTA -> List.of(ModEntities.FLAVIO_BOLSONARO.get());
-            case MISSAO -> List.of(ModEntities.ARTHUR_INVOCADOR.get());
+            case LULISTA -> List.of(ModEntities.HADDAD.get(), ModEntities.BOULOS.get(), ModEntities.DILMA.get(), figure(io.github.omarflk.guerraezuberante.faction.Figure.ANDRE_JANONES));
+            case BOLSONARISTA -> List.of(ModEntities.FLAVIO_BOLSONARO.get(), figure(io.github.omarflk.guerraezuberante.faction.Figure.TARCISIO_FREITAS),
+                    figure(io.github.omarflk.guerraezuberante.faction.Figure.JAIR_RENAN), figure(io.github.omarflk.guerraezuberante.faction.Figure.EDUARDO_BOLSONARO),
+                    figure(io.github.omarflk.guerraezuberante.faction.Figure.MICHELLE_BOLSONARO), figure(io.github.omarflk.guerraezuberante.faction.Figure.EDUARDA_CAMPOPIANO),
+                    figure(io.github.omarflk.guerraezuberante.faction.Figure.NIKOLAS_FERREIRA), figure(io.github.omarflk.guerraezuberante.faction.Figure.LUCAS_PAVANATO));
+            case MISSAO -> List.of(ModEntities.ARTHUR_INVOCADOR.get(), figure(io.github.omarflk.guerraezuberante.faction.Figure.KIM_KATAGUIRI), figure(io.github.omarflk.guerraezuberante.faction.Figure.GUTO_ZACARIAS));
             case ESQUERDA -> List.of(ModEntities.TABATA_AMARAL.get(), ModEntities.MARINA_SILVA.get(), ModEntities.CIRO_GOMES.get());
             case DIREITA -> List.of(ModEntities.AUGUSTO_CURY.get(), ModEntities.ROMEU_ZEMA.get(), ModEntities.RONALDO_CAIADO.get());
             default -> List.of();
@@ -154,7 +159,8 @@ public final class FactionVillageStructure extends Structure {
                 continue;
             }
             // Corners of the square, a different one each, so no two characters share a spot.
-            int x = index % 2 == 0 ? 3 : -3, z = index % 4 < 2 ? -x : x;
+            int ring = 3 + 2 * (index / 4);
+            int x = index % 2 == 0 ? ring : -ring, z = index % 4 < 2 ? -x : x;
             spawn(level, chunkBox, type, center.offset(x, 0, z));
         }
         var villagerType = io.github.omarflk.guerraezuberante.registry.ModVillagers.type(faction);

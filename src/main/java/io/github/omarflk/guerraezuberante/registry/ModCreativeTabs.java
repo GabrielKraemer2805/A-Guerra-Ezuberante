@@ -34,6 +34,7 @@ public final class ModCreativeTabs {
             output.accept(ModItems.ENEIAS_SPAWN_EGG.get());
             output.accept(ModItems.AUGUSTO_CURY_SPAWN_EGG.get());
             output.accept(ModItems.ROMEU_ZEMA_SPAWN_EGG.get());
+            for (var figure : io.github.omarflk.guerraezuberante.faction.Figure.values()) { output.accept(ModItems.figureEgg(figure).get()); }
             output.accept(ModItems.RONALDO_CAIADO_SPAWN_EGG.get());
             output.accept(ModItems.DIREITISTA_SPAWN_EGG.get());
                         output.accept(ModItems.JAIR_SPAWN_EGG.get());

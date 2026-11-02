@@ -7,6 +7,17 @@
 - **haddad**: APROVADA (75 cores)
 - **jones_manoel**: APROVADA (78 cores)
 - **dilma**: APROVADA (80 cores)
+- **guilherme_boulos**: APROVADA (66 cores)
+- **tarcisio_freitas**: APROVADA (77 cores)
+- **jair_renan**: APROVADA (69 cores)
+- **eduardo_bolsonaro**: APROVADA (78 cores)
+- **michelle_bolsonaro**: APROVADA (65 cores)
+- **eduarda_campopiano**: APROVADA (75 cores)
+- **nikolas_ferreira**: APROVADA (73 cores)
+- **lucas_pavanato**: APROVADA (68 cores)
+- **kim_kataguiri**: APROVADA (75 cores)
+- **guto_zacarias**: APROVADA (66 cores)
+- **andre_janones**: APROVADA (67 cores)
 
 ## Originais (linha de base)
 
@@ -66,6 +77,10 @@
   - alfa parcial (antialiasing ou desfoque nas bordas)
   - 307 pixels fora de regioes usadas pelo modelo
   - 641 cores: provavel imagem reduzida
+- **guilherme_boulos**: REPROVADA (11 cores)
+  - alfa parcial (antialiasing ou desfoque nas bordas)
+  - 4 pixels fora de regioes usadas pelo modelo
+  - rosto com menos de 8 tons (chapado)
 
 ## Rostos distintos (diferenca media por canal, 0-255)
 
@@ -73,12 +88,122 @@
 - marina_silva x haddad: 37.1
 - marina_silva x jones_manoel: 39.6
 - marina_silva x dilma: 47.9
+- marina_silva x guilherme_boulos: 61.4
+- marina_silva x tarcisio_freitas: 36.6
+- marina_silva x jair_renan: 43.2
+- marina_silva x eduardo_bolsonaro: 47.2
+- marina_silva x michelle_bolsonaro: 55.7
+- marina_silva x eduarda_campopiano: 45.8
+- marina_silva x nikolas_ferreira: 43.3
+- marina_silva x lucas_pavanato: 34.4
+- marina_silva x kim_kataguiri: 32.1
+- marina_silva x guto_zacarias: 49.6
+- marina_silva x andre_janones: 33.7
 - tabata_amaral x haddad: 45.3
 - tabata_amaral x jones_manoel: 64.3
 - tabata_amaral x dilma: 28.8
+- tabata_amaral x guilherme_boulos: 56.6
+- tabata_amaral x tarcisio_freitas: 44.7
+- tabata_amaral x jair_renan: 42.8
+- tabata_amaral x eduardo_bolsonaro: 53.4
+- tabata_amaral x michelle_bolsonaro: 29.1
+- tabata_amaral x eduarda_campopiano: 17.8
+- tabata_amaral x nikolas_ferreira: 47.1
+- tabata_amaral x lucas_pavanato: 38.6
+- tabata_amaral x kim_kataguiri: 42.4
+- tabata_amaral x guto_zacarias: 72.5
+- tabata_amaral x andre_janones: 59.8
 - haddad x jones_manoel: 68.5
 - haddad x dilma: 36.9
+- haddad x guilherme_boulos: 66.5
+- haddad x tarcisio_freitas: 19.5
+- haddad x jair_renan: 35.5
+- haddad x eduardo_bolsonaro: 51.5
+- haddad x michelle_bolsonaro: 41.9
+- haddad x eduarda_campopiano: 51.7
+- haddad x nikolas_ferreira: 28.5
+- haddad x lucas_pavanato: 14.4
+- haddad x kim_kataguiri: 28.4
+- haddad x guto_zacarias: 81.5
+- haddad x andre_janones: 39.7
 - jones_manoel x dilma: 71.3
+- jones_manoel x guilherme_boulos: 45.8
+- jones_manoel x tarcisio_freitas: 66.7
+- jones_manoel x jair_renan: 69.5
+- jones_manoel x eduardo_bolsonaro: 31.4
+- jones_manoel x michelle_bolsonaro: 80.7
+- jones_manoel x eduarda_campopiano: 65.9
+- jones_manoel x nikolas_ferreira: 68.6
+- jones_manoel x lucas_pavanato: 63.8
+- jones_manoel x kim_kataguiri: 58.4
+- jones_manoel x guto_zacarias: 18.3
+- jones_manoel x andre_janones: 41.7
+- dilma x guilherme_boulos: 66.6
+- dilma x tarcisio_freitas: 40.2
+- dilma x jair_renan: 48.6
+- dilma x eduardo_bolsonaro: 56.4
+- dilma x michelle_bolsonaro: 23.1
+- dilma x eduarda_campopiano: 38.7
+- dilma x nikolas_ferreira: 37.4
+- dilma x lucas_pavanato: 32.6
+- dilma x kim_kataguiri: 44.9
+- dilma x guto_zacarias: 82.1
+- dilma x andre_janones: 61.3
+- guilherme_boulos x tarcisio_freitas: 51.6
+- guilherme_boulos x jair_renan: 67.3
+- guilherme_boulos x eduardo_bolsonaro: 34.6
+- guilherme_boulos x michelle_bolsonaro: 63.2
+- guilherme_boulos x eduarda_campopiano: 61.5
+- guilherme_boulos x nikolas_ferreira: 64.7
+- guilherme_boulos x lucas_pavanato: 65.5
+- guilherme_boulos x kim_kataguiri: 54.9
+- guilherme_boulos x guto_zacarias: 60.7
+- guilherme_boulos x andre_janones: 59.4
+- tarcisio_freitas x jair_renan: 40.5
+- tarcisio_freitas x eduardo_bolsonaro: 46.1
+- tarcisio_freitas x michelle_bolsonaro: 40.5
+- tarcisio_freitas x eduarda_campopiano: 50.2
+- tarcisio_freitas x nikolas_ferreira: 32.8
+- tarcisio_freitas x lucas_pavanato: 22.6
+- tarcisio_freitas x kim_kataguiri: 27.5
+- tarcisio_freitas x guto_zacarias: 82.8
+- tarcisio_freitas x andre_janones: 44.7
+- jair_renan x eduardo_bolsonaro: 53.4
+- jair_renan x michelle_bolsonaro: 52.6
+- jair_renan x eduarda_campopiano: 46.0
+- jair_renan x nikolas_ferreira: 28.0
+- jair_renan x lucas_pavanato: 25.3
+- jair_renan x kim_kataguiri: 22.6
+- jair_renan x guto_zacarias: 79.5
+- jair_renan x andre_janones: 34.2
+- eduardo_bolsonaro x michelle_bolsonaro: 61.8
+- eduardo_bolsonaro x eduarda_campopiano: 56.3
+- eduardo_bolsonaro x nikolas_ferreira: 53.8
+- eduardo_bolsonaro x lucas_pavanato: 47.2
+- eduardo_bolsonaro x kim_kataguiri: 44.7
+- eduardo_bolsonaro x guto_zacarias: 47.0
+- eduardo_bolsonaro x andre_janones: 39.8
+- michelle_bolsonaro x eduarda_campopiano: 34.5
+- michelle_bolsonaro x nikolas_ferreira: 51.2
+- michelle_bolsonaro x lucas_pavanato: 42.4
+- michelle_bolsonaro x kim_kataguiri: 52.7
+- michelle_bolsonaro x guto_zacarias: 93.9
+- michelle_bolsonaro x andre_janones: 73.0
+- eduarda_campopiano x nikolas_ferreira: 51.6
+- eduarda_campopiano x lucas_pavanato: 43.6
+- eduarda_campopiano x kim_kataguiri: 46.5
+- eduarda_campopiano x guto_zacarias: 73.0
+- eduarda_campopiano x andre_janones: 61.3
+- nikolas_ferreira x lucas_pavanato: 20.6
+- nikolas_ferreira x kim_kataguiri: 21.3
+- nikolas_ferreira x guto_zacarias: 80.2
+- nikolas_ferreira x andre_janones: 42.0
+- lucas_pavanato x kim_kataguiri: 21.2
+- lucas_pavanato x guto_zacarias: 75.4
+- lucas_pavanato x andre_janones: 32.8
+- kim_kataguiri x guto_zacarias: 71.6
+- kim_kataguiri x andre_janones: 30.0
+- guto_zacarias x andre_janones: 48.7
 
 ## Integracao: textura do jogo igual a skin refatorada
 
@@ -87,3 +212,14 @@
 - haddad: textura igual; fonte em assets-entrada igual
 - jones_manoel: textura igual; fonte em assets-entrada igual
 - dilma: textura igual; fonte em assets-entrada igual
+- guilherme_boulos: textura igual; fonte em assets-entrada igual
+- tarcisio_freitas: textura igual; fonte em assets-entrada igual
+- jair_renan: textura igual; fonte em assets-entrada igual
+- eduardo_bolsonaro: textura igual; fonte em assets-entrada igual
+- michelle_bolsonaro: textura igual; fonte em assets-entrada igual
+- eduarda_campopiano: textura igual; fonte em assets-entrada igual
+- nikolas_ferreira: textura igual; fonte em assets-entrada igual
+- lucas_pavanato: textura igual; fonte em assets-entrada igual
+- kim_kataguiri: textura igual; fonte em assets-entrada igual
+- guto_zacarias: textura igual; fonte em assets-entrada igual
+- andre_janones: textura igual; fonte em assets-entrada igual

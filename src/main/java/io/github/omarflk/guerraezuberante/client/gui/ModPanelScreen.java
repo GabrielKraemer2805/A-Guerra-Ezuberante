@@ -45,10 +45,12 @@ public final class ModPanelScreen extends Screen {
     private int characterSelected;
     /** Text key prefix and entity id of each character tab, in tab order. */
     private static final String[] CHARACTER_KEYS = {"renan", "arthur_fighter", "arthur_summoner", "ucraniana", "lula", "jair", "flavio",
-            "haddad", "boulos", "dilma", "jones", "tabata", "marina", "ciro", "eneias", "cury", "guarda", "zema", "caiado"};
+            "haddad", "boulos", "dilma", "jones", "tabata", "marina", "ciro", "eneias", "cury", "guarda", "zema", "caiado",
+            "tarcisio_freitas", "jair_renan", "eduardo_bolsonaro", "michelle_bolsonaro", "eduarda_campopiano", "nikolas_ferreira", "lucas_pavanato", "kim_kataguiri", "guto_zacarias", "andre_janones"};
     private static final String[] CHARACTER_ENTITIES = {"renan_santos", "arthur_do_val_combatente", "arthur_do_val_invocador", "combatente_ucraniana",
             "lula", "jair_bolsonaro", "flavio_bolsonaro", "haddad", "guilherme_boulos", "dilma", "jones_manoel", "tabata_amaral", "marina_silva", "ciro_gomes",
-            "eneias", "augusto_cury", "guarda_da_torre", "romeu_zema", "ronaldo_caiado"};
+            "eneias", "augusto_cury", "guarda_da_torre", "romeu_zema", "ronaldo_caiado",
+            "tarcisio_freitas", "jair_renan", "eduardo_bolsonaro", "michelle_bolsonaro", "eduarda_campopiano", "nikolas_ferreira", "lucas_pavanato", "kim_kataguiri", "guto_zacarias", "andre_janones"};
     private int shownCooldown = -1;
     private Faction shownFaction;
 
@@ -150,6 +152,7 @@ public final class ModPanelScreen extends Screen {
                             : characterSelected == 16 ? ModEntities.TOWER_GUARD.get().create(minecraft.level)
                             : characterSelected == 17 ? ModEntities.ROMEU_ZEMA.get().create(minecraft.level)
                             : characterSelected == 18 ? ModEntities.RONALDO_CAIADO.get().create(minecraft.level)
+                            : characterSelected > 18 ? ModEntities.figure(io.github.omarflk.guerraezuberante.faction.Figure.values()[characterSelected - 19]).get().create(minecraft.level)
                             : ModEntities.FLAVIO_BOLSONARO.get().create(minecraft.level);
                 }
             }

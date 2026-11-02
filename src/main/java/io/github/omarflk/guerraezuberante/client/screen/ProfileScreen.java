@@ -37,6 +37,8 @@ public final class ProfileScreen extends Screen {
         boolean contains(double mouseX, double mouseY) { return mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + NODE_HEIGHT; }
         int centerX() { return x + w / 2; }
     }
+    private static final int MIN_TREE_COLUMN = 74;
+    private int treeScroll;
     private static Tab tab = Tab.PERFIL;
     private int left, top, panelWidth, panelHeight;
     private Faction faction;
@@ -59,7 +61,7 @@ public final class ProfileScreen extends Screen {
     protected void init() {
         faction = minecraft.player == null ? null : Factions.of(minecraft.player).orElse(null);
         // The Esquerda tree has four branches side by side.
-        panelWidth = Math.min(width - 16, faction == null || !SkillTree.wide(faction) ? 300 : SkillTree.columns(faction) > 4 ? 440 : 380);
+        panelWidth = Math.min(width - 16, faction == null || !SkillTree.wide(faction) ? 300 : SkillTree.columns(faction) > 5 ? 560 : SkillTree.columns(faction) > 4 ? 440 : 380);
         panelHeight = faction == null ? 90 : PANEL_HEIGHT;
         left = (width - panelWidth) / 2;
         top = Math.max(4, (height - panelHeight) / 2);
@@ -245,8 +247,8 @@ public final class ProfileScreen extends Screen {
     private Box box(int row, int column) {
         int inner = panelWidth - 20, gap = 6, y = treeTop() + row * NODE_ROW;
         if (wideTree()) {
-            int columns = SkillTree.columns(faction), w = (inner - (columns - 1) * gap) / columns;
-            return new Box(left + 10 + column * (w + gap), y, w);
+            int w = treeColumnWidth();
+            return new Box(left + 10 + column * (w + gap) - treeScroll, y, w);
         }
         int center = Math.round(inner * .42F), side = (inner - center - 2 * gap) / 2;
         int x = left + 10 + switch (column) { case 0 -> 0; case 1 -> side + gap; default -> side + gap + center + gap; };
@@ -255,11 +257,37 @@ public final class ProfileScreen extends Screen {
 
     private Box box(Node node) { return box(node.row(), node.column()); }
 
+    /** Column width of a wide tree; the Bolsonarista tree (0.023) is wider than the panel and scrolls sideways. */
+    private int treeColumnWidth() {
+        int columns = SkillTree.columns(faction), inner = panelWidth - 20, gap = 6;
+        return Math.max(MIN_TREE_COLUMN, (inner - (columns - 1) * gap) / columns);
+    }
+
+    private int maxTreeScroll() {
+        if (faction == null || !wideTree()) { return 0; }
+        int columns = SkillTree.columns(faction);
+        return Math.max(0, columns * treeColumnWidth() + (columns - 1) * 6 - (panelWidth - 20));
+    }
+
+    private boolean insideTree(double mouseX, double mouseY) {
+        return mouseX >= left + 8 && mouseX < left + panelWidth - 8 && mouseY >= treeTop() - 2 && mouseY < treeTop() + 6 * NODE_ROW;
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+        if (tab == Tab.ARVORE && maxTreeScroll() > 0) {
+            treeScroll = Math.max(0, Math.min(maxTreeScroll(), treeScroll - (int) Math.round(delta * 40)));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, delta);
+    }
+
     /** The free first power: centre column, or the two middle columns of the Esquerda tree. */
     private Box rootBox() {
         Box first = box(0, 1);
         if (!wideTree()) { return first; }
-        Box second = box(0, SkillTree.columns(faction) - 2);
+        // A tree that scrolls keeps the root over its first columns, always within reach.
+        Box second = box(0, maxTreeScroll() > 0 ? 2 : SkillTree.columns(faction) - 2);
         return new Box(first.x(), first.y(), second.x() + second.w() - first.x());
     }
 
@@ -301,6 +329,14 @@ public final class ProfileScreen extends Screen {
         graphics.drawString(font, Component.translatable("gui.guerra_ezuberante.tree.points", ProgressionClient.treePoints()), left + 10, y0,
                 ProgressionClient.treePoints() > 0 ? GREEN : MUTED);
         List<Node> nodes = SkillTree.nodes(faction);
+        treeScroll = Math.min(treeScroll, maxTreeScroll());
+        if (maxTreeScroll() > 0) {
+            Component hint = Component.translatable("gui.guerra_ezuberante.tree.scroll_hint");
+            graphics.drawString(font, hint, left + panelWidth - 10 - font.width(hint), y0, MUTED);
+        }
+        graphics.enableScissor(left + 8, treeTop() - 2, left + panelWidth - 8, treeTop() + 6 * NODE_ROW);
+        boolean mouseInside = insideTree(mouseX, mouseY);
+        int hoverX = mouseInside ? mouseX : -1000, hoverY = mouseInside ? mouseY : -1000;
         Box root = rootBox();
         // Edges first, so nodes are drawn over them. Nodes without requirements below the root hang from it.
         for (Node child : nodes) {
@@ -311,17 +347,18 @@ public final class ProfileScreen extends Screen {
             for (Node parent : drawnParents(child)) { connect(graphics, box(parent), box(child), ProgressionClient.owns(parent)); }
         }
         int selected = ProgressionClient.selected();
-        if (drawNode(graphics, root, faction.powerName(0), true, false, selected == 0, 0, mouseX, mouseY)) {
+        if (drawNode(graphics, root, faction.powerName(0), true, false, selected == 0, 0, hoverX, hoverY)) {
             tooltip = powerTooltip(0, true);
         }
         for (Node node : nodes) {
             boolean owned = ProgressionClient.owns(node);
             boolean isPower = node.kind() == SkillTree.Kind.POWER;
             if (drawNode(graphics, box(node), node.displayName(faction), owned, canBuy(node),
-                    isPower && owned && selected == node.slot(), owned ? 0 : node.cost(), mouseX, mouseY)) {
+                    isPower && owned && selected == node.slot(), owned ? 0 : node.cost(), hoverX, hoverY)) {
                 tooltip = isPower ? powerTooltip(node.slot(), owned) : upgradeTooltip(node, owned);
             }
         }
+        graphics.disableScissor();
         graphics.drawString(font, Component.translatable("gui.guerra_ezuberante.tree.selected", ModKeyBindings.USE_POWER.getTranslatedKeyMessage(),
                 faction.powerName(selected), seconds(ProgressionClient.remaining(selected))), left + 10, treeTop() + 6 * NODE_ROW + 2, TEXT);
         return tooltip;
@@ -403,7 +440,7 @@ public final class ProfileScreen extends Screen {
         if (super.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
-        if (faction == null || tab != Tab.ARVORE || button != 0) {
+        if (faction == null || tab != Tab.ARVORE || button != 0 || !insideTree(mouseX, mouseY)) {
             return false;
         }
         if (rootBox().contains(mouseX, mouseY)) {
