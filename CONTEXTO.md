@@ -2,7 +2,7 @@
 
 ## ONDE PARAMOS E O QUE FALTA (02/11/2026)
 
-Trabalho parado a pedido do colaborador, com a Fase 6 implementada e **nunca vista funcionando no jogo**. Tudo na branch `feat/generais-exercito`, commitado só localmente, sem push (0.024 a 0.028). Antes dela, `feat/refatoracao-skins` foi enviada ao fork. O próximo passo é o teste abaixo, nada de novas features antes dele.
+Trabalho parado a pedido do colaborador. Depois disso, ele testou a Fase 6 no jogo e aprovou; os itens abaixo seguem como lista de conferência, sem confirmação item a item. Tudo na branch `feat/generais-exercito`, commitado só localmente, sem push (0.024 a 0.028). Antes dela, `feat/refatoracao-skins` foi enviada ao fork. Pendente: confirmar a queda do castelo em mundo natural, se ainda não vista, e investigar a instabilidade dos testes.
 
 **Situação das 6 fases**
 
@@ -13,7 +13,7 @@ Trabalho parado a pedido do colaborador, com a Fase 6 implementada e **nunca vis
 | 3. Base, generais, missões | 0.025.0 | Testada e aprovada, depois ampliada a todas as vilas |
 | 4. Twitter/X | 0.026.0 | O colaborador avançou sem apontar problema; sprite do joinha nunca visto |
 | 5. Recrutamento e castelo | 0.027.0 | O colaborador avançou sem apontar problema; missão inteira não confirmada |
-| 6. Daciolo, igrejas, nerds | 0.028.0 | **Implementada; sem validação visual nem teste do colaborador** |
+| 6. Daciolo, igrejas, nerds | 0.028.0 | Testada pelo colaborador em mundo novo em 02/11/2026: "tudo está funcionando conforme" |
 
 **Testar no jogo (sempre em mundo novo), por prioridade**
 
@@ -34,7 +34,7 @@ Trabalho parado a pedido do colaborador, com a Fase 6 implementada e **nunca vis
 
 ## Daciolo, igrejas e aldeões nerds — 0.028.0 (02/11/2026)
 
-- Fase 6 de 6 (ver 0.023.0). **Ver acima: nada disto foi conferido no jogo.**
+- Fase 6 de 6 (ver 0.023.0). Aprovada pelo colaborador no jogo; a captura automática segue sem validar.
 - **Cabo Daciolo** (`CaboDacioloEntity`, 300 HP, sem partido, só luta se provocado): segura a Bíblia, chama 3 anjos a cada 15 s de luta, grita "Glória a Deus!" no chat e larga a Bíblia ao morrer. Config `[cabo_daciolo]`.
 - **Bíblia** (`BibleItem`, só por drop): chama 3 anjos para quem a usa; recarga de 30 s; até 6 anjos vivos por dono. **Anjos** (`AngelEntity`): herdam o vex, não são salvos, duram 20 s, atacam inimigos do dono num raio de 16 blocos; textura própria em `textures/entity/anjo.png`, sobre o modelo vanilla.
 - **Igreja do Daciolo** (`DacioloChurchStructure`, `DacioloChurchPiece`): nave de 27 × 47 com torre e cruz de ouro, sem água, `random_spread` espaçamento 80 chunks; pode haver mais de uma no mundo, cada uma com seu Daciolo.
