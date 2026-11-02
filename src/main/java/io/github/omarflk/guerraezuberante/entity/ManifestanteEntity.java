@@ -47,6 +47,7 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
     private static final EntityDataAccessor<Integer> SKIN = SynchedEntityData.defineId(ManifestanteEntity.class, EntityDataSerializers.INT);
     private UUID ownerId;
     private int lifeTicks;
+    private boolean recruit;
 
     public ManifestanteEntity(EntityType<? extends ManifestanteEntity> type, Level level) {
         super(type, level);
@@ -87,6 +88,20 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
         var attack = getAttribute(Attributes.ATTACK_DAMAGE);
         if (attack != null) { attack.setBaseValue(attack.getBaseValue() * damageScale); }
     }
+
+    /** 0.027: hired from a general. A soldier has a sword and more health; a militiaman is just a citizen who came along. */
+    public void becomeRecruit(boolean soldier) {
+        recruit = true;
+        if (soldier) {
+            setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_SWORD));
+            setItemSlot(net.minecraft.world.entity.EquipmentSlot.HEAD, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_HELMET));
+            var health = getAttribute(Attributes.MAX_HEALTH);
+            if (health != null) { health.setBaseValue(40); }
+            setHealth(40);
+        }
+    }
+
+    public boolean isRecruit() { return recruit; }
 
     @Override
     public UUID getOwnerId() { return ownerId; }
@@ -146,6 +161,10 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
                 : owner.isAlliedTo(target)) {
             return false;
         }
+        if (owner instanceof Player player && target instanceof RetaliatingCharacterEntity character && character.faction() != null
+                && Factions.of(player).filter(party -> party == character.faction()).isPresent()) {
+            return false;
+        }
         return super.canAttack(target) && PowerTargets.anyone(owner, target);
     }
 
@@ -162,6 +181,8 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
         }
         LivingEntity owner = getOwner();
         if (owner != null && !(owner instanceof Player) && owner.isAlliedTo(entity)) { return true; }
+        if (owner instanceof Player player && entity instanceof RetaliatingCharacterEntity character && character.faction() != null
+                && Factions.of(player).filter(party -> party == character.faction()).isPresent()) { return true; }
         return owner instanceof Player player && entity instanceof Player other && PowerTargets.sameFaction(player, other)
                 || super.isAlliedTo(entity);
     }

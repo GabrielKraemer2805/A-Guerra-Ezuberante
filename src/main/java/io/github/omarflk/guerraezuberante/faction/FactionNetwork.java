@@ -25,7 +25,7 @@ public final class FactionNetwork {
      * 4: village music (0.014.3). 5: classes, skill tree and moral bar (0.017).
      * 6: up to 10 power slots, a 64-bit node mask (Esquerda tree and Lulista Manifestando) and cast poses (0.019).
      */
-    private static final String VERSION = "10";
+    private static final String VERSION = "11";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(GuerraEzuberanteMod.MOD_ID, "faction"), () -> VERSION, VERSION::equals, VERSION::equals);
     /** ordinal -1 means "no faction". */
@@ -54,11 +54,12 @@ public final class FactionNetwork {
     public record CastPoseSync(int entity, int pose, int ticks) {}
 
     /** The player's place in the party story; open also shows the general's screen. mission is -1 without a story. */
-    public record MissionSync(int mission, boolean active, int progress, int done, boolean open) {}
+    public record MissionSync(int mission, boolean active, int progress, int done, boolean open, boolean aligned, int recruits, int targetFaction, int targetX, int targetZ) {}
     public record MissionAction(int action) {}
 
-    public static void sendMission(ServerPlayer player, int mission, boolean active, int progress, int done, boolean open) {
-        send(player, new MissionSync(mission, active, progress, done, open));
+    public static void sendMission(ServerPlayer player, int mission, boolean active, int progress, int done, boolean open,
+                                   boolean aligned, int recruits, int targetFaction, int targetX, int targetZ) {
+        send(player, new MissionSync(mission, active, progress, done, open, aligned, recruits, targetFaction, targetX, targetZ));
     }
 
     public static void missionAction(int action) {
@@ -106,11 +107,14 @@ public final class FactionNetwork {
                 }).add();
         CHANNEL.messageBuilder(MissionSync.class, 14, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder((packet, buffer) -> { buffer.writeVarInt(packet.mission() + 1); buffer.writeBoolean(packet.active());
-                    buffer.writeVarInt(packet.progress()); buffer.writeVarInt(packet.done()); buffer.writeBoolean(packet.open()); })
-                .decoder(buffer -> new MissionSync(buffer.readVarInt() - 1, buffer.readBoolean(), buffer.readVarInt(), buffer.readVarInt(), buffer.readBoolean()))
+                    buffer.writeVarInt(packet.progress()); buffer.writeVarInt(packet.done()); buffer.writeBoolean(packet.open());
+                    buffer.writeBoolean(packet.aligned()); buffer.writeVarInt(packet.recruits()); buffer.writeVarInt(packet.targetFaction() + 1);
+                    buffer.writeInt(packet.targetX()); buffer.writeInt(packet.targetZ()); })
+                .decoder(buffer -> new MissionSync(buffer.readVarInt() - 1, buffer.readBoolean(), buffer.readVarInt(), buffer.readVarInt(), buffer.readBoolean(),
+                        buffer.readBoolean(), buffer.readVarInt(), buffer.readVarInt() - 1, buffer.readInt(), buffer.readInt()))
                 .consumerMainThread((packet, context) -> {
                     DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> io.github.omarflk.guerraezuberante.client.MissionClient.apply(
-                            packet.mission(), packet.active(), packet.progress(), packet.done(), packet.open()));
+                            packet.mission(), packet.active(), packet.progress(), packet.done(), packet.open(), packet.aligned(), packet.recruits(), packet.targetFaction(), packet.targetX(), packet.targetZ()));
                     context.get().setPacketHandled(true);
                 }).add();
         CHANNEL.messageBuilder(MissionAction.class, 15, NetworkDirection.PLAY_TO_SERVER)

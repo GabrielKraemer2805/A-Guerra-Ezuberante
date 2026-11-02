@@ -23,6 +23,7 @@ public enum Mission {
     CEN_NEUTRALIDADE(Faction.CENTRO, Type.SABOTAGE, null, 2, () -> Items.EMERALD, 6),
     CEN_GOVERNABILIDADE(Faction.CENTRO, Type.KILL_GUARDS, null, 4, () -> Items.DIAMOND, 2),
     CEN_FUNDAO(Faction.CENTRO, Type.DELIVER, () -> Items.DIAMOND, 3, () -> ModItems.PICANHA.get(), 3),
+    CEN_CASTELO(Faction.CENTRO, Type.DESTROY_CASTLE, null, Points.CASTLE, () -> Items.DIAMOND, 6),
     // Bolsonaristas: Tarcisio
     BOL_MINERIO(Faction.BOLSONARISTA, Type.DELIVER, () -> Items.IRON_INGOT, 12, () -> ModItems.PICANHA.get(), 2),
     BOL_COMUNISTAS(Faction.BOLSONARISTA, Type.KILL_RIVALS, null, 3, () -> Items.EMERALD, 4),
@@ -30,6 +31,7 @@ public enum Mission {
     BOL_BANDEIRA(Faction.BOLSONARISTA, Type.SABOTAGE, null, 2, () -> Items.EMERALD, 6),
     BOL_BASE(Faction.BOLSONARISTA, Type.KILL_GUARDS, null, 4, () -> Items.DIAMOND, 2),
     BOL_CERCADINHO(Faction.BOLSONARISTA, Type.DELIVER, () -> Items.DIAMOND, 3, () -> ModItems.MEGAFONE.get(), 1),
+    BOL_CASTELO(Faction.BOLSONARISTA, Type.DESTROY_CASTLE, null, Points.CASTLE, () -> Items.DIAMOND, 6),
     // Lulistas: Janones
     LUL_FOME(Faction.LULISTA, Type.DELIVER, () -> Items.WHEAT, 32, () -> ModItems.FEIJOADA.get(), 1),
     LUL_PICANHA(Faction.LULISTA, Type.DELIVER, () -> Items.COOKED_BEEF, 16, () -> ModItems.PICANHA.get(), 3),
@@ -37,6 +39,7 @@ public enum Mission {
     LUL_BANDEIRA(Faction.LULISTA, Type.SABOTAGE, null, 2, () -> Items.EMERALD, 6),
     LUL_BASE(Faction.LULISTA, Type.KILL_GUARDS, null, 4, () -> Items.DIAMOND, 2),
     LUL_BLUSINHAS(Faction.LULISTA, Type.DELIVER, () -> Items.EMERALD, 8, () -> ModItems.MEGAFONE.get(), 1),
+    LUL_CASTELO(Faction.LULISTA, Type.DESTROY_CASTLE, null, Points.CASTLE, () -> Items.DIAMOND, 6),
     // Missao: Kim
     MIS_LIVE(Faction.MISSAO, Type.DELIVER, () -> Items.COAL, 24, () -> Items.EMERALD, 3),
     MIS_VELHA_POLITICA(Faction.MISSAO, Type.KILL_RIVALS, null, 3, null, 0),
@@ -44,6 +47,7 @@ public enum Mission {
     MIS_BANDEIRA(Faction.MISSAO, Type.SABOTAGE, null, 2, () -> Items.EMERALD, 6),
     MIS_BASE(Faction.MISSAO, Type.KILL_GUARDS, null, 4, () -> Items.DIAMOND, 2),
     MIS_VAQUINHA(Faction.MISSAO, Type.DELIVER, () -> Items.DIAMOND, 3, () -> ModItems.MEGAFONE.get(), 1),
+    MIS_CASTELO(Faction.MISSAO, Type.DESTROY_CASTLE, null, Points.CASTLE, () -> Items.DIAMOND, 6),
     // Esquerda: Ciro
     ESQ_INDUSTRIA(Faction.ESQUERDA, Type.DELIVER, () -> Items.IRON_INGOT, 16, () -> Items.EMERALD, 3),
     ESQ_LUTA(Faction.ESQUERDA, Type.KILL_RIVALS, null, 3, () -> ModItems.FOICE_E_MARTELO.get(), 1),
@@ -51,19 +55,27 @@ public enum Mission {
     ESQ_EXPROPRIACAO(Faction.ESQUERDA, Type.SABOTAGE, null, 2, () -> Items.EMERALD, 6),
     ESQ_PALACIO(Faction.ESQUERDA, Type.KILL_GUARDS, null, 4, () -> Items.DIAMOND, 2),
     ESQ_PLANO(Faction.ESQUERDA, Type.DELIVER, () -> Items.GOLD_INGOT, 8, null, 0),
+    ESQ_CASTELO(Faction.ESQUERDA, Type.DESTROY_CASTLE, null, Points.CASTLE, () -> Items.DIAMOND, 6),
     // Direita: Caiado
     DIR_BOI(Faction.DIREITA, Type.DELIVER, () -> Items.LEATHER, 16, () -> Items.EMERALD, 3),
     DIR_POSSE(Faction.DIREITA, Type.KILL_RIVALS, null, 3, () -> Items.EMERALD, 4),
     DIR_IMPOSTO(Faction.DIREITA, Type.DELIVER, () -> Items.GOLD_INGOT, 8, null, 0),
     DIR_BANDEIRA(Faction.DIREITA, Type.SABOTAGE, null, 2, () -> Items.EMERALD, 6),
     DIR_BASE(Faction.DIREITA, Type.KILL_GUARDS, null, 4, () -> Items.DIAMOND, 2),
-    DIR_PRIVATIZA(Faction.DIREITA, Type.DELIVER, () -> Items.EMERALD, 8, () -> ModItems.MOTOSSERRA.get(), 1);
+    DIR_PRIVATIZA(Faction.DIREITA, Type.DELIVER, () -> Items.EMERALD, 8, () -> ModItems.MOTOSSERRA.get(), 1),
+    DIR_CASTELO(Faction.DIREITA, Type.DESTROY_CASTLE, null, Points.CASTLE, () -> Items.DIAMOND, 6);
+
+    /** A soldier of the castle or its base is worth 1, the leader 4. */
+    public static final int CASTLE_GUARD_POINTS = 1, CASTLE_LEADER_POINTS = 4;
 
     /**
      * DELIVER: hand items to the general. KILL_RIVALS: characters, soldiers or villagers of another party.
      * SABOTAGE: break flags of another party. KILL_GUARDS: soldiers of another party's base or castle.
+     * DESTROY_CASTLE: the last chapter, open only to the well aligned: bring down the defenders of one rival castle.
      */
-    public enum Type { DELIVER, KILL_RIVALS, SABOTAGE, KILL_GUARDS }
+    public enum Type { DELIVER, KILL_RIVALS, SABOTAGE, KILL_GUARDS, DESTROY_CASTLE }
+
+    private static final class Points { private static final int CASTLE = 8; }
 
     private final Faction faction;
     private final Type type;

@@ -10,10 +10,16 @@ import java.util.Optional;
 
 /** The player's place in the party story, as the server last told it. */
 public final class MissionClient {
-    private static int mission = -1, progress, done;
-    private static boolean active;
+    private static int mission = -1, progress, done, recruits, targetFaction = -1, targetX, targetZ;
+    private static boolean active, aligned;
 
-    public static void apply(int missionOrdinal, boolean isActive, int currentProgress, int finished, boolean open) {
+    public static void apply(int missionOrdinal, boolean isActive, int currentProgress, int finished, boolean open,
+                             boolean isAligned, int recruitCount, int target, int x, int z) {
+        aligned = isAligned;
+        recruits = recruitCount;
+        targetFaction = target;
+        targetX = x;
+        targetZ = z;
         mission = missionOrdinal;
         active = isActive;
         progress = currentProgress;
@@ -31,6 +37,11 @@ public final class MissionClient {
     public static Optional<Mission> mission() { return Mission.byOrdinal(mission); }
     public static boolean active() { return active; }
     public static int done() { return done; }
+    public static boolean aligned() { return aligned; }
+    public static int recruits() { return recruits; }
+    public static Optional<io.github.omarflk.guerraezuberante.faction.Faction> targetFaction() { return io.github.omarflk.guerraezuberante.faction.Faction.byOrdinal(targetFaction); }
+    public static int targetX() { return targetX; }
+    public static int targetZ() { return targetZ; }
 
     /** A delivery is counted from the inventory here, so the screen stays right as items come and go. */
     public static int progress() {

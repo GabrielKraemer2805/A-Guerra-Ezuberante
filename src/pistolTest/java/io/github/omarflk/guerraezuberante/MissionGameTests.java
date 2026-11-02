@@ -62,7 +62,8 @@ public final class MissionGameTests {
     @GameTest(template="empty", batch="ge_mission_data") public static void everyPartyHasAStoryAndAGeneral(GameTestHelper h) {
         for (Faction faction : Faction.values()) {
             var story = Mission.of(faction);
-            h.assertTrue(story.size() == 6 && Missions.general(faction).isPresent(), faction + " story " + story.size());
+            h.assertTrue(story.size() == 7 && Missions.general(faction).isPresent(), faction + " story " + story.size());
+            h.assertTrue(story.get(6).type() == Mission.Type.DESTROY_CASTLE, faction + " does not end with the castle");
             h.assertTrue(story.stream().map(Mission::type).distinct().count() == Mission.Type.values().length, faction + " does not use every type of mission");
             for (Mission mission : story) {
                 h.assertTrue(mission.count() > 0, mission + " asks for nothing");
@@ -177,22 +178,108 @@ public final class MissionGameTests {
         h.succeed();
     }
 
+    @GameTest(template="empty", batch="ge_mission_recruit") public static void recruitsNeedAlignmentAndEmeralds(GameTestHelper h) {
+        var player = player(h, ground(h), Faction.LULISTA);
+        try {
+            h.assertTrue(!Missions.aligned(player, Faction.LULISTA) && !Missions.recruit(player, Faction.LULISTA, false), "Recruited with no alignment");
+            for (int i = 0; i < 4; i++) {
+                var mission = Missions.current(player, Faction.LULISTA).orElseThrow();
+                Missions.accept(player, Faction.LULISTA);
+                player.getInventory().add(new ItemStack(mission.wanted() == Items.AIR ? Items.STONE : mission.wanted(), 64));
+                for (int k = 0; k < mission.count(); k++) Missions.count(player, mission.type());
+                h.assertTrue(Missions.turnIn(player, Faction.LULISTA), "Could not finish " + mission);
+            }
+            Morality.set(player, Morality.anchor(Faction.BOLSONARISTA));
+            h.assertTrue(!Missions.aligned(player, Faction.LULISTA), "Aligned with the bar in another party");
+            Morality.set(player, Morality.anchor(Faction.LULISTA));
+            h.assertTrue(Missions.aligned(player, Faction.LULISTA), "Not aligned after the missions");
+            player.getInventory().clearContent();
+            h.assertTrue(!Missions.recruit(player, Faction.LULISTA, true), "Recruited for free");
+            player.getInventory().add(new ItemStack(Items.EMERALD, 8));
+            h.assertTrue(Missions.recruit(player, Faction.LULISTA, true) && Missions.recruit(player, Faction.LULISTA, false), "Refused with emeralds");
+            h.assertTrue(player.getInventory().countItem(Items.EMERALD) == 0, "Wrong price: " + player.getInventory().countItem(Items.EMERALD));
+            var recruits = io.github.omarflk.guerraezuberante.faction.ConvictionPowers.recruits(player);
+            h.assertTrue(recruits.size() == 2 && recruits.stream().filter(recruit -> recruit.getMainHandItem().is(Items.IRON_SWORD)).count() == 1, "Recruits: " + recruits.size());
+            h.assertTrue(io.github.omarflk.guerraezuberante.faction.ConvictionPowers.protesters(player).isEmpty(), "Recruits took room in the crowd");
+        } finally {
+            io.github.omarflk.guerraezuberante.faction.ConvictionPowers.recruits(player).forEach(Entity::discard);
+            leave(h, player);
+        }
+        h.succeed();
+    }
+
+    /** Found in the game: the zombie under the recruit made the player's own general shoot it. */
+    @GameTest(template="empty", batch="ge_mission_recruit_side", timeoutTicks=120) public static void ownPartyLeavesThePlayersCrowdAlone(GameTestHelper h) {
+        var p = ground(h);
+        var player = player(h, p, Faction.BOLSONARISTA);
+        var tarcisio = mob(h, ModEntities.figure(Figure.TARCISIO_FREITAS).get(), p.add(4, 0, 0));
+        var haddad = mob(h, ModEntities.HADDAD.get(), p.add(-4, 0, 0));
+        var recruit = io.github.omarflk.guerraezuberante.faction.ConvictionPowers.spawnRecruit(player, true);
+        Runnable cleanup = () -> { recruit.ifPresent(Entity::discard); tarcisio.discard(); haddad.discard(); leave(h, player); };
+        try {
+            h.assertTrue(recruit.isPresent(), "No recruit");
+            h.assertTrue(tarcisio.isAlliedTo(recruit.get()) && !tarcisio.isFoe(recruit.get()) && !tarcisio.isVillageThreat(recruit.get()), "The own general treats the recruit as an enemy");
+            h.assertTrue(recruit.get().isAlliedTo(tarcisio) && !recruit.get().canAttack(tarcisio), "The recruit may attack the own general");
+            h.assertTrue(haddad.isFoe(recruit.get()) && !haddad.isAlliedTo(recruit.get()) && recruit.get().canAttack(haddad), "A rival should still fight the recruit");
+        } catch (RuntimeException | Error failure) { cleanup.run(); throw failure; }
+        cleanup.run();
+        h.succeed();
+    }
+
+    @GameTest(template="empty", batch="ge_mission_castle") public static void castlePointsComeFromItsDefenders(GameTestHelper h) {
+        var p = ground(h);
+        var player = player(h, p, Faction.BOLSONARISTA);
+        var guard = mob(h, ModEntities.TOWER_GUARD.get(), p.add(2, 0, 0));
+        var far = mob(h, ModEntities.TOWER_GUARD.get(), p.add(0, 0, 3));
+        var friend = mob(h, ModEntities.TOWER_GUARD.get(), p.add(-2, 0, 0));
+        var lula = mob(h, ModEntities.LULA.get(), p.add(0, 0, -3));
+        var haddad = mob(h, ModEntities.HADDAD.get(), p.add(4, 0, 0));
+        try {
+            guard.setup(Faction.LULISTA, h.getLevel().getRandom());
+            far.setup(Faction.DIREITA, h.getLevel().getRandom());
+            friend.setup(Faction.BOLSONARISTA, h.getLevel().getRandom());
+            h.assertTrue(Missions.castleValue(player, Faction.BOLSONARISTA, guard) == 0, "A point before taking the mission");
+            Missions.acceptCastle(player, Faction.BOLSONARISTA, new Missions.CastleTarget(Faction.LULISTA, BlockPos.containing(p)));
+            h.assertTrue(Missions.castleValue(player, Faction.BOLSONARISTA, guard) == Mission.CASTLE_GUARD_POINTS, "The target's soldier");
+            h.assertTrue(Missions.castleValue(player, Faction.BOLSONARISTA, lula) == Mission.CASTLE_LEADER_POINTS, "The target's leader");
+            h.assertTrue(Missions.castleValue(player, Faction.BOLSONARISTA, far) == 0, "Soldier of another party");
+            h.assertTrue(Missions.castleValue(player, Faction.BOLSONARISTA, friend) == 0, "Own soldier");
+            h.assertTrue(Missions.castleValue(player, Faction.BOLSONARISTA, haddad) == 0, "A member who is not the leader");
+            Missions.acceptCastle(player, Faction.BOLSONARISTA, new Missions.CastleTarget(Faction.LULISTA, BlockPos.containing(p).offset(5000, 0, 0)));
+            h.assertTrue(Missions.castleValue(player, Faction.BOLSONARISTA, guard) == 0, "A soldier far from the target");
+        } finally {
+            guard.discard(); far.discard(); friend.discard(); lula.discard(); haddad.discard();
+            leave(h, player);
+        }
+        h.succeed();
+    }
+
     @GameTest(template="empty", batch="ge_mission_routine") public static void storyEndsInRoutineAndPartiesKeepTheirPlace(GameTestHelper h) {
         var player = player(h, ground(h), Faction.MISSAO);
         try {
             for (Mission mission : Mission.of(Faction.MISSAO)) {
                 h.assertTrue(Missions.current(player, Faction.MISSAO).orElseThrow() == mission, "Out of order: " + mission);
+                if (mission.type() == Mission.Type.DESTROY_CASTLE) {
+                    // A spot with no village: the mission still works, there is just nothing to blow up.
+                    var target = new Missions.CastleTarget(Faction.LULISTA, new BlockPos(UUID.randomUUID().hashCode() & 0xFFFF, 0, 30000));
+                    Missions.acceptCastle(player, Faction.MISSAO, target);
+                    h.assertTrue(!Missions.turnIn(player, Faction.MISSAO), "Turned in a castle still standing");
+                    Missions.castlePoints(player, Faction.MISSAO, mission.count());
+                    h.assertTrue(io.github.omarflk.guerraezuberante.mission.CastleFall.get(h.getLevel().getServer()).hasFallen(target.faction(), target.village()), "The castle was not marked as fallen");
+                    h.assertTrue(Missions.turnIn(player, Faction.MISSAO), "Could not finish " + mission);
+                    continue;
+                }
                 Missions.accept(player, Faction.MISSAO);
                 player.getInventory().add(new ItemStack(mission.wanted() == Items.AIR ? Items.STONE : mission.wanted(), 64));
                 for (int i = 0; i < mission.count(); i++) Missions.count(player, mission.type());
                 h.assertTrue(Missions.turnIn(player, Faction.MISSAO), "Could not finish " + mission);
             }
-            h.assertTrue(Missions.done(player, Faction.MISSAO) == 6, "Done count");
+            h.assertTrue(Missions.done(player, Faction.MISSAO) == 7, "Done count");
             h.assertTrue(Missions.current(player, Faction.MISSAO).orElseThrow() == Mission.of(Faction.MISSAO).get(2), "No routine after the story");
             // Another party's story starts from its beginning, and this one is still here on coming back.
             Factions.assign(player, Faction.DIREITA);
             h.assertTrue(Missions.current(player, Faction.DIREITA).orElseThrow() == Mission.DIR_BOI, "New party should start at the beginning");
-            h.assertTrue(Missions.done(player, Faction.MISSAO) == 6, "Lost the other story");
+            h.assertTrue(Missions.done(player, Faction.MISSAO) == 7, "Lost the other story");
         } finally { leave(h, player); }
         h.succeed();
     }

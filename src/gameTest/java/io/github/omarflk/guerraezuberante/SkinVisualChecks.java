@@ -43,6 +43,7 @@ public final class SkinVisualChecks {
     private static BlockPos base;
     /** Server side: the character being photographed, held in place because some walk or get pushed even with no AI. */
     private static volatile Mob posing;
+    private static volatile io.github.omarflk.guerraezuberante.village.FactionCastlePiece villageCastle;
     private static double poseX, poseZ;
     private static float poseYaw;
     private static final Map<String, Object> results = new LinkedHashMap<>();
@@ -132,6 +133,8 @@ public final class SkinVisualChecks {
             start.placeInChunk(level, level.structureManager(), generator, level.getRandom(), new net.minecraft.world.level.levelgen.structure.BoundingBox(each.getMinBlockX(),
                     level.getMinBuildHeight(), each.getMinBlockZ(), each.getMaxBlockX(), level.getMaxBuildHeight(), each.getMaxBlockZ()), each);
         });
+        villageCastle = start.getPieces().stream().filter(io.github.omarflk.guerraezuberante.village.FactionCastlePiece.class::isInstance)
+                .map(io.github.omarflk.guerraezuberante.village.FactionCastlePiece.class::cast).findFirst().orElse(null);
         var base = start.getPieces().stream().filter(io.github.omarflk.guerraezuberante.village.FactionBasePiece.class::isInstance)
                 .map(io.github.omarflk.guerraezuberante.village.FactionBasePiece.class::cast).findFirst().orElse(null);
         if (base == null) { errors.add("The village has no base"); return; }
@@ -293,8 +296,72 @@ public final class SkinVisualChecks {
                 case 15 -> {
                     if (ticks < 10) return;
                     mc.setScreen(null);
-                    finish(null);
+                    // The whole story of the party, so the castle chapter and the recruits open as they do in play.
+                    server(() -> {
+                        ServerPlayer player = serverPlayer();
+                        for (var mission : io.github.omarflk.guerraezuberante.mission.Mission.of(Faction.BOLSONARISTA)) {
+                            if (mission.type() == io.github.omarflk.guerraezuberante.mission.Mission.Type.DESTROY_CASTLE) { break; }
+                            io.github.omarflk.guerraezuberante.mission.Missions.accept(player, Faction.BOLSONARISTA);
+                            if (mission.wanted() != net.minecraft.world.item.Items.AIR) { player.getInventory().add(new net.minecraft.world.item.ItemStack(mission.wanted(), 64)); }
+                            for (int i = 0; i < mission.count(); i++) { io.github.omarflk.guerraezuberante.mission.Missions.count(player, mission.type()); }
+                            if (!io.github.omarflk.guerraezuberante.mission.Missions.turnIn(player, Faction.BOLSONARISTA)) { errors.add("Could not finish " + mission); }
+                        }
+                        io.github.omarflk.guerraezuberante.progression.Morality.set(player, io.github.omarflk.guerraezuberante.progression.Morality.anchor(Faction.BOLSONARISTA));
+                        if (!io.github.omarflk.guerraezuberante.mission.Missions.aligned(player, Faction.BOLSONARISTA)) { errors.add("Not aligned after the story"); }
+                        io.github.omarflk.guerraezuberante.mission.Missions.acceptCastle(player, Faction.BOLSONARISTA, new io.github.omarflk.guerraezuberante.mission.Missions.CastleTarget(Faction.LULISTA, player.blockPosition().atY(0)));
+                        player.getInventory().clearContent();
+                        for (boolean soldier : new boolean[]{true, true, false, false}) {
+                            if (!io.github.omarflk.guerraezuberante.mission.Missions.recruit(player, Faction.BOLSONARISTA, soldier)) { errors.add("Recruit refused"); }
+                        }
+                        io.github.omarflk.guerraezuberante.mission.Missions.sync(player, true);
+                    });
+                    next(16);
                 }
+                case 16 -> {
+                    if (ticks < 20) return;
+                    if (!(mc.screen instanceof io.github.omarflk.guerraezuberante.client.screen.MissionScreen)) { errors.add("No castle screen"); }
+                    Screenshot.grab(mc.gameDirectory, "skin-tela-do-castelo.png", mc.getMainRenderTarget(), ignored -> {});
+                    results.put("tela-do-castelo", "captured");
+                    next(17);
+                }
+                case 17 -> {
+                    if (ticks < 10) return;
+                    mc.setScreen(null);
+                    next(18);
+                }
+                case 18 -> {
+                    if (ticks < 60) return;
+                    int alive = mc.level.getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.ManifestanteEntity.class, mc.player.getBoundingBox().inflate(32)).size();
+                    results.put("recrutas-vivos", alive);
+                    if (alive != 4) { errors.add("Recruits alive after 3 s beside the general: " + alive); }
+                    capture("recrutas");
+                    server(() -> {
+                        ServerPlayer player = serverPlayer();
+                        io.github.omarflk.guerraezuberante.faction.ConvictionPowers.recruits(player).forEach(Entity::discard);
+                        if (villageCastle == null) { errors.add("No castle piece"); return; }
+                        var box = villageCastle.getBoundingBox();
+                        player.setGameMode(GameType.SPECTATOR);
+                        player.teleportTo(player.serverLevel(), box.getCenter().getX() + 34.5, box.minY() + 18, box.getCenter().getZ() + .5, 90, 12);
+                        player.setYHeadRot(90);
+                    });
+                    next(19);
+                }
+                case 19 -> {
+                    if (ticks < 60) return;
+                    capture("castelo-antes");
+                    server(() -> {
+                        ServerLevel level = serverPlayer().serverLevel();
+                        if (villageCastle == null) { return; }
+                        for (var point : io.github.omarflk.guerraezuberante.mission.CastleFall.points(villageCastle)) { io.github.omarflk.guerraezuberante.mission.CastleFall.blast(level, point, villageCastle.getBoundingBox()); }
+                    });
+                    next(20);
+                }
+                case 20 -> {
+                    if (ticks < 60) return;
+                    capture("castelo-depois");
+                    next(21);
+                }
+                case 21 -> { if (ticks >= 10) finish(null); }
                 default -> {}
             }
         } catch (Exception e) {

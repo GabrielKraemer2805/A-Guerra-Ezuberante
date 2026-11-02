@@ -172,6 +172,9 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
                 || faction() != null && other instanceof Villager villager && ModVillagers.faction(villager) == faction()
                 || faction() != null && other instanceof ManifestanteEntity crowd && crowd.getOwner() instanceof RetaliatingCharacterEntity leader
                 && leader.faction() == faction()
+                // 0.027: the crowd and the recruits of a player of the same faction are on this side too, zombies or not.
+                || faction() != null && other instanceof ManifestanteEntity crowd && crowd.getOwner() instanceof Player owner
+                && io.github.omarflk.guerraezuberante.faction.Factions.of(owner).filter(party -> party == faction()).isPresent()
                 || super.isAlliedTo(other);
     }
 

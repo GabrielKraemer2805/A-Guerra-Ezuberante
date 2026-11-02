@@ -12,7 +12,7 @@ import net.minecraft.network.chat.Component;
 
 /** What the general says: the current mission, how far it has gone, and accept, turn in or give up. */
 public final class MissionScreen extends Screen {
-    private static final int WIDTH = 300, HEIGHT = 190;
+    private static final int WIDTH = 300, HEIGHT = 230;
     private int left, top;
 
     public MissionScreen() { super(Component.translatable("gui.guerra_ezuberante.mission.title")); }
@@ -25,6 +25,10 @@ public final class MissionScreen extends Screen {
         top = (height - HEIGHT) / 2;
         int y = top + HEIGHT - 26;
         var mission = MissionClient.mission();
+        if (MissionClient.aligned()) {
+            addRenderableWidget(button("recruit_militia", Missions.RECRUIT_MILITIA, left + 10, y - 22, 136));
+            addRenderableWidget(button("recruit_soldier", Missions.RECRUIT_SOLDIER, left + 154, y - 22, 136));
+        }
         if (mission.isPresent() && !MissionClient.active()) {
             addRenderableWidget(button("accept", Missions.ACCEPT, left + 10, y, 136));
         } else if (mission.isPresent()) {
@@ -78,16 +82,30 @@ public final class MissionScreen extends Screen {
                 graphics.drawString(font, line, left + 10, y, 0xFFD6DAE0);
                 y += 10;
             }
-            graphics.drawString(font, goal(current), left + 10, top + HEIGHT - 58, 0xFFFFE08A);
+            // The strategic information about the target, once the castle mission is taken.
+            if (current.type() == Mission.Type.DESTROY_CASTLE && MissionClient.active() && MissionClient.targetFaction().isPresent()) {
+                y += 3;
+                for (var line : font.split(Component.translatable("mission.guerra_ezuberante.intel." + MissionClient.targetFaction().get().id()), WIDTH - 20)) {
+                    graphics.drawString(font, line, left + 10, y, 0xFF93C5FD);
+                    y += 10;
+                }
+            }
+            graphics.drawString(font, goal(current), left + 10, top + HEIGHT - 80, 0xFFFFE08A);
             if (MissionClient.active()) {
                 int progress = MissionClient.progress();
-                graphics.fill(left + 10, top + HEIGHT - 44, left + WIDTH - 10, top + HEIGHT - 39, 0xFF2A2E36);
-                graphics.fill(left + 10, top + HEIGHT - 44, left + 10 + (WIDTH - 20) * progress / Math.max(1, current.count()), top + HEIGHT - 39, 0xFF4ADE80);
+                graphics.fill(left + 10, top + HEIGHT - 68, left + WIDTH - 10, top + HEIGHT - 63, 0xFF2A2E36);
+                graphics.fill(left + 10, top + HEIGHT - 68, left + 10 + (WIDTH - 20) * progress / Math.max(1, current.count()), top + HEIGHT - 63, 0xFF4ADE80);
             } else {
-                graphics.drawString(font, reward(current), left + 10, top + HEIGHT - 44, 0xFF9AA3AF);
+                graphics.drawString(font, reward(current), left + 10, top + HEIGHT - 68, 0xFF9AA3AF);
             }
         } else {
             graphics.drawString(font, Component.translatable("gui.guerra_ezuberante.mission.none"), left + 10, top + 34, 0xFFD6DAE0);
+        }
+        if (!MissionClient.aligned()) {
+            graphics.drawString(font, Component.translatable("gui.guerra_ezuberante.mission.recruit_locked"), left + 10, top + HEIGHT - 42, 0xFF6B7280);
+        } else {
+            graphics.drawString(font, Component.translatable("gui.guerra_ezuberante.mission.recruits", MissionClient.recruits()), left + WIDTH - 10
+                    - font.width(Component.translatable("gui.guerra_ezuberante.mission.recruits", MissionClient.recruits())), top + 8, 0xFF9AA3AF);
         }
         super.render(graphics, mouseX, mouseY, partialTick);
     }
@@ -100,6 +118,10 @@ public final class MissionScreen extends Screen {
             case KILL_RIVALS -> Component.translatable("gui.guerra_ezuberante.mission.goal.kill", progress, mission.count());
             case SABOTAGE -> Component.translatable("gui.guerra_ezuberante.mission.goal.sabotage", progress, mission.count());
             case KILL_GUARDS -> Component.translatable("gui.guerra_ezuberante.mission.goal.guards", progress, mission.count());
+            case DESTROY_CASTLE -> MissionClient.active() && MissionClient.targetFaction().isPresent()
+                    ? Component.translatable("gui.guerra_ezuberante.mission.goal.castle", MissionClient.targetFaction().get().displayName(),
+                            MissionClient.targetX(), MissionClient.targetZ(), progress, mission.count())
+                    : Component.translatable("gui.guerra_ezuberante.mission.goal.castle_locked");
         };
     }
 

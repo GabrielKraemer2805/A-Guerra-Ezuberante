@@ -1,5 +1,14 @@
 # Contexto de trabalho — Guerra Ezuberante
 
+## Recrutamento e "Destrua o castelo" — 0.027.0 (02/11/2026)
+
+- Fase 5 de 6 (ver 0.023.0), branch `feat/generais-exercito`.
+- **Alinhamento** (`Missions.aligned`): barra moral na zona do próprio partido e pelo menos 4 missões feitas para ele. `mission_moral` padrão 30 → 60, senão os partidos das pontas da barra (Bolsonarismo, a 300 pontos do centro) não chegavam à própria zona com a campanha.
+- **Recrutas** (`ConvictionPowers.spawnRecruit`, `ManifestanteEntity.becomeRecruit`), pela tela do general, com alinhamento: miliciano (2 esmeraldas, 15 min) e soldado (6 esmeraldas, 30 min, espada, capacete, 40 de vida, dobro de dano); até 8. Não ocupam vaga no Manifestando. Como todo manifestante, não são salvos: somem ao sair do mundo. Ideia do agente: o pedido falava em exército local e NPCs da facção, atendidos pelos dois tipos.
+- **Capítulo 7, Destrua o Castelo Inimigo** (`Mission.Type.DESTROY_CASTLE`, em todos os partidos): sorteia um dos 3 castelos rivais de pé mais próximos e mostra coordenadas e informações sobre os defensores. Soldado rival a até 110 blocos do centro da vila vale 1 ponto, o líder vale 4, meta 8. Mortes dos recrutas contam. Ao completar, `CastleFall` avisa todos, registra no `SavedData`, gera post no feed e demole o castelo depois de 5 s: explosões (não quebram bloco) e remoção dos blocos em raio 9 em 9 pontos, só dentro do castelo. Config `castle_demolition`.
+- **Bug achado na captura:** generais e NPCs da própria facção atacavam manifestantes e recrutas do jogador, por serem zumbis (`Enemy`). `RetaliatingCharacterEntity.isAlliedTo` e `ManifestanteEntity` agora os tratam como aliados. Teste novo `ownPartyLeavesThePlayersCrowdAlone`; a captura confere 4 recrutas vivos depois de 3 s.
+- Protocolo do canal `faction` 10 → **11**. Testes: `recruitsNeedAlignmentAndEmeralds`, `castlePointsComeFromItsDefenders`, `castleBlastsTakeItDown`, e capturas em `SkinVisualChecks` (tela do castelo, recrutas, castelo antes e depois). **Não validado:** achar o castelo pela `CastleFall.castle` num mundo gerado de verdade (os testes colocam a vila por comando, o que não registra as referências de estrutura) e a missão inteira em jogo.
+
 ## Aba Twitter/X — 0.026.0 (02/11/2026)
 
 - Fase 4 de 6 (ver 0.023.0), branch `feat/generais-exercito`. A aba é identificada na tela como paródia, com posts fictícios escritos para o jogo.

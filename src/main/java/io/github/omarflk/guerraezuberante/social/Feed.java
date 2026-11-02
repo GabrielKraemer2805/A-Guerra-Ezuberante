@@ -98,6 +98,16 @@ public final class Feed extends SavedData {
         }
     }
 
+    /** A castle fell: its own party comments. */
+    public static void castleFell(MinecraftServer server, Faction faction) {
+        Feed feed = get(server);
+        var own = Author.of(faction);
+        if (own.isEmpty()) { return; }
+        RandomSource random = server.overworld().getRandom();
+        Author author = own.get(random.nextInt(own.size()));
+        feed.add(server, new Post(author.ordinal(), "", faction.ordinal(), "x.guerra_ezuberante.castle." + faction.id(), "", false, server.overworld().getGameTime(), likes(random)));
+    }
+
     /** Whoever comes in sees the timeline as it is. */
     @SubscribeEvent
     public static void login(PlayerEvent.PlayerLoggedInEvent event) {

@@ -4,6 +4,9 @@ import io.github.omarflk.guerraezuberante.GuerraEzuberanteMod;
 import io.github.omarflk.guerraezuberante.config.ModConfig;
 import io.github.omarflk.guerraezuberante.entity.RetaliatingCharacterEntity;
 import io.github.omarflk.guerraezuberante.entity.TowerGuardEntity;
+import io.github.omarflk.guerraezuberante.faction.ConvictionPowers;
+import io.github.omarflk.guerraezuberante.village.FactionVillageStructure;
+import io.github.omarflk.guerraezuberante.village.FactionVillages;
 import io.github.omarflk.guerraezuberante.faction.Faction;
 import io.github.omarflk.guerraezuberante.faction.FactionNetwork;
 import io.github.omarflk.guerraezuberante.faction.Factions;
@@ -52,7 +55,10 @@ public final class Missions {
     private static final int ROUTINE_FROM = 2;
     private static final double TALK_RANGE = 8;
 
-    public static final int ACCEPT = 0, TURN_IN = 1, ABANDON = 2;
+    public static final int ACCEPT = 0, TURN_IN = 1, ABANDON = 2, RECRUIT_MILITIA = 3, RECRUIT_SOLDIER = 4;
+    private static final String TARGET_FACTION = "TargetFaction", TARGET_X = "TargetX", TARGET_Z = "TargetZ";
+    /** How far from the middle of the target village a kill counts: the castle and base are both within this. */
+    public static final double CASTLE_RADIUS = 110;
 
     /** The general of a party. Jones Manoel stays on the Esquerda's throne as its leader; Ciro runs the base. */
     public static Optional<EntityType<?>> general(Faction faction) {
@@ -99,6 +105,105 @@ public final class Missions {
     /** Missions finished for the party, routine included. */
     public static int done(Player player, Faction faction) { return data(player, faction).getInt(DONE); }
 
+    /**
+     * High alignment: the moral bar stands in the party's own zone and enough missions were done for it. Opens the recruits;
+     * the castle chapter comes after the whole story, so it also needs this.
+     */
+    public static boolean aligned(Player player, Faction faction) {
+        return Morality.zone(Morality.moral(player)) == faction && done(player, faction) >= ModConfig.MISSION_RECRUIT_MIN_DONE.get();
+    }
+
+    /** Paid recruits who follow the player: the village's militia, or better armed soldiers. Refused with the reason. */
+    public static boolean recruit(ServerPlayer player, Faction faction, boolean soldier) {
+        if (!aligned(player, faction)) {
+            player.displayClientMessage(Component.translatable("mission.guerra_ezuberante.recruit.not_aligned"), true);
+            return false;
+        }
+        if (ConvictionPowers.recruits(player).size() >= ModConfig.MISSION_RECRUIT_MAX.get()) {
+            player.displayClientMessage(Component.translatable("mission.guerra_ezuberante.recruit.full"), true);
+            return false;
+        }
+        int cost = soldier ? ModConfig.MISSION_SOLDIER_COST.get() : ModConfig.MISSION_MILITIA_COST.get();
+        if (!player.getAbilities().instabuild && player.getInventory().countItem(net.minecraft.world.item.Items.EMERALD) < cost) {
+            player.displayClientMessage(Component.translatable("mission.guerra_ezuberante.recruit.no_money", cost), true);
+            return false;
+        }
+        var recruit = ConvictionPowers.spawnRecruit(player, soldier);
+        if (recruit.isEmpty()) {
+            player.displayClientMessage(Component.translatable("power.guerra_ezuberante.no_space"), true);
+            return false;
+        }
+        if (!player.getAbilities().instabuild) {
+            int missing = cost;
+            for (ItemStack stack : player.getInventory().items) {
+                if (missing > 0 && stack.is(net.minecraft.world.item.Items.EMERALD)) {
+                    int used = Math.min(missing, stack.getCount());
+                    stack.shrink(used);
+                    missing -= used;
+                }
+            }
+        }
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.VILLAGER_CELEBRATE, SoundSource.PLAYERS, 1, 1);
+        return true;
+    }
+
+    /** The castle the player was sent to: faction of the target and the middle of its village. */
+    public static Optional<CastleTarget> target(Player player, Faction faction) {
+        CompoundTag data = data(player, faction);
+        return Faction.byId(data.getString(TARGET_FACTION)).map(rival -> new CastleTarget(rival, new net.minecraft.core.BlockPos(data.getInt(TARGET_X), 0, data.getInt(TARGET_Z))));
+    }
+
+    public record CastleTarget(Faction faction, net.minecraft.core.BlockPos village) {}
+
+    /** Takes the castle chapter with this target. Public for GameTests, where the test world has no villages to find. */
+    public static boolean acceptCastle(ServerPlayer player, Faction faction, CastleTarget target) {
+        CompoundTag data = data(player, faction);
+        data.putBoolean(ACTIVE, true);
+        data.putInt(PROGRESS, 0);
+        data.putString(TARGET_FACTION, target.faction().id());
+        data.putInt(TARGET_X, target.village().getX());
+        data.putInt(TARGET_Z, target.village().getZ());
+        return true;
+    }
+
+    /** One of the three nearest standing castles of the other parties, so giving up can send the player elsewhere. */
+    private static Optional<CastleTarget> findTarget(ServerPlayer player, Faction own) {
+        var candidates = new java.util.ArrayList<CastleTarget>();
+        CastleFall fallen = CastleFall.get(player.server);
+        for (Faction rival : Faction.values()) {
+            if (rival == own) { continue; }
+            FactionVillages.locate(player.server, rival).ifPresent(villages -> villages.stream()
+                    .filter(village -> !fallen.hasFallen(rival, village)).forEach(village -> candidates.add(new CastleTarget(rival, village))));
+        }
+        candidates.sort(java.util.Comparator.comparingDouble(target -> target.village().distSqr(player.blockPosition().atY(0))));
+        return candidates.isEmpty() ? Optional.empty() : Optional.of(candidates.get(player.getRandom().nextInt(Math.min(3, candidates.size()))));
+    }
+
+    /** Adds points to the castle chapter; reaching the goal brings the castle down. Public for GameTests. */
+    public static void castlePoints(ServerPlayer player, Faction faction, int points) {
+        var mission = current(player, faction);
+        var target = target(player, faction);
+        if (mission.isEmpty() || mission.get().type() != Mission.Type.DESTROY_CASTLE || !isActive(player, faction) || target.isEmpty()) { return; }
+        CompoundTag data = data(player, faction);
+        int before = data.getInt(PROGRESS);
+        if (before >= mission.get().count()) { return; }
+        data.putInt(PROGRESS, Math.min(mission.get().count(), before + points));
+        player.displayClientMessage(Component.translatable("mission.guerra_ezuberante.progress",
+                Component.translatable(mission.get().key("title")), data.getInt(PROGRESS), mission.get().count()).withStyle(ChatFormatting.GOLD), true);
+        if (data.getInt(PROGRESS) >= mission.get().count()) { CastleFall.fall(player.server, target.get().faction(), target.get().village()); }
+        sync(player, false);
+    }
+
+    /** Points the victim is worth for the player's castle chapter: defenders of the target, close to its village. Public for GameTests. */
+    public static int castleValue(Player player, Faction faction, LivingEntity victim) {
+        var target = target(player, faction);
+        if (target.isEmpty() || !(victim instanceof RetaliatingCharacterEntity character) || character.faction() != target.get().faction()) { return 0; }
+        double dx = victim.getX() - target.get().village().getX(), dz = victim.getZ() - target.get().village().getZ();
+        if (dx * dx + dz * dz > CASTLE_RADIUS * CASTLE_RADIUS) { return 0; }
+        if (victim instanceof TowerGuardEntity) { return Mission.CASTLE_GUARD_POINTS; }
+        return FactionVillageStructure.leader(target.get().faction()).filter(type -> type == victim.getType()).isPresent() ? Mission.CASTLE_LEADER_POINTS : 0;
+    }
+
     /** Items in the inventory for a delivery; the counter otherwise. */
     public static int progress(Player player, Mission mission) {
         if (mission.type() == Mission.Type.DELIVER) {
@@ -123,6 +228,8 @@ public final class Missions {
             case ACCEPT -> accept(player, faction.get());
             case TURN_IN -> turnIn(player, faction.get());
             case ABANDON -> abandon(player, faction.get());
+            case RECRUIT_MILITIA -> recruit(player, faction.get(), false);
+            case RECRUIT_SOLDIER -> recruit(player, faction.get(), true);
             default -> false;
         };
         sync(player, false);
@@ -131,6 +238,18 @@ public final class Missions {
 
     public static boolean accept(ServerPlayer player, Faction faction) {
         if (isActive(player, faction) || current(player, faction).isEmpty()) { return false; }
+        if (current(player, faction).get().type() == Mission.Type.DESTROY_CASTLE) {
+            if (!aligned(player, faction)) {
+                player.displayClientMessage(Component.translatable("mission.guerra_ezuberante.recruit.not_aligned"), true);
+                return false;
+            }
+            var target = findTarget(player, faction);
+            if (target.isEmpty()) {
+                player.displayClientMessage(Component.translatable("mission.guerra_ezuberante.no_castle"), true);
+                return false;
+            }
+            return acceptCastle(player, faction, target.get());
+        }
         CompoundTag data = data(player, faction);
         data.putBoolean(ACTIVE, true);
         data.putInt(PROGRESS, 0);
@@ -149,6 +268,7 @@ public final class Missions {
         data.putInt(INDEX, next >= story ? ROUTINE_FROM : next);
         data.putBoolean(ACTIVE, false);
         data.putInt(PROGRESS, 0);
+        data.remove(TARGET_FACTION);
         data.putInt(DONE, data.getInt(DONE) + 1);
         Morality.toward(player, faction, ModConfig.MISSION_MORAL.get());
         Progression.addXp(player, ModConfig.MISSION_XP.get());
@@ -180,6 +300,7 @@ public final class Missions {
         CompoundTag data = data(player, faction);
         data.putBoolean(ACTIVE, false);
         data.putInt(PROGRESS, 0);
+        data.remove(TARGET_FACTION);
         Morality.awayFrom(player, faction, ModConfig.MISSION_ABANDON_MORAL.get());
         player.sendSystemMessage(Component.translatable("mission.guerra_ezuberante.abandoned").withStyle(ChatFormatting.RED));
         return true;
@@ -223,9 +344,14 @@ public final class Missions {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void death(LivingDeathEvent event) {
-        if (event.isCanceled() || !(event.getSource().getEntity() instanceof ServerPlayer player)) { return; }
+        if (event.isCanceled()) { return; }
+        // Recruits and other summons kill on their owner's account.
+        ServerPlayer player = Progression.creditedPlayer(event.getEntity(), event.getSource());
+        if (player == null) { return; }
         var faction = factionOf(player);
         if (faction.isEmpty() || !isRivalNpc(event.getEntity(), faction.get())) { return; }
+        int value = castleValue(player, faction.get(), event.getEntity());
+        if (value > 0) { castlePoints(player, faction.get(), value); }
         count(player, Mission.Type.KILL_RIVALS);
         if (event.getEntity() instanceof TowerGuardEntity) { count(player, Mission.Type.KILL_GUARDS); }
     }
@@ -267,10 +393,14 @@ public final class Missions {
     public static void sync(ServerPlayer player, boolean open) {
         var faction = factionOf(player);
         var mission = faction.flatMap(party -> current(player, party));
+        var target = faction.flatMap(party -> target(player, party));
         FactionNetwork.sendMission(player, mission.map(Enum::ordinal).orElse(-1),
                 faction.map(party -> isActive(player, party)).orElse(false),
                 mission.map(current -> progress(player, current)).orElse(0),
-                faction.map(party -> done(player, party)).orElse(0), open);
+                faction.map(party -> done(player, party)).orElse(0), open,
+                faction.map(party -> aligned(player, party)).orElse(false), ConvictionPowers.recruits(player).size(),
+                target.map(value -> value.faction().ordinal()).orElse(-1),
+                target.map(value -> value.village().getX()).orElse(0), target.map(value -> value.village().getZ()).orElse(0));
     }
 
     private Missions() {}

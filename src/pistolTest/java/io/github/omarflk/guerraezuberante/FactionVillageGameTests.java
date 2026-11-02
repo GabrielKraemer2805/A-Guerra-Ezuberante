@@ -274,6 +274,32 @@ public final class FactionVillageGameTests {
     @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400) public static void missaoBaseHasItsGeneral(GameTestHelper h) { assertBaseOf(h, Faction.MISSAO, new ChunkPos(425, 250)); }
     @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400) public static void direitaBaseHasItsGeneral(GameTestHelper h) { assertBaseOf(h, Faction.DIREITA, new ChunkPos(450, 250)); }
 
+    /** 0.027: the blasts really take the towers and the keep down, and the castle can be found from its village. */
+    @GameTest(template="empty", batch="ge_castelo_cai", timeoutTicks=400) public static void castleBlastsTakeItDown(GameTestHelper h) {
+        StructureStart start = generate(h, Faction.DIREITA, new ChunkPos(475, 250));
+        try {
+            FactionCastlePiece castle = castle(h, start);
+            var box = castle.getBoundingBox();
+            int before = countStone(h, box);
+            for (var point : io.github.omarflk.guerraezuberante.mission.CastleFall.points(castle)) {
+                io.github.omarflk.guerraezuberante.mission.CastleFall.blast(h.getLevel(), point, box);
+            }
+            int after = countStone(h, box);
+            h.assertTrue(after < before * .4, "The castle stood: " + before + " -> " + after);
+        } finally {
+            cleanUp(h, start);
+        }
+        h.succeed();
+    }
+    private static int countStone(GameTestHelper h, BoundingBox box) {
+        int stone = 0;
+        for (BlockPos pos : BlockPos.betweenClosed(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ())) {
+            if (h.getLevel().getBlockState(pos).is(net.minecraft.world.level.block.Blocks.STONE_BRICKS)
+                    || h.getLevel().getBlockState(pos).is(net.minecraft.world.level.block.Blocks.MOSSY_STONE_BRICKS)) { stone++; }
+        }
+        return stone;
+    }
+
     /** Jones stays on the throne as leader and Ciro runs the base. */
     @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400) public static void esquerdaBaseHasCiroAndJonesKeepsTheThrone(GameTestHelper h) {
         StructureStart start = generate(h, Faction.ESQUERDA, new ChunkPos(375, 250));

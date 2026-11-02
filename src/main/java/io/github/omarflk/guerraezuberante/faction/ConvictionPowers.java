@@ -305,7 +305,24 @@ public final class ConvictionPowers {
 
     public static List<ManifestanteEntity> protesters(LivingEntity owner) {
         return owner.level().getEntitiesOfClass(ManifestanteEntity.class, owner.getBoundingBox().inflate(64),
-                zombie -> owner.getUUID().equals(zombie.getOwnerId()));
+                zombie -> owner.getUUID().equals(zombie.getOwnerId()) && !zombie.isRecruit());
+    }
+
+    /** 0.027: the recruits a general hired for this player; they do not take up room in the crowd of Manifestando. */
+    public static List<ManifestanteEntity> recruits(LivingEntity owner) {
+        return owner.level().getEntitiesOfClass(ManifestanteEntity.class, owner.getBoundingBox().inflate(64),
+                zombie -> owner.getUUID().equals(zombie.getOwnerId()) && zombie.isRecruit());
+    }
+
+    /** One recruit beside the player, or empty when there is no safe ground. */
+    public static java.util.Optional<ManifestanteEntity> spawnRecruit(ServerPlayer player, boolean soldier) {
+        var before = new HashSet<>(protesters(player));
+        int life = soldier ? ModConfig.MISSION_SOLDIER_TICKS.get() : ModConfig.MISSION_MILITIA_TICKS.get();
+        if (spawnProtesters(player.serverLevel(), player, 1, soldier ? 2 : 1, life) == 0) { return java.util.Optional.empty(); }
+        return protesters(player).stream().filter(zombie -> !before.contains(zombie)).findFirst().map(zombie -> {
+            zombie.becomeRecruit(soldier);
+            return zombie;
+        });
     }
 
     static boolean protest(ServerPlayer player, double scale) {
