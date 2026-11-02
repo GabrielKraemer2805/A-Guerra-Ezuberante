@@ -118,6 +118,9 @@ public final class MissionScreen extends Screen {
             case KILL_RIVALS -> Component.translatable("gui.guerra_ezuberante.mission.goal.kill", progress, mission.count());
             case SABOTAGE -> Component.translatable("gui.guerra_ezuberante.mission.goal.sabotage", progress, mission.count());
             case KILL_GUARDS -> Component.translatable("gui.guerra_ezuberante.mission.goal.guards", progress, mission.count());
+            case RETRIEVE -> MissionClient.active() && MissionClient.targetFaction().isPresent()
+                    ? Component.translatable("gui.guerra_ezuberante.mission.goal.bible", MissionClient.targetX(), MissionClient.targetZ(), progress, mission.count())
+                    : Component.translatable("gui.guerra_ezuberante.mission.goal.bible_far", progress, mission.count());
             case DESTROY_CASTLE -> MissionClient.active() && MissionClient.targetFaction().isPresent()
                     ? Component.translatable("gui.guerra_ezuberante.mission.goal.castle", MissionClient.targetFaction().get().displayName(),
                             MissionClient.targetX(), MissionClient.targetZ(), progress, mission.count())

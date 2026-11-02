@@ -21,7 +21,7 @@ from render_skin import CUBES, ROOT  # noqa: E402
 TEXTURES = ROOT / "src/main/resources/assets/guerra_ezuberante/textures/entity"
 NAMES = ["marina_silva", "tabata_amaral", "haddad", "jones_manoel", "dilma", "guilherme_boulos", "tarcisio_freitas", "jair_renan",
          "eduardo_bolsonaro", "michelle_bolsonaro", "eduarda_campopiano", "nikolas_ferreira", "lucas_pavanato", "kim_kataguiri",
-         "guto_zacarias", "andre_janones", "oficial_centro"]
+         "guto_zacarias", "andre_janones", "oficial_centro", "cabo_daciolo", "nerd_0", "nerd_1", "nerd_2", "nerd_3", "nerd_4"]
 # Sem skin anterior no mod: a fonte em assets-entrada nao leva o sufixo _refatorada.
 NEW = NAMES[6:]
 # Atlas: caixa = (u, v, largura, altura, profundidade)
@@ -162,9 +162,10 @@ def main():
             lines.append(f"- {a.stem.replace('_skin_64x64', '')} x {b.stem.replace('_skin_64x64', '')}: {d:.1f}")
     lines += ["", "## Integracao: textura do jogo igual a skin refatorada", ""]
     for n in NAMES:
-        same = sha(TEXTURES / f"{n}.png") == sha(HERE / n / f"{n}_skin_64x64.png")
+        texture = TEXTURES / "nerd" / f"{n}.png" if n.startswith("nerd_") else TEXTURES / f"{n}.png"
+        same = sha(texture) == sha(HERE / n / f"{n}_skin_64x64.png")
         src = ROOT / "assets-entrada/skins" / (f"{n}_skin_64x64.png" if n in NEW else f"{n}_skin_64x64_refatorada.png")
-        src_ok = src.exists() and sha(src) == sha(TEXTURES / f"{n}.png")
+        src_ok = src.exists() and sha(src) == sha(texture)
         lines.append(f"- {n}: textura {'igual' if same else 'DIFERENTE'}; fonte em assets-entrada {'igual' if src_ok else 'DIFERENTE/AUSENTE'}")
         if "--integrada" in sys.argv and not (same and src_ok):
             bad = True

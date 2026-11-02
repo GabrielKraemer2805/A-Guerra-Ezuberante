@@ -206,7 +206,7 @@ public final class Missions {
 
     /** Items in the inventory for a delivery; the counter otherwise. */
     public static int progress(Player player, Mission mission) {
-        if (mission.type() == Mission.Type.DELIVER) {
+        if (mission.type() == Mission.Type.DELIVER || mission.type() == Mission.Type.RETRIEVE) {
             int have = 0;
             for (ItemStack stack : player.getInventory().items) { if (stack.is(mission.wanted())) { have += stack.getCount(); } }
             return Math.min(have, mission.count());
@@ -253,7 +253,22 @@ public final class Missions {
         CompoundTag data = data(player, faction);
         data.putBoolean(ACTIVE, true);
         data.putInt(PROGRESS, 0);
+        if (current(player, faction).get().type() == Mission.Type.RETRIEVE) { pointToChurch(player, data); }
         return true;
+    }
+
+    /** The nearest church, when one is found; the screen then shows where it is. Searching is why this only runs on accepting. */
+    private static void pointToChurch(ServerPlayer player, CompoundTag data) {
+        var tag = net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.STRUCTURE,
+                new net.minecraft.resources.ResourceLocation(GuerraEzuberanteMod.MOD_ID, "igreja_daciolo"));
+        var church = player.serverLevel().findNearestMapStructure(tag, player.blockPosition(), 64, false);
+        if (church == null) {
+            data.remove(TARGET_FACTION);
+            return;
+        }
+        data.putString(TARGET_FACTION, Faction.CENTRO.id());
+        data.putInt(TARGET_X, church.getX());
+        data.putInt(TARGET_Z, church.getZ());
     }
 
     /** Delivers, pays and advances the story; refused until the goal is met. */

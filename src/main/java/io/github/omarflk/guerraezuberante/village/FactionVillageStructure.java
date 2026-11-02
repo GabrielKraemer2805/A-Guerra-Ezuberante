@@ -116,7 +116,13 @@ public final class FactionVillageStructure extends Structure {
                     // 0.025: the military base of the village, with its general and soldiers.
                     var taken = new java.util.ArrayList<StructurePiece>(village);
                     taken.add(castle);
-                    builder.addPiece(FactionBasePiece.create(context, faction, taken, stub.position()));
+                    var base = FactionBasePiece.create(context, faction, taken, stub.position());
+                    builder.addPiece(base);
+                    // 0.028: the Bolsonarista villages also have an evangelical church.
+                    if (faction == Faction.BOLSONARISTA) {
+                        taken.add(base);
+                        builder.addPiece(EvangelicalChurchPiece.create(context, taken, stub.position()));
+                    }
                 }));
     }
 

@@ -62,12 +62,12 @@ public final class MissionGameTests {
     @GameTest(template="empty", batch="ge_mission_data") public static void everyPartyHasAStoryAndAGeneral(GameTestHelper h) {
         for (Faction faction : Faction.values()) {
             var story = Mission.of(faction);
-            h.assertTrue(story.size() == 7 && Missions.general(faction).isPresent(), faction + " story " + story.size());
-            h.assertTrue(story.get(6).type() == Mission.Type.DESTROY_CASTLE, faction + " does not end with the castle");
+            h.assertTrue(story.size() == 8 && Missions.general(faction).isPresent(), faction + " story " + story.size());
+            h.assertTrue(story.get(6).type() == Mission.Type.RETRIEVE && story.get(7).type() == Mission.Type.DESTROY_CASTLE, faction + " does not end with the Bible and the castle");
             h.assertTrue(story.stream().map(Mission::type).distinct().count() == Mission.Type.values().length, faction + " does not use every type of mission");
             for (Mission mission : story) {
                 h.assertTrue(mission.count() > 0, mission + " asks for nothing");
-                h.assertTrue(mission.type() != Mission.Type.DELIVER || mission.wanted() != Items.AIR, mission + " delivers nothing");
+                h.assertTrue(mission.type() != Mission.Type.DELIVER && mission.type() != Mission.Type.RETRIEVE || mission.wanted() != Items.AIR, mission + " delivers nothing");
                 h.assertTrue(mission.rewardCount() == 0 || mission.reward() != Items.AIR, mission + " pays with air");
             }
         }
@@ -274,12 +274,12 @@ public final class MissionGameTests {
                 for (int i = 0; i < mission.count(); i++) Missions.count(player, mission.type());
                 h.assertTrue(Missions.turnIn(player, Faction.MISSAO), "Could not finish " + mission);
             }
-            h.assertTrue(Missions.done(player, Faction.MISSAO) == 7, "Done count");
+            h.assertTrue(Missions.done(player, Faction.MISSAO) == 8, "Done count");
             h.assertTrue(Missions.current(player, Faction.MISSAO).orElseThrow() == Mission.of(Faction.MISSAO).get(2), "No routine after the story");
             // Another party's story starts from its beginning, and this one is still here on coming back.
             Factions.assign(player, Faction.DIREITA);
             h.assertTrue(Missions.current(player, Faction.DIREITA).orElseThrow() == Mission.DIR_BOI, "New party should start at the beginning");
-            h.assertTrue(Missions.done(player, Faction.MISSAO) == 7, "Lost the other story");
+            h.assertTrue(Missions.done(player, Faction.MISSAO) == 8, "Lost the other story");
         } finally { leave(h, player); }
         h.succeed();
     }

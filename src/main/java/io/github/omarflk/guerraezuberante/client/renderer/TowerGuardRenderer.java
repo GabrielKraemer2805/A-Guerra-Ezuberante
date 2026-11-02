@@ -24,6 +24,7 @@ public final class TowerGuardRenderer extends CharacterGeoRenderer<TowerGuardEnt
             case BOLSONARISTA -> pick(PetistaRenderer.BOLSONARISTAS, guard.skin());
             case ESQUERDA -> pick(PetistaRenderer.COMUNISTAS, guard.skin());
             case DIREITA -> pick(PetistaRenderer.DIREITISTAS, guard.skin());
+            case MISSAO -> pick(PetistaRenderer.NERDS, guard.skin());
             default -> VILLAGER;
         };
     }

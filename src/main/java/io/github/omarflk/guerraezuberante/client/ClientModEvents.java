@@ -37,6 +37,9 @@ public final class ClientModEvents {
         for (var figure : io.github.omarflk.guerraezuberante.faction.Figure.values()) {
             event.registerEntityRenderer(ModEntities.figure(figure).get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, figure.id(), 1));
         }
+        event.registerEntityRenderer(ModEntities.CABO_DACIOLO.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "cabo_daciolo", 1));
+        event.registerEntityRenderer(ModEntities.ANGEL.get(), io.github.omarflk.guerraezuberante.client.renderer.AngelRenderer.provider());
+        event.registerEntityRenderer(ModEntities.NERD.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.PetistaRenderer<>(c, io.github.omarflk.guerraezuberante.client.renderer.PetistaRenderer.NERDS));
         event.registerEntityRenderer(ModEntities.CENTRO_OFFICER.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "oficial_centro", 1));
         event.registerEntityRenderer(ModEntities.ROMEU_ZEMA.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "romeu_zema", 1));
         event.registerEntityRenderer(ModEntities.RONALDO_CAIADO.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "ronaldo_caiado", 1));

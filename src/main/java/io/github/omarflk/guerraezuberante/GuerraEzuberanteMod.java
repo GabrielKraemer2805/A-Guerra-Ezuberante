@@ -54,6 +54,9 @@ public final class GuerraEzuberanteMod {
         for (var figure : io.github.omarflk.guerraezuberante.faction.Figure.values()) {
             event.put(ModEntities.figure(figure).get(), io.github.omarflk.guerraezuberante.entity.FigureEntity.createAttributes().build());
         }
+        event.put(ModEntities.CABO_DACIOLO.get(), io.github.omarflk.guerraezuberante.entity.CaboDacioloEntity.createAttributes().build());
+        event.put(ModEntities.ANGEL.get(), net.minecraft.world.entity.monster.Vex.createAttributes().build());
+        event.put(ModEntities.NERD.get(), net.minecraft.world.entity.npc.Villager.createAttributes().build());
         event.put(ModEntities.CENTRO_OFFICER.get(), io.github.omarflk.guerraezuberante.entity.CentroOfficerEntity.createAttributes().build());
         event.put(ModEntities.ROMEU_ZEMA.get(), io.github.omarflk.guerraezuberante.entity.RomeuZemaEntity.createAttributes().build());
         event.put(ModEntities.RONALDO_CAIADO.get(), io.github.omarflk.guerraezuberante.entity.RonaldoCaiadoEntity.createAttributes().build());

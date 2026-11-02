@@ -41,7 +41,8 @@ public final class ModConfig {
     public static final java.util.Map<io.github.omarflk.guerraezuberante.faction.FigurePower, ForgeConfigSpec.IntValue> FIGURE_COOLDOWN = new java.util.EnumMap<>(io.github.omarflk.guerraezuberante.faction.FigurePower.class);
     public static final java.util.Map<io.github.omarflk.guerraezuberante.faction.FigurePower, ForgeConfigSpec.DoubleValue> FIGURE_VALUE = new java.util.EnumMap<>(io.github.omarflk.guerraezuberante.faction.FigurePower.class);
     public static final ForgeConfigSpec.DoubleValue FIGURE_BACKFIRE_CHANCE;
-    public static final ForgeConfigSpec.DoubleValue CENTRO_OFFICER_HEALTH;
+    public static final ForgeConfigSpec.DoubleValue CENTRO_OFFICER_HEALTH, DACIOLO_HEALTH;
+    public static final ForgeConfigSpec.IntValue DACIOLO_ANGEL_COOLDOWN, BIBLE_ANGELS, BIBLE_COOLDOWN, BIBLE_ANGEL_TICKS;
     public static final ForgeConfigSpec.BooleanValue MISSION_CASTLE_DEMOLITION;
     public static final ForgeConfigSpec.IntValue MISSION_RECRUIT_MIN_DONE, MISSION_RECRUIT_MAX, MISSION_MILITIA_COST, MISSION_SOLDIER_COST, MISSION_MILITIA_TICKS, MISSION_SOLDIER_TICKS;
     public static final ForgeConfigSpec.IntValue MISSION_MORAL, MISSION_ABANDON_MORAL, MISSION_XP;
@@ -577,6 +578,13 @@ public final class ModConfig {
         MISSION_CASTLE_DEMOLITION = builder.comment("Finishing Destrua o Castelo blows up the target castle's blocks.").define("castle_demolition", true);
         CENTRO_OFFICER_HEALTH = builder.defineInRange("centro_officer_max_health", 100D, 1D, 1024D);
         MISSION_XP = builder.defineInRange("mission_xp", 200, 0, 100000);
+        builder.pop();
+        builder.comment("Cabo Daciolo, his Bible and angels.").push("cabo_daciolo");
+        DACIOLO_HEALTH = builder.defineInRange("max_health", 300D, 1D, 2048D);
+        DACIOLO_ANGEL_COOLDOWN = builder.defineInRange("angel_cooldown_ticks", 300, 20, 72000);
+        BIBLE_ANGELS = builder.comment("Angels per call, for Daciolo and for whoever holds the Bible; at most 6 alive per owner.").defineInRange("bible_angels", 3, 1, 6);
+        BIBLE_COOLDOWN = builder.defineInRange("bible_cooldown_ticks", 600, 20, 72000);
+        BIBLE_ANGEL_TICKS = builder.defineInRange("bible_angel_ticks", 400, 20, 72000);
         builder.pop();
         SPEC = builder.build();
     }

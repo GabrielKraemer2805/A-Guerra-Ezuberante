@@ -22,6 +22,17 @@ public final class ModVillagers {
     /** 0.022: the Direita village. */
     public static final RegistryObject<VillagerType> DIREITISTA = TYPES.register("direitista", () -> new VillagerType("direitista"));
 
+    /** 0.028: the Missão village. */
+    public static final RegistryObject<VillagerType> NERD = TYPES.register("nerd", () -> new VillagerType("nerd"));
+
+    public static boolean isNerd(Villager villager) {
+        return villager.getVillagerData().getType() == NERD.get();
+    }
+
+    public static void makeNerd(Villager villager) {
+        villager.setVillagerData(villager.getVillagerData().setType(NERD.get()));
+    }
+
     public static boolean isPetista(Villager villager) {
         return villager.getVillagerData().getType() == PETISTA.get();
     }
@@ -57,13 +68,13 @@ public final class ModVillagers {
     /** The faction whose village this villager belongs to, or null for an ordinary villager. */
     public static Faction faction(Villager villager) {
         return isPetista(villager) ? Faction.LULISTA : isComunista(villager) ? Faction.ESQUERDA
-                : isBolsonarista(villager) ? Faction.BOLSONARISTA : isDireitista(villager) ? Faction.DIREITA : null;
+                : isBolsonarista(villager) ? Faction.BOLSONARISTA : isDireitista(villager) ? Faction.DIREITA : isNerd(villager) ? Faction.MISSAO : null;
     }
 
     /** The villager type of a faction's village, or null when its villagers stay vanilla. */
     public static VillagerType type(Faction faction) {
         return faction == Faction.LULISTA ? PETISTA.get() : faction == Faction.ESQUERDA ? COMUNISTA.get()
-                : faction == Faction.BOLSONARISTA ? BOLSONARISTA.get() : faction == Faction.DIREITA ? DIREITISTA.get() : null;
+                : faction == Faction.BOLSONARISTA ? BOLSONARISTA.get() : faction == Faction.DIREITA ? DIREITISTA.get() : faction == Faction.MISSAO ? NERD.get() : null;
     }
 
     private ModVillagers() {}

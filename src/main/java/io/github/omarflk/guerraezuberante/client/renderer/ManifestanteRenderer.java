@@ -39,6 +39,7 @@ public final class ManifestanteRenderer extends EntityRenderer<ManifestanteEntit
             case COMUNISTA -> PetistaRenderer.COMUNISTAS;
             case BOLSONARISTA -> PetistaRenderer.BOLSONARISTAS;
             case DIREITISTA -> PetistaRenderer.DIREITISTAS;
+            case NERD -> PetistaRenderer.NERDS;
             default -> PetistaRenderer.PETISTAS;
         };
         return set.skins()[Math.floorMod(entity.skin(), set.skins().length)];

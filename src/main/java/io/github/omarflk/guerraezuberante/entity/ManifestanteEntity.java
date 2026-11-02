@@ -41,7 +41,7 @@ import java.util.UUID;
  */
 public final class ManifestanteEntity extends Zombie implements OwnedSummon {
     /** How it looks: the red zombie, a petista or a comunista. */
-    public enum Look { ZOMBIE, PETISTA, COMUNISTA, BOLSONARISTA, DIREITISTA }
+    public enum Look { ZOMBIE, PETISTA, COMUNISTA, BOLSONARISTA, DIREITISTA, NERD }
 
     private static final EntityDataAccessor<Integer> LOOK = SynchedEntityData.defineId(ManifestanteEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SKIN = SynchedEntityData.defineId(ManifestanteEntity.class, EntityDataSerializers.INT);
@@ -77,7 +77,7 @@ public final class ManifestanteEntity extends Zombie implements OwnedSummon {
         Faction faction = owner instanceof Player player ? Factions.of(player).orElse(null)
                 : owner instanceof RetaliatingCharacterEntity character ? character.faction() : null;
         return faction == Faction.LULISTA ? Look.PETISTA : faction == Faction.ESQUERDA ? Look.COMUNISTA
-                : faction == Faction.BOLSONARISTA ? Look.BOLSONARISTA : faction == Faction.DIREITA ? Look.DIREITISTA : Look.ZOMBIE;
+                : faction == Faction.BOLSONARISTA ? Look.BOLSONARISTA : faction == Faction.DIREITA ? Look.DIREITISTA : faction == Faction.MISSAO ? Look.NERD : Look.ZOMBIE;
     }
 
     public void bindTo(LivingEntity owner, int lifetimeTicks, double damageScale) {

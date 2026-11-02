@@ -37,6 +37,28 @@ public final class FactionBanners {
         };
     }
 
+    /** 0.028: the flags of the evangelical churches, hung lengthwise like a banner: stripes, then the corner or the star. */
+    public static final Design UNITED_STATES = new Design(DyeColor.WHITE, List.of(Pair.of(BannerPatterns.STRIPE_SMALL, DyeColor.RED),
+            Pair.of(BannerPatterns.SQUARE_TOP_LEFT, DyeColor.BLUE)), DyeColor.WHITE);
+    public static final Design ISRAEL = new Design(DyeColor.WHITE, List.of(Pair.of(BannerPatterns.STRIPE_TOP, DyeColor.BLUE),
+            Pair.of(BannerPatterns.STRIPE_BOTTOM, DyeColor.BLUE), Pair.of(BannerPatterns.RHOMBUS_MIDDLE, DyeColor.BLUE),
+            Pair.of(BannerPatterns.CIRCLE_MIDDLE, DyeColor.WHITE)), DyeColor.WHITE);
+
+    public static BlockState standing(Design design, int rotation) {
+        return BannerBlock.byColor(design.base()).defaultBlockState().setValue(BannerBlock.ROTATION, rotation & 15);
+    }
+
+    public static void paint(LevelAccessor level, BlockPos pos, Design design) {
+        if (level.getBlockEntity(pos) instanceof BannerBlockEntity banner) {
+            BannerPattern.Builder patterns = new BannerPattern.Builder();
+            design.layers().forEach(layer -> patterns.addPattern(layer.getFirst(), layer.getSecond()));
+            CompoundTag tag = new CompoundTag();
+            tag.put(BannerBlockEntity.TAG_PATTERNS, patterns.toListTag());
+            banner.load(tag);
+            banner.setChanged();
+        }
+    }
+
     /** Standing banner; rotation 0..15 like {@link BannerBlock#ROTATION}. */
     public static BlockState standing(Faction faction, int rotation) {
         return BannerBlock.byColor(design(faction).base()).defaultBlockState().setValue(BannerBlock.ROTATION, rotation & 15);

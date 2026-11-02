@@ -1,5 +1,49 @@
 # Contexto de trabalho — Guerra Ezuberante
 
+## ONDE PARAMOS E O QUE FALTA (02/11/2026)
+
+Trabalho parado a pedido do colaborador, com a Fase 6 implementada e **nunca vista funcionando no jogo**. Tudo na branch `feat/generais-exercito`, commitado só localmente, sem push (0.024 a 0.028). Antes dela, `feat/refatoracao-skins` foi enviada ao fork. O próximo passo é o teste abaixo, nada de novas features antes dele.
+
+**Situação das 6 fases**
+
+| Fase | Versão | Situação |
+|---|---|---|
+| 1. Personagens, skins, poderes | 0.023.0 | Testada e aprovada pelo colaborador; ajustes de skin não vistos por ele |
+| 2. HUD e itens craftáveis | 0.024.0 | O colaborador avançou sem apontar problema; rolagem física do mouse não confirmada |
+| 3. Base, generais, missões | 0.025.0 | Testada e aprovada, depois ampliada a todas as vilas |
+| 4. Twitter/X | 0.026.0 | O colaborador avançou sem apontar problema; sprite do joinha nunca visto |
+| 5. Recrutamento e castelo | 0.027.0 | O colaborador avançou sem apontar problema; missão inteira não confirmada |
+| 6. Daciolo, igrejas, nerds | 0.028.0 | **Implementada; sem validação visual nem teste do colaborador** |
+
+**Testar no jogo (sempre em mundo novo), por prioridade**
+
+1. **Fase 6, tudo:** igreja enorme do Daciolo aparece no mundo natural? A missão "A Bíblia do Cabo" (capítulo 7) mostra as coordenadas? Daciolo segura a Bíblia, chama anjos e grita "Glória a Deus!" no chat? A Bíblia cai ao morrer e chama anjos para o jogador? Os anjos aparecem com a textura própria? Igreja evangélica na vila bolsonarista, com as bandeiras dos EUA e de Israel legíveis? As bandeiras são aproximações com padrões vanilla e a de Israel usa losango e círculo no lugar da estrela. Nerds na vila do Missão e nos soldados e recrutas dele?
+2. **Queda do castelo (capítulo 8):** `CastleFall.castle` nunca rodou num mundo gerado de verdade, porque os testes colocam a vila por comando. Conferir se o castelo vira ruína ao chegar a 8 pontos e se a demolição aparece.
+3. **Pontos soltos:** recrutas com skin e seguindo o dono; joinha do Bolsonaro; Shift + rolagem; layout do painel K com 31 abas; base no terreno natural de cada partido; skins de Campopiano, Pavanato, Guto e Daciolo, desenhadas sem referência visual confirmada.
+4. **Rebalanceamento:** `mission_moral` 60; preço e duração dos recrutas; 300 de vida do Daciolo.
+
+**Testes automáticos: instabilidade sem causa conhecida**
+
+- A suíte falha em boa parte das rodadas, sempre em testes variados e quase sempre antigos: `fazOLHits...`, `protestersLook...`, `viraroVoto...`, `haddadSlaps...`, `yellowBookBores...`, `comunistaEgg...`, `swordArthur...`, `oldDefaults...`, `oldCharacterHealth...`, `bolsonaristaVillageHasJair...` (aldeão não bolsonarista), `eneiasAtomicBomb...` (dano 0). Algumas podem ser defeito real, sobretudo as duas últimas e `comunistaEgg`, ainda não investigadas.
+- Medições: 0.024, 5 de 5 limpas (mas num mundo de teste novo); 0.025, 3 de 7 limpas; sem `MissionGameTests`, 6 de 6; sem só `onlyRivalsCount`, 5 de 6; 0.028 em mundo novo, 0 de 3 (a 3ª foi interrompida, já com uma falha).
+- **Hipóteses descartadas:** recarga do arquivo de config; morte do Flávio; mundo de teste acumulado (com mundo novo continua falhando). **Não comprovada:** chunks fora da área carregada, porque a fixture testada carregava em volta do spawn 0,0, sem confirmar que os testes rodam ali.
+- Próximo passo sugerido: logar a posição real dos testes e a fila de lotes (a ordem muda ao somar testes) e checar interferência entre testes vizinhos.
+- Última rodada completa da 0.028 antes do último ajuste: com TaCZ, só `bibleSummons...` falhou (corrigido depois, com `FigurePowers.foe` poupando o partido do jogador); sem TaCZ, 3 falhas. **A suíte não passou limpa nesta versão.** A correção da Bíblia não falhou nas rodadas seguintes.
+- `SkinVisualChecks` (Fase 6): a primeira captura saiu com 4 imagens idênticas e "aprovado", porque gerar estrutura trava o servidor; agora espera com `serverAndWait`, **mas a versão corrigida nunca terminou**: a janela foi fechada 1 s depois de abrir o mundo. Olhar as imagens em `.tools/run-skins-client/screenshots`; "passed" sozinho não basta.
+- Outros: `tools/gradle.ps1` com saída redirecionada no PowerShell pode derrubar o wrapper; no Bash, redirecionar para arquivo. A `libraries.minecraft.net` falhou uma vez na validação de certificado, passageira. O mundo antigo de testes está em `.tools/run-gametest-world-antigo-1225` (132 MB, ignorado pelo Git; pode apagar).
+
+## Daciolo, igrejas e aldeões nerds — 0.028.0 (02/11/2026)
+
+- Fase 6 de 6 (ver 0.023.0). **Ver acima: nada disto foi conferido no jogo.**
+- **Cabo Daciolo** (`CaboDacioloEntity`, 300 HP, sem partido, só luta se provocado): segura a Bíblia, chama 3 anjos a cada 15 s de luta, grita "Glória a Deus!" no chat e larga a Bíblia ao morrer. Config `[cabo_daciolo]`.
+- **Bíblia** (`BibleItem`, só por drop): chama 3 anjos para quem a usa; recarga de 30 s; até 6 anjos vivos por dono. **Anjos** (`AngelEntity`): herdam o vex, não são salvos, duram 20 s, atacam inimigos do dono num raio de 16 blocos; textura própria em `textures/entity/anjo.png`, sobre o modelo vanilla.
+- **Igreja do Daciolo** (`DacioloChurchStructure`, `DacioloChurchPiece`): nave de 27 × 47 com torre e cruz de ouro, sem água, `random_spread` espaçamento 80 chunks; pode haver mais de uma no mundo, cada uma com seu Daciolo.
+- **Missão "A Bíblia do Cabo"** (`Mission.Type.RETRIEVE`, capítulo 7 de todos os partidos; o castelo passa a ser o 8): aponta a igreja mais próxima com `findNearestMapStructure` e pede a Bíblia no inventário; o jogador fica com ela. Sem softlock: qualquer Bíblia serve.
+- **Igreja evangélica** (`EvangelicalChurchPiece`): só nas vilas bolsonaristas; bandeiras dos EUA e de Israel (`FactionBanners.UNITED_STATES`, `ISRAEL`) na porta e no palco.
+- **Nerds** (`ModVillagers.NERD`, `NerdEntity`, `PetistaRenderer.NERDS`, `Look.NERD`): 5 skins geradas (anime, chapéu com barba de pescoço, oleoso com pizza, headset, aparelho). Aldeões da vila do Missão, soldados e manifestantes do Missão.
+- **Correção:** poderes novos e anjos do jogador atingiam NPCs do próprio partido, porque `PowerTargets.enemy` conta qualquer personagem; `FigurePowers.foe` agora os poupa. Os poderes mais antigos que usam `PowerTargets.enemy` direto seguem com essa regra e não foram revistos.
+- Testes: `DacioloGameTests` (6). Validador de skins cobre as 6 skins novas.
+
 ## Recrutamento e "Destrua o castelo" — 0.027.0 (02/11/2026)
 
 - Fase 5 de 6 (ver 0.023.0), branch `feat/generais-exercito`.

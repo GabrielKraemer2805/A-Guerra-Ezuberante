@@ -1,0 +1,7 @@
+{
+  "type": "guerra_ezuberante:igreja_daciolo",
+  "biomes": "#guerra_ezuberante:has_structure/vila_faccao",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "spawn_overrides": {}
+}

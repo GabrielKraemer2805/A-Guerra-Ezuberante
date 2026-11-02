@@ -478,7 +478,7 @@ public final class EsquerdaPlayerPowersGameTests {
             ConvictionPowers.spawnProtesters(level, jones, 1, 1);
             h.assertTrue(ConvictionPowers.protesters(esquerda).get(0).look() == ManifestanteEntity.Look.COMUNISTA, "Esquerda crowd is not comunista");
             h.assertTrue(ConvictionPowers.protesters(lulista).get(0).look() == ManifestanteEntity.Look.PETISTA, "Lulista crowd is not petista");
-            h.assertTrue(ConvictionPowers.protesters(missao).get(0).look() == ManifestanteEntity.Look.ZOMBIE, "Other factions should keep the red zombie");
+            h.assertTrue(ConvictionPowers.protesters(missao).get(0).look() == ManifestanteEntity.Look.NERD, "Other factions should keep the red zombie");
             h.assertTrue(ConvictionPowers.protesters(lula).get(0).look() == ManifestanteEntity.Look.PETISTA, "Lula's crowd is not petista");
             h.assertTrue(ConvictionPowers.protesters(jones).get(0).look() == ManifestanteEntity.Look.COMUNISTA, "Jones's comrades are not comunistas");
         });

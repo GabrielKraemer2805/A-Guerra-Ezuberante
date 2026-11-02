@@ -30,6 +30,12 @@ public final class ModWorldgen {
             STRUCTURES.register("vila_faccao", () -> () -> FactionVillageStructure.CODEC);
     public static final RegistryObject<StructurePlacementType<FactionVillagePlacement>> FACTION_VILLAGE_PLACEMENT =
             PLACEMENTS.register("vilas_faccao", () -> () -> FactionVillagePlacement.CODEC);
+    public static final RegistryObject<StructureType<io.github.omarflk.guerraezuberante.village.DacioloChurchStructure>> DACIOLO_CHURCH =
+            STRUCTURES.register("igreja_daciolo", () -> () -> io.github.omarflk.guerraezuberante.village.DacioloChurchStructure.CODEC);
+    public static final RegistryObject<StructurePieceType> DACIOLO_CHURCH_PIECE =
+            PIECES.register("igreja_daciolo", () -> (StructurePieceType.ContextlessType) io.github.omarflk.guerraezuberante.village.DacioloChurchPiece::new);
+    public static final RegistryObject<StructurePieceType> EVANGELICAL_CHURCH =
+            PIECES.register("igreja_evangelica", () -> (StructurePieceType.ContextlessType) io.github.omarflk.guerraezuberante.village.EvangelicalChurchPiece::new);
     public static final RegistryObject<StructurePieceType> CASTLE =
             PIECES.register("castelo_faccao", () -> (StructurePieceType.ContextlessType) FactionCastlePiece::new);
     public static final RegistryObject<StructurePieceType> BASE =

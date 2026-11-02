@@ -58,6 +58,14 @@ public final class PetistaRenderer<T extends Villager> extends HumanoidMobRender
             Map.entry(VillagerProfession.MASON, 3),
             Map.entry(VillagerProfession.NONE, 4), Map.entry(VillagerProfession.NITWIT, 4)));
 
+    /** 0.028, generated: anime, chapéu e barba de pescoço, oleoso com pizza, headset and aparelho, in that order. */
+    public static final SkinSet NERDS = SkinSet.of("nerd", 5, 3, Map.ofEntries(
+            Map.entry(VillagerProfession.LIBRARIAN, 0), Map.entry(VillagerProfession.CARTOGRAPHER, 0), Map.entry(VillagerProfession.CLERIC, 0),
+            Map.entry(VillagerProfession.FARMER, 1), Map.entry(VillagerProfession.SHEPHERD, 1), Map.entry(VillagerProfession.FISHERMAN, 1),
+            Map.entry(VillagerProfession.BUTCHER, 2), Map.entry(VillagerProfession.LEATHERWORKER, 2), Map.entry(VillagerProfession.FLETCHER, 2),
+            Map.entry(VillagerProfession.ARMORER, 3), Map.entry(VillagerProfession.WEAPONSMITH, 3), Map.entry(VillagerProfession.TOOLSMITH, 3),
+            Map.entry(VillagerProfession.MASON, 3), Map.entry(VillagerProfession.NONE, 4), Map.entry(VillagerProfession.NITWIT, 4)));
+
     /** 0.022, generated: terno azul, agroboy, camisa amarela, empresário and mauricinho, in that order. */
     public static final SkinSet DIREITISTAS = SkinSet.of("direitista", 5, 3, Map.ofEntries(
             Map.entry(VillagerProfession.LIBRARIAN, 0), Map.entry(VillagerProfession.CARTOGRAPHER, 0), Map.entry(VillagerProfession.CLERIC, 0),

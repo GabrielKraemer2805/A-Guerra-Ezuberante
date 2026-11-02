@@ -48,7 +48,7 @@ public final class MissionClient {
         var player = Minecraft.getInstance().player;
         var current = mission();
         if (player == null || current.isEmpty()) { return 0; }
-        if (current.get().type() != Mission.Type.DELIVER) { return progress; }
+        if (current.get().type() != Mission.Type.DELIVER && current.get().type() != Mission.Type.RETRIEVE) { return progress; }
         int have = 0;
         for (ItemStack stack : player.getInventory().items) { if (stack.is(current.get().wanted())) { have += stack.getCount(); } }
         return Math.min(have, current.get().count());

@@ -76,6 +76,16 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.CentroOfficerEntity>> CENTRO_OFFICER = REGISTER.register(
             "oficial_centro", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.CentroOfficerEntity::new, MobCategory.CREATURE)
                     .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":oficial_centro"));
+    /** 0.028: Cabo Daciolo, his angels (never saved) and the egg of the Missão's nerds. */
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.CaboDacioloEntity>> CABO_DACIOLO = REGISTER.register(
+            "cabo_daciolo", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.CaboDacioloEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(10).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":cabo_daciolo"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.AngelEntity>> ANGEL = REGISTER.register(
+            "anjo", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.AngelEntity::new, MobCategory.MISC)
+                    .sized(.4F,.8F).fireImmune().clientTrackingRange(8).noSave().build(GuerraEzuberanteMod.MOD_ID+":anjo"));
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.NerdEntity>> NERD = REGISTER.register(
+            "nerd", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.NerdEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.95F).clientTrackingRange(10).build(GuerraEzuberanteMod.MOD_ID+":nerd"));
     /** 0.022: Romeu Zema and Ronaldo Caiado of the Direita; the appliances and oxen of their powers are never saved. */
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.RomeuZemaEntity>> ROMEU_ZEMA = REGISTER.register(
             "romeu_zema", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.RomeuZemaEntity::new, MobCategory.CREATURE)

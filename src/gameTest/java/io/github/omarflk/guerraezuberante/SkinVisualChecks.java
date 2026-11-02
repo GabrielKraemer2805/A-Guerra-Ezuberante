@@ -47,7 +47,7 @@ public final class SkinVisualChecks {
     private static double poseX, poseZ;
     private static float poseYaw;
     private static final Map<String, Object> results = new LinkedHashMap<>();
-    private static final List<String> errors = new ArrayList<>();
+    private static final List<String> errors = java.util.Collections.synchronizedList(new ArrayList<>());
 
     private static boolean enabled() {
         return Boolean.getBoolean("guerra.skinsTest") && Minecraft.getInstance().gameDirectory.toPath().toAbsolutePath().normalize()
@@ -62,6 +62,13 @@ public final class SkinVisualChecks {
         results.put(name, mc.screen == null ? "captured" : "invalid");
     }
     private static void server(Runnable task) { Minecraft.getInstance().getSingleplayerServer().execute(task); }
+    private static volatile boolean serverBusy;
+    private static void serverAndWait(Runnable task) {
+        serverBusy = true;
+        server(() -> {
+            try { task.run(); } catch (RuntimeException failure) { errors.add(failure.toString()); } finally { serverBusy = false; }
+        });
+    }
     private static ServerPlayer serverPlayer() {
         var mc = Minecraft.getInstance();
         return mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
@@ -114,6 +121,42 @@ public final class SkinVisualChecks {
         player.setYHeadRot(0);
     }
 
+    private static volatile BlockPos altarSpot;
+
+    /** Server thread: puts a structure on the first dry chunk found going away from here, then runs the rest. */
+    private static void placeStructure(String id, int distance, java.util.function.Consumer<net.minecraft.world.level.levelgen.structure.StructureStart> then) {
+        ServerPlayer player = serverPlayer();
+        ServerLevel level = player.serverLevel();
+        var structure = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE)
+                .getHolderOrThrow(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.STRUCTURE,
+                        new net.minecraft.resources.ResourceLocation(GuerraEzuberanteMod.MOD_ID, id)));
+        var generator = level.getChunkSource().getGenerator();
+        for (int step = 0; step < 12; step++) {
+            var chunk = new net.minecraft.world.level.ChunkPos(base.offset(distance + step * 160, 0, distance));
+            var start = structure.value().generate(level.registryAccess(), generator, generator.getBiomeSource(),
+                    level.getChunkSource().randomState(), level.getStructureManager(), level.getSeed(), chunk, 0, level, biome -> true);
+            if (!start.isValid()) { continue; }
+            var box = start.getBoundingBox();
+            net.minecraft.world.level.ChunkPos.rangeClosed(new net.minecraft.world.level.ChunkPos(box.minX() >> 4, box.minZ() >> 4),
+                    new net.minecraft.world.level.ChunkPos(box.maxX() >> 4, box.maxZ() >> 4)).forEach(each -> {
+                level.getChunk(each.x, each.z);
+                start.placeInChunk(level, level.structureManager(), generator, level.getRandom(), new net.minecraft.world.level.levelgen.structure.BoundingBox(each.getMinBlockX(),
+                        level.getMinBuildHeight(), each.getMinBlockZ(), each.getMaxBlockX(), level.getMaxBuildHeight(), each.getMaxBlockZ()), each);
+            });
+            then.accept(start);
+            return;
+        }
+        errors.add("No place for " + id);
+    }
+
+    /** Server thread: the camera some blocks away from the spot, looking at it. */
+    private static void lookAt(BlockPos spot, int away, int up) {
+        ServerPlayer player = serverPlayer();
+        player.setGameMode(GameType.SPECTATOR);
+        player.teleportTo(player.serverLevel(), spot.getX() + .5, spot.getY() + up, spot.getZ() - away + .5, 0, 10);
+        player.setYHeadRot(0);
+    }
+
     /** Server thread: a real Bolsonarista village on this spot, and the camera at the gate of its base, looking at the general. */
     private static void placeVillage() {
         ServerPlayer player = serverPlayer();
@@ -161,6 +204,8 @@ public final class SkinVisualChecks {
         if (++elapsed > 4000) { finish("Timed out at stage " + stage); return; }
         try {
             if (mc.getOverlay() != null || mc.level == null || mc.player == null || mc.getSingleplayerServer() == null) return;
+            // Generating a structure stalls the server for many seconds: photographs wait for it, with the camera already moved.
+            if (serverBusy) { ticks = 0; elapsed--; return; }
             switch (stage) {
                 case 0 -> {
                     if (ticks < 40) return;
@@ -361,7 +406,71 @@ public final class SkinVisualChecks {
                     capture("castelo-depois");
                     next(21);
                 }
-                case 21 -> { if (ticks >= 10) finish(null); }
+                case 21 -> {
+                    if (ticks < 10) return;
+                    serverAndWait(() -> placeStructure("vila_bolsonarista", 700, this_stage -> {
+                        var church = this_stage.getPieces().stream().filter(io.github.omarflk.guerraezuberante.village.EvangelicalChurchPiece.class::isInstance)
+                                .map(io.github.omarflk.guerraezuberante.village.EvangelicalChurchPiece.class::cast).findFirst().orElse(null);
+                        if (church == null) { errors.add("No evangelical church"); return; }
+                        lookAt(church.flags().get(0), 12, 10);
+                    }));
+                    next(22);
+                }
+                case 22 -> {
+                    if (ticks < 100) return;
+                    capture("igreja-evangelica");
+                    serverAndWait(() -> placeStructure("igreja_daciolo", 1000, this_stage -> {
+                        var church = (io.github.omarflk.guerraezuberante.village.DacioloChurchPiece) this_stage.getPieces().get(0);
+                        var box = church.getBoundingBox();
+                        ServerPlayer player = serverPlayer();
+                        player.teleportTo(player.serverLevel(), box.getCenter().getX() + 60.5, box.minY() + 26, box.getCenter().getZ() + .5, 90, 8);
+                        player.setYHeadRot(90);
+                        altarSpot = church.altar();
+                    }));
+                    next(23);
+                }
+                case 23 -> {
+                    if (ticks < 100) return;
+                    capture("igreja-daciolo");
+                    serverAndWait(() -> {
+                        if (altarSpot == null) { errors.add("No Daciolo church"); return; }
+                        lookAt(altarSpot, 7, 2);
+                        ServerLevel level = serverPlayer().serverLevel();
+                        var daciolos = level.getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.CaboDacioloEntity.class, new AABB(altarSpot).inflate(8));
+                        if (daciolos.isEmpty()) { errors.add("No Daciolo at the altar"); return; }
+                        daciolos.get(0).callAngels();
+                    });
+                    next(24);
+                }
+                case 24 -> {
+                    if (ticks < 50) return;
+                    capture("daciolo-anjos");
+                    serverAndWait(() -> {
+                        ServerLevel level = serverPlayer().serverLevel();
+                        BlockPos stage = base.offset(0, 0, 0);
+                        level.getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.AngelEntity.class, new AABB(altarSpot).inflate(32)).forEach(Entity::discard);
+                        ServerPlayer player = serverPlayer();
+                        player.teleportTo(level, stage.getX() + .5, stage.getY(), stage.getZ() + .5, 0, 8);
+                        player.setYHeadRot(0);
+                        var professions = java.util.List.of(net.minecraft.world.entity.npc.VillagerProfession.LIBRARIAN, net.minecraft.world.entity.npc.VillagerProfession.FARMER,
+                                net.minecraft.world.entity.npc.VillagerProfession.BUTCHER, net.minecraft.world.entity.npc.VillagerProfession.ARMORER, net.minecraft.world.entity.npc.VillagerProfession.NITWIT);
+                        for (int i = 0; i < professions.size(); i++) {
+                            var villager = EntityType.VILLAGER.create(level);
+                            villager.moveTo(stage.getX() + .5 + (2 - i) * 1.3, stage.getY(), stage.getZ() + 5.5, 180, 0);
+                            villager.setNoAi(true); villager.setYHeadRot(180); villager.setYBodyRot(180);
+                            io.github.omarflk.guerraezuberante.registry.ModVillagers.makeNerd(villager);
+                            villager.setVillagerData(villager.getVillagerData().setProfession(professions.get(i)));
+                            level.addFreshEntity(villager);
+                        }
+                    });
+                    next(25);
+                }
+                case 25 -> {
+                    if (ticks < 40) return;
+                    capture("nerds");
+                    next(26);
+                }
+                case 26 -> { if (ticks >= 10) finish(null); }
                 default -> {}
             }
         } catch (Exception e) {

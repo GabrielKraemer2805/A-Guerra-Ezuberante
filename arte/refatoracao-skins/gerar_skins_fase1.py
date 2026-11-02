@@ -410,7 +410,158 @@ def oficial_centro():
     return s.img
 
 
-SKINS = {"oficial_centro": oficial_centro, "tarcisio_freitas": tarcisio, "jair_renan": jair_renan, "eduardo_bolsonaro": eduardo, "michelle_bolsonaro": michelle,
+def cabo_daciolo():
+    """Cabelo preto curto, sem barba, farda camuflada de cabo, botas pretas. A Biblia vem na mao do modelo."""
+    s = Skin(palette(["e8b48c", "d69f78", "b47c5c", "8a5a44", "dca585"], ["25241f", "151410", "3f3d33"],
+                     a="3a2f28", b="261e19", c="17120e", e="0d0a08", w="e6dfd2", i="20140d", k="2a1f18",
+                     r="ab6d55", R="7a4334", m="6b7040", n="4f5530", o="3a3f22", p="2a2e18", x="4f5530", y="8a7a4a", z="e8c34a",
+                     q="5a5f35", s="454a29", u="33371e", v="23261a"))
+    s.head(0, 0,
+           front=["bbaaaabb", "cbbaabbc", "cc2112cc", "2kk12kk2", "2wi21iw2", "23231232", "32rRRr23", "33222233"],
+           right=["cbbaabab", "cbabbabb", "ccbbbbcb", "ecc32222", "ecc34222", "ecc34322", "e4332223", "e4333334"],
+           back=["cbbaabbc", "cbabbabc", "ccbbbbcc", "ecccccce", "eecccc ee".replace(" ", ""), "4eeeeee4", "43333334", "43333334"],
+           top=["cbbaabbc", "babbabab", "bbabbabb", "babbabab", "bbabbabb", "babbabab", "bbabbabb", "cbbaabbc"],
+           bottom=["33333333"] * 8)
+    s.torso([
+        "oonn nm3223mo nnoo onyonyno",
+        "oonn nyo22oyo nnoo onnooynn",
+        "oyon nnmooynn yonn ynnooyno",
+        "ooyn oynnmonn nyoo ooynnony",
+        "nnoo nnyooznn oonn nnoonnoo",
+        "oonn myonnnyo nnoo yoonyono",
+        "onyo nnnoyonn oyno onoynnoo",
+        "oonn yonnnnyo nnoo noonnyoo",
+        "nyoo nnoyoonn ooyn onyoonoo",
+        "oono ooooooon oono ooonoooo",
+        "pppp pppyyppp pppp pppppppp",
+        "oopo oonnnnoo opoo oonnnnoo"], ["nmmmmmmn", "mm3333mm", "nm3223mn", "nnmmmmnn"], "o")
+    camo_arm = ["onyo nyoo oyno onyo", "oonn nnyo nnoo yono", "oyon oonn noyo onny", "nnoo nyoo oonn oyno", "oono onno onoo oono",
+                "onyo nnyo oyno nyoo", "yoon oonn nooy onno", "oony nyoo yooo onyo", "onno nnoy onno yono", "pppp pppp pppp pppp",
+                "3221 2112 1223 3223", "4333 3223 3334 3333"]
+    legs = ["vuus syqs suuv vuuv", "vuys sqsu syuv vusv", "vyus uqqs suyv vuuv", "vuus sqyu suuv uyuv", "vuus sqsu suuv vuuv", "vuyu qqsy uyuv vuyv",
+            "vuus suqs suuv uuuv", "yuus sqsy suuy vuyv", "vuus syqs suuv vuuv", "7777 7777 7777 7777", "7667 6886 7667 7667", "7777 6666 7777 7777"]
+    limbs(s, arm=camo_arm, leg=legs)
+    return s.img
+
+
+def _nerd(pal, front, right, back, top, torso, arm, leg, hat=None, sole="7"):
+    s = Skin(pal)
+    s.head(0, 0, front=front, right=right, back=back, top=top, bottom=["33333333"] * 8)
+    if hat:
+        s.head(32, 0, **hat)
+    s.torso(torso, TOP, "o")
+    limbs(s, arm=arm, leg=leg, sole=sole)
+    return s.img
+
+
+GLASSES = dict(front=["........", "........", "........", "GGGGGGGG", "G......G", "GG....GG", "........", "........"],
+               right=["........", "........", "........", "...GGGGG", "........", "........", "........", "........"],
+               left=["........", "........", "........", "GGGGG...", "........", "........", "........", "........"],
+               back=["........"] * 8, top=["........"] * 8)
+SHIRT_BACK = "onnnnnno"
+
+
+def _tee(rows):
+    """Camiseta: a frente de cada linha muda, os lados e as costas sao os mesmos."""
+    sides = [("oonn", "nnoo")] * 12
+    out = []
+    for i, front in enumerate(rows):
+        r, l = sides[i]
+        back = "popoopop" if i == 11 else "ponnnnop" if i == 10 else SHIRT_BACK
+        out.append(f"{'pppp' if i == 11 else r} {front} {'pppp' if i == 11 else l} {back}")
+    return out
+
+
+def nerd_0():
+    """Anime: franjao preto, oculos fundo de garrafa, espinhas, camiseta preta com estampa rosa."""
+    pal = palette(["f3d2b8", "e7bfa4", "cda088", "a87e68", "d9685a"], ["e8e8e8", "a8a8ae", "3c3c42"],
+                  a="2f2a2c", b="1f1b1d", c="131013", e="0a0809", w="f4f0e8", i="1a1410", k="1f1b1d", r="b5706a", R="8a4a48",
+                  G="55585e", m="34343a", n="26262c", o="1a1a20", p="101014", y="f28ab2", z="ffd1e3",
+                  q="4a5a4a", s="3a4a3a", u="2c3a2c", v="1f2a1f")
+    return _nerd(pal, ["bbbaabbb", "bbbbbbbb", "ababbaba", "2kk12kk2", "2wi21iw2", "5223125 ".replace(" ", "5"), "352RR253", "33522533"],
+                 ["cbbaabab", "cbabbabb", "cbbabbbb", "ccb32222", "ccb34222", "cc234522", "e4332223", "e4333334"],
+                 ["cbbaabbc", "cbabbabc", "cbbabbbc", "cbbabbbc", "ccbbbbcc", "ecccccce", "43333334", "43333334"],
+                 ["cbbaabbc", "babbabab", "bbabbabb", "babbabab", "bbabbabb", "babbabab", "bbabbabb", "bbbaabbb"],
+                 _tee(["nn3223nn", "nnoooonn", "nmmmmmmn", "nmmyymmn", "nmyzzymn", "nmyzzymn", "nmmyymmn", "nmyyyymn", "nmmmmmmn", "nmmmmmno", "oonnnnoo", "opoooopo"]),
+                 ARM_SHORT, LEG, hat=GLASSES)
+
+
+def nerd_1():
+    """Chapeu e barba de pescoco: fedora cinza, rosto gordo, camiseta roxa manchada, calca cargo."""
+    pal = palette(["f0c8a8", "e0b090", "c29078", "9c7060", "e8a890"], ["2e2a28", "1b1817", "4a433f"],
+                  a="4a3a2c", b="33261c", c="221810", e="150e09", w="e6e0d4", i="2a1c12", k="33261c", r="b5786a", R="8a5040",
+                  G="6b6f75", F="8a8e94", H="4a4d52", m="6a4a9c", n="553a84", o="412c68", p="2d1e4a", y="c9b98a",
+                  q="77704f", s="625c40", u="4d4832", v="383424")
+    hat = dict(front=["FFFFFFFF", "HHHHHHHH", "........", "........", "........", "........", "........", "........"],
+               right=["FFFFFFFF", "HHHHHHHH", "........", "........", "........", "........", "........", "........"],
+               back=["FFFFFFFF", "HHHHHHHH", "........", "........", "........", "........", "........", "........"],
+               top=["GFFFFFFG", "FFGFFGFF", "FFFGGFFF", "FFFGGFFF", "FFFGGFFF", "FFFGGFFF", "FFGFFGFF", "GFFFFFFG"])
+    return _nerd(pal, ["FFFFFFFF", "HHHHHHHH", "22111122", "2kk12kk2", "2wi21iw2", "32231223", "3b2RR2b3", "bcbbbbcb"],
+                 ["FFFFFFFF", "HHHHHHHH", "ccc32222", "ccc32222", "cc234222", "cc234322", "ec332bb3", "ebcbbbbc"],
+                 ["FFFFFFFF", "HHHHHHHH", "ccbbbbcc", "ccbbbbcc", "ccbbbbcc", "ecccccce", "43333334", "43333334"],
+                 ["GFFFFFFG", "FFGFFGFF", "FFFGGFFF", "FFFGGFFF", "FFFGGFFF", "FFFGGFFF", "FFGFFGFF", "GFFFFFFG"],
+                 _tee(["nn3223nn", "nnoooonn", "nmmmmmmn", "nmmmmmmn", "mmmmymmm", "mmmyymmm", "mmmmmmmm", "mmmmmmmm", "nmmmmmmn", "nnmmmmno", "oonnnnoo", "opoooopo"]),
+                 ARM_SHORT, LEG, hat=hat)
+
+
+def nerd_2():
+    """Oleoso: cabelo longo e sebento, palido, camiseta branca com mancha de pizza, bermuda e chinelo."""
+    pal = palette(["f6e0cc", "ecd0b8", "d2b49c", "ae9078", "e8b8a0"], ["5a7a9a", "3a5a7a", "7a9aba"],
+                  a="5e5238", b="463c28", c="322a1c", e="201a10", w="f0ece0", i="2a2018", k="3a3020", r="c08a80", R="96605a",
+                  m="ecece4", n="d8d8ce", o="bdbdb2", p="9a9a90", y="d96a1c", z="f0a020",
+                  q="6a6a58", s="565646", u="444436", v="323226")
+    side = ["cbbaabab", "cabbabab", "cbabbabb", "cbbabbab", "ccbabbab", "ccbabbac", "ccbbabbc", "eccbbbcc"]
+    return _nerd(pal, ["cbaabbac", "babbabab", "bb1112bb", "bkk12kkb", "cwi21iwc", "c223122c", "c32RR23c", "e322223e"],
+                 side, ["cbbaabbc", "cbabbabc", "cbabbabc", "cbbabbac", "ccbabbac", "ccbabbcc", "ecbbabce", "ecbbbbce"],
+                 ["cbbaabbc", "babbabab", "bbabbabb", "babbabab", "bbabbabb", "babbabab", "bbabbabb", "cbbaabbc"],
+                 _tee(["nn3223nn", "nnoooonn", "nmmmmmmn", "nmmzzmmn", "nmzyyzmn", "nmzyyymn", "nmmzymmn", "nmmmzmmn", "nmmmmmmn", "nmmmmmno", "oonnnnoo", "opoooopo"]),
+                 ARM_SHORT,
+                 ["vuus sqqs suuv vuuv", "vuus sqqs suuv vuuv", "vuus sqqs suuv vuuv", "vuus sqqs suuv vuuv", "vvuu usuu uuvv vvuv", "3221 2112 1223 3223",
+                  "3221 2112 1223 3223", "3221 2112 1223 3223", "3221 2112 1223 3223", "4322 3223 2234 3333", "7667 6886 7667 7667", "7777 6666 7777 7777"], sole="7")
+
+
+def nerd_3():
+    """Headset: fone verde sobre o cabelo castanho, oculos, camisa xadrez vermelha e jeans."""
+    pal = palette(["efc4a0", "deae8a", "be8c6c", "966450", "e4a888"], ["e8e8e8", "a8a8ae", "3c3c42"],
+                  a="5e4230", b="462f20", c="312015", e="1f140c", w="e8e0d2", i="2a1c12", k="3a2618", r="b57a66", R="86503f",
+                  G="4a4d52", L="3fa34a", D="2a7a34", m="c8362e", n="f0ece2", o="9c2420", p="6f1814", y="2a2a30",
+                  q="3f5d8c", s="314b75", u="26395d", v="1a2843")
+    hat = dict(front=["LDDDDDDL", "L......L", "D......D", "GGGGGGGG", "G......G", "GG....GG", "........", "........"],
+               right=["DDDDDDDD", "...LL...", "...LL...", "..LDDL.G", "..LDDL..", "...LL...", "........", "........"],
+               left=["DDDDDDDD", "...LL...", "...LL...", "G.LDDL..", "..LDDL..", "...LL...", "........", "........"],
+               back=["DDDDDDDD", "........", "........", "........", "........", "........", "........", "........"],
+               top=["...DD...", "...LL...", "...LL...", "...LL...", "...LL...", "...LL...", "...LL...", "...DD..."])
+    plaid = ["mnmo nmnm omnm onmn", "onmn nmon nmon mnon", "mnmo mnmn omnm onmn", "onmn nmon nmon mnon", "mnmo nmnm omnm onmn", "onmn nmon nmon mnon",
+             "mnmo mnmn omnm onmn", "onmn nmon nmon mnon", "mnmo nmnm omnm onmn", "pooo oooo ooop oooo", "3221 2112 1223 3223", "4333 3223 3334 3333"]
+    return _nerd(pal, ["cbaabbac", "bbbabbab", "cc2112cc", "2kk12kk2", "2wi21iw2", "23231232", "32rRRr23", "33222233"],
+                 ["cbbaabab", "cbabbabb", "cbbabbbb", "ccb32222", "cc234222", "cc234322", "e4332223", "e4333334"],
+                 ["cbbaabbc", "cbabbabc", "cbbabbbc", "cbbabbbc", "ccbbbbcc", "ecccccce", "43333334", "43333334"],
+                 ["cbbaabbc", "babbabab", "bbabbabb", "babbabab", "bbabbabb", "babbabab", "bbabbabb", "cbbaabbc"],
+                 ["oonn nm3223no nnoo onmnnmno", "oomn mnooonmn nnmo mnmnnmnm", "onmn nmnmnmnm mnoo onmnnmno", "oomn mnmnmnmn nnmo mnmnnmnm", "onmn nmnmnmnm mnoo onmnnmno",
+                  "oomn mnmnmnmn nnmo mnmnnmnm", "onmn nmnmnmnm mnoo onmnnmno", "oomn mnmnmnmn nnmo mnmnnmnm", "onmn nmnmnmnm mnoo onmnnmno", "oomn mnmnmnmn nnmo mnmnnmnm",
+                  "ppoo pyyyyyyp oopp popoopop", "pppp oooooooo pppp pppppppp"], plaid, LEG, hat=hat)
+
+
+def nerd_4():
+    """Aparelho e colete: palido, cheio de espinhas, aparelho nos dentes, colete de la com camisa branca e calca curta."""
+    pal = palette(["f8e0cc", "eed0b8", "d4b49c", "b09078", "e0705f"], ["3a2e22", "241c14", "57483a"],
+                  a="c07a3c", b="a0602a", c="7c4820", e="583214", w="f4f0e8", i="2a2018", k="8a5428", r="c0857a", t="d8dde2",
+                  G="55585e", m="c8a24a", n="a8842f", o="846822", p="5e4a18", x="f2f4f4", y="d4d8da",
+                  q="8a7a58", s="746646", u="5e5236", v="483e28")
+    torso = ["oonn nx3223xn nnoo onnxxnno", "oonn nnx22xnn nnoo onmnnmno", "oonm nmxxxxmn mnoo onnmmnno", "ponm nmmxxmmn mnop onnmmnno", "ponn nmmmxmmn nnop onnmnnno", "ponn nmmmmmno nnop onnnnnoo",
+             "ponn nmmmmnmn nnop onmnnmno", "ponn nmmmnmmn nnop onmnnmno", "pono nnmmmmnn onop ooonnooo", "pono nnnmmnno onop oonnnnoo", "poop oonnnnoo poop ponnnnop", "pppp oooooooo pppp popoopop"]
+    sleeve = ["yxxx xxxy xxxy yxxy", "yxxx xxxy xxxy yxxy", "yxxx xxxy xxxy yxxy", "yxxx xxxy xxxy yxxy", "yxxx xxxy xxxy yxxy", "yyxx xxxy xxyy yxxy",
+              "yxxx xxxy xxxy yxxy", "yxxx xxxy xxxy yxxy", "yxxx xxxy xxxy yxxy", "xxxx xxxx xxxx xxxx", "3221 2112 1223 3223", "4333 3223 3334 3333"]
+    legs = ["vuus sqqs suuv vuuv", "vuus sqqs suuv vuuv", "vuus sqqs suuv vuuv", "vuus sqqs suuv vusv", "vuus sqqs suuv vusv", "vuus qqqs suuv vusv",
+            "vvuu usuu uuvv vvuv", "xxxx xxxx xxxx xxxx", "yyyy yyyy yyyy yyyy", "xxxx xxxx xxxx xxxx", "7667 6886 7667 7667", "7777 6666 7777 7777"]
+    return _nerd(pal, ["cbaabbac", "bbbabbab", "cc2152cc", "2kk12kk2", "5wi21iw5", "25231252", "32tttt23", "35222253"],
+                 ["cbbaabab", "cbabbabb", "cbbabbbb", "ccb32522", "ccb34222", "cc234352", "e4332523", "e4333334"],
+                 ["cbbaabbc", "cbabbabc", "cbbabbbc", "ccbabbcc", "ccbbbbcc", "ecccccce", "43333334", "43333334"],
+                 ["cbbaabbc", "babbabab", "bbabbabb", "babbabab", "bbabbabb", "babbabab", "bbabbabb", "cbbaabbc"],
+                 torso, sleeve, legs, hat=GLASSES)
+
+
+SKINS = {"cabo_daciolo": cabo_daciolo, "nerd_0": nerd_0, "nerd_1": nerd_1, "nerd_2": nerd_2, "nerd_3": nerd_3, "nerd_4": nerd_4, "oficial_centro": oficial_centro, "tarcisio_freitas": tarcisio, "jair_renan": jair_renan, "eduardo_bolsonaro": eduardo, "michelle_bolsonaro": michelle,
          "eduarda_campopiano": campopiano, "nikolas_ferreira": nikolas, "lucas_pavanato": pavanato,
          "kim_kataguiri": kim, "guto_zacarias": guto, "andre_janones": janones, "guilherme_boulos": boulos}
 

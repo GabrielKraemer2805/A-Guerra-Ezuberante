@@ -169,6 +169,7 @@ public abstract class RetaliatingCharacterEntity extends PathfinderMob implement
                 || faction() == Faction.ESQUERDA && other instanceof ComunistaEntity
                 || faction() == Faction.BOLSONARISTA && other instanceof BolsonaristaEntity
                 || faction() == Faction.DIREITA && other instanceof DireitistaEntity
+                || faction() == Faction.MISSAO && other instanceof NerdEntity
                 || faction() != null && other instanceof Villager villager && ModVillagers.faction(villager) == faction()
                 || faction() != null && other instanceof ManifestanteEntity crowd && crowd.getOwner() instanceof RetaliatingCharacterEntity leader
                 && leader.faction() == faction()

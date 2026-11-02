@@ -78,7 +78,8 @@ public final class FigurePowers {
     }
 
     public static boolean foe(LivingEntity caster, LivingEntity victim) {
-        return caster instanceof RetaliatingCharacterEntity character ? character.isFoe(victim) : PowerTargets.enemy(caster, victim);
+        // PowerTargets.enemy counts every character, so a player's own party is taken out here.
+        return caster instanceof RetaliatingCharacterEntity character ? character.isFoe(victim) : PowerTargets.enemy(caster, victim) && !ally(caster, victim);
     }
 
     /** Players and characters on the caster's side, the caster included. */

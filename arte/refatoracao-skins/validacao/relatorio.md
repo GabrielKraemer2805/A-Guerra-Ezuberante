@@ -19,6 +19,12 @@
 - **guto_zacarias**: APROVADA (66 cores)
 - **andre_janones**: APROVADA (67 cores)
 - **oficial_centro**: APROVADA (76 cores)
+- **cabo_daciolo**: APROVADA (70 cores)
+- **nerd_0**: APROVADA (72 cores)
+- **nerd_1**: APROVADA (68 cores)
+- **nerd_2**: APROVADA (69 cores)
+- **nerd_3**: APROVADA (79 cores)
+- **nerd_4**: APROVADA (77 cores)
 
 ## Originais (linha de base)
 
@@ -101,6 +107,12 @@
 - marina_silva x guto_zacarias: 49.6
 - marina_silva x andre_janones: 33.7
 - marina_silva x oficial_centro: 50.6
+- marina_silva x cabo_daciolo: 24.4
+- marina_silva x nerd_0: 43.2
+- marina_silva x nerd_1: 64.4
+- marina_silva x nerd_2: 50.5
+- marina_silva x nerd_3: 32.8
+- marina_silva x nerd_4: 62.8
 - tabata_amaral x haddad: 45.3
 - tabata_amaral x jones_manoel: 64.3
 - tabata_amaral x dilma: 28.8
@@ -116,6 +128,12 @@
 - tabata_amaral x guto_zacarias: 72.5
 - tabata_amaral x andre_janones: 59.8
 - tabata_amaral x oficial_centro: 55.6
+- tabata_amaral x cabo_daciolo: 47.2
+- tabata_amaral x nerd_0: 54.0
+- tabata_amaral x nerd_1: 64.4
+- tabata_amaral x nerd_2: 16.7
+- tabata_amaral x nerd_3: 40.2
+- tabata_amaral x nerd_4: 54.2
 - haddad x jones_manoel: 68.5
 - haddad x dilma: 36.9
 - haddad x guilherme_boulos: 66.5
@@ -130,6 +148,12 @@
 - haddad x guto_zacarias: 81.5
 - haddad x andre_janones: 39.7
 - haddad x oficial_centro: 15.8
+- haddad x cabo_daciolo: 27.2
+- haddad x nerd_0: 49.0
+- haddad x nerd_1: 41.8
+- haddad x nerd_2: 49.8
+- haddad x nerd_3: 22.2
+- haddad x nerd_4: 43.4
 - jones_manoel x dilma: 71.3
 - jones_manoel x guilherme_boulos: 45.8
 - jones_manoel x tarcisio_freitas: 66.7
@@ -143,6 +167,12 @@
 - jones_manoel x guto_zacarias: 18.3
 - jones_manoel x andre_janones: 41.7
 - jones_manoel x oficial_centro: 82.4
+- jones_manoel x cabo_daciolo: 48.1
+- jones_manoel x nerd_0: 63.2
+- jones_manoel x nerd_1: 60.9
+- jones_manoel x nerd_2: 65.0
+- jones_manoel x nerd_3: 59.5
+- jones_manoel x nerd_4: 92.9
 - dilma x guilherme_boulos: 66.6
 - dilma x tarcisio_freitas: 40.2
 - dilma x jair_renan: 48.6
@@ -155,6 +185,12 @@
 - dilma x guto_zacarias: 82.1
 - dilma x andre_janones: 61.3
 - dilma x oficial_centro: 41.1
+- dilma x cabo_daciolo: 48.8
+- dilma x nerd_0: 55.2
+- dilma x nerd_1: 55.1
+- dilma x nerd_2: 33.6
+- dilma x nerd_3: 41.0
+- dilma x nerd_4: 42.9
 - guilherme_boulos x tarcisio_freitas: 51.6
 - guilherme_boulos x jair_renan: 67.3
 - guilherme_boulos x eduardo_bolsonaro: 34.6
@@ -166,6 +202,12 @@
 - guilherme_boulos x guto_zacarias: 60.7
 - guilherme_boulos x andre_janones: 59.4
 - guilherme_boulos x oficial_centro: 70.7
+- guilherme_boulos x cabo_daciolo: 60.8
+- guilherme_boulos x nerd_0: 68.6
+- guilherme_boulos x nerd_1: 40.3
+- guilherme_boulos x nerd_2: 64.5
+- guilherme_boulos x nerd_3: 61.9
+- guilherme_boulos x nerd_4: 83.7
 - tarcisio_freitas x jair_renan: 40.5
 - tarcisio_freitas x eduardo_bolsonaro: 46.1
 - tarcisio_freitas x michelle_bolsonaro: 40.5
@@ -176,6 +218,12 @@
 - tarcisio_freitas x guto_zacarias: 82.8
 - tarcisio_freitas x andre_janones: 44.7
 - tarcisio_freitas x oficial_centro: 24.4
+- tarcisio_freitas x cabo_daciolo: 31.9
+- tarcisio_freitas x nerd_0: 54.1
+- tarcisio_freitas x nerd_1: 43.3
+- tarcisio_freitas x nerd_2: 52.6
+- tarcisio_freitas x nerd_3: 27.4
+- tarcisio_freitas x nerd_4: 48.1
 - jair_renan x eduardo_bolsonaro: 53.4
 - jair_renan x michelle_bolsonaro: 52.6
 - jair_renan x eduarda_campopiano: 46.0
@@ -185,6 +233,12 @@
 - jair_renan x guto_zacarias: 79.5
 - jair_renan x andre_janones: 34.2
 - jair_renan x oficial_centro: 50.5
+- jair_renan x cabo_daciolo: 24.0
+- jair_renan x nerd_0: 30.1
+- jair_renan x nerd_1: 58.2
+- jair_renan x nerd_2: 37.5
+- jair_renan x nerd_3: 16.5
+- jair_renan x nerd_4: 37.5
 - eduardo_bolsonaro x michelle_bolsonaro: 61.8
 - eduardo_bolsonaro x eduarda_campopiano: 56.3
 - eduardo_bolsonaro x nikolas_ferreira: 53.8
@@ -193,6 +247,12 @@
 - eduardo_bolsonaro x guto_zacarias: 47.0
 - eduardo_bolsonaro x andre_janones: 39.8
 - eduardo_bolsonaro x oficial_centro: 60.8
+- eduardo_bolsonaro x cabo_daciolo: 41.1
+- eduardo_bolsonaro x nerd_0: 59.1
+- eduardo_bolsonaro x nerd_1: 35.4
+- eduardo_bolsonaro x nerd_2: 54.3
+- eduardo_bolsonaro x nerd_3: 44.1
+- eduardo_bolsonaro x nerd_4: 72.4
 - michelle_bolsonaro x eduarda_campopiano: 34.5
 - michelle_bolsonaro x nikolas_ferreira: 51.2
 - michelle_bolsonaro x lucas_pavanato: 42.4
@@ -200,27 +260,90 @@
 - michelle_bolsonaro x guto_zacarias: 93.9
 - michelle_bolsonaro x andre_janones: 73.0
 - michelle_bolsonaro x oficial_centro: 39.3
+- michelle_bolsonaro x cabo_daciolo: 60.4
+- michelle_bolsonaro x nerd_0: 66.9
+- michelle_bolsonaro x nerd_1: 55.8
+- michelle_bolsonaro x nerd_2: 36.3
+- michelle_bolsonaro x nerd_3: 51.3
+- michelle_bolsonaro x nerd_4: 42.4
 - eduarda_campopiano x nikolas_ferreira: 51.6
 - eduarda_campopiano x lucas_pavanato: 43.6
 - eduarda_campopiano x kim_kataguiri: 46.5
 - eduarda_campopiano x guto_zacarias: 73.0
 - eduarda_campopiano x andre_janones: 61.3
 - eduarda_campopiano x oficial_centro: 63.0
+- eduarda_campopiano x cabo_daciolo: 49.9
+- eduarda_campopiano x nerd_0: 60.2
+- eduarda_campopiano x nerd_1: 70.9
+- eduarda_campopiano x nerd_2: 22.2
+- eduarda_campopiano x nerd_3: 42.4
+- eduarda_campopiano x nerd_4: 54.1
 - nikolas_ferreira x lucas_pavanato: 20.6
 - nikolas_ferreira x kim_kataguiri: 21.3
 - nikolas_ferreira x guto_zacarias: 80.2
 - nikolas_ferreira x andre_janones: 42.0
 - nikolas_ferreira x oficial_centro: 39.6
+- nikolas_ferreira x cabo_daciolo: 29.2
+- nikolas_ferreira x nerd_0: 34.9
+- nikolas_ferreira x nerd_1: 49.8
+- nikolas_ferreira x nerd_2: 46.9
+- nikolas_ferreira x nerd_3: 17.8
+- nikolas_ferreira x nerd_4: 44.2
 - lucas_pavanato x kim_kataguiri: 21.2
 - lucas_pavanato x guto_zacarias: 75.4
 - lucas_pavanato x andre_janones: 32.8
 - lucas_pavanato x oficial_centro: 27.1
+- lucas_pavanato x cabo_daciolo: 20.5
+- lucas_pavanato x nerd_0: 40.1
+- lucas_pavanato x nerd_1: 47.1
+- lucas_pavanato x nerd_2: 39.7
+- lucas_pavanato x nerd_3: 12.4
+- lucas_pavanato x nerd_4: 36.9
 - kim_kataguiri x guto_zacarias: 71.6
 - kim_kataguiri x andre_janones: 30.0
 - kim_kataguiri x oficial_centro: 41.2
+- kim_kataguiri x cabo_daciolo: 16.4
+- kim_kataguiri x nerd_0: 31.6
+- kim_kataguiri x nerd_1: 52.4
+- kim_kataguiri x nerd_2: 45.9
+- kim_kataguiri x nerd_3: 12.6
+- kim_kataguiri x nerd_4: 48.5
 - guto_zacarias x andre_janones: 48.7
 - guto_zacarias x oficial_centro: 97.2
+- guto_zacarias x cabo_daciolo: 58.2
+- guto_zacarias x nerd_0: 67.9
+- guto_zacarias x nerd_1: 77.0
+- guto_zacarias x nerd_2: 73.1
+- guto_zacarias x nerd_3: 70.4
+- guto_zacarias x nerd_4: 106.2
 - andre_janones x oficial_centro: 55.0
+- andre_janones x cabo_daciolo: 17.6
+- andre_janones x nerd_0: 39.9
+- andre_janones x nerd_1: 55.1
+- andre_janones x nerd_2: 60.1
+- andre_janones x nerd_3: 27.2
+- andre_janones x nerd_4: 64.0
+- oficial_centro x cabo_daciolo: 42.5
+- oficial_centro x nerd_0: 63.6
+- oficial_centro x nerd_1: 45.9
+- oficial_centro x nerd_2: 64.2
+- oficial_centro x nerd_3: 36.7
+- oficial_centro x nerd_4: 45.9
+- cabo_daciolo x nerd_0: 29.9
+- cabo_daciolo x nerd_1: 57.4
+- cabo_daciolo x nerd_2: 47.5
+- cabo_daciolo x nerd_3: 14.3
+- cabo_daciolo x nerd_4: 53.2
+- nerd_0 x nerd_1: 65.5
+- nerd_0 x nerd_2: 51.7
+- nerd_0 x nerd_3: 30.7
+- nerd_0 x nerd_4: 54.4
+- nerd_1 x nerd_2: 64.0
+- nerd_1 x nerd_3: 49.4
+- nerd_1 x nerd_4: 64.5
+- nerd_2 x nerd_3: 38.5
+- nerd_2 x nerd_4: 48.1
+- nerd_3 x nerd_4: 41.6
 
 ## Integracao: textura do jogo igual a skin refatorada
 
@@ -241,3 +364,9 @@
 - guto_zacarias: textura igual; fonte em assets-entrada igual
 - andre_janones: textura igual; fonte em assets-entrada igual
 - oficial_centro: textura igual; fonte em assets-entrada igual
+- cabo_daciolo: textura igual; fonte em assets-entrada igual
+- nerd_0: textura igual; fonte em assets-entrada igual
+- nerd_1: textura igual; fonte em assets-entrada igual
+- nerd_2: textura igual; fonte em assets-entrada igual
+- nerd_3: textura igual; fonte em assets-entrada igual
+- nerd_4: textura igual; fonte em assets-entrada igual
