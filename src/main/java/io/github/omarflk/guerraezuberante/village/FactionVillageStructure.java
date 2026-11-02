@@ -111,7 +111,12 @@ public final class FactionVillageStructure extends Structure {
                 .map(stub -> new GenerationStub(stub.position(), builder -> {
                     List<StructurePiece> village = stub.getPiecesBuilder().build().pieces();
                     village.forEach(builder::addPiece);
-                    builder.addPiece(FactionCastlePiece.create(context, faction, village, stub.position()));
+                    var castle = FactionCastlePiece.create(context, faction, village, stub.position());
+                    builder.addPiece(castle);
+                    // 0.025: the military base of the village, with its general and soldiers.
+                    var taken = new java.util.ArrayList<StructurePiece>(village);
+                    taken.add(castle);
+                    builder.addPiece(FactionBasePiece.create(context, faction, taken, stub.position()));
                 }));
     }
 
@@ -148,7 +153,9 @@ public final class FactionVillageStructure extends Structure {
         StructurePiece square = pieces.pieces().get(0);
         BlockPos center = square.getBoundingBox().getCenter();
         squareFlag(level, chunkBox, square.getBoundingBox());
-        List<EntityType<?>> members = members(faction);
+        // The general stands in the military base, not in the square.
+        var general = io.github.omarflk.guerraezuberante.mission.Missions.general(faction).orElse(null);
+        List<EntityType<?>> members = members(faction).stream().filter(type -> type != general).toList();
         var castle = pieces.pieces().stream().filter(FactionCastlePiece.class::isInstance).map(FactionCastlePiece.class::cast).findFirst();
         for (int index = 0; index < members.size(); index++) {
             EntityType<?> type = members.get(index);

@@ -113,6 +113,40 @@ public final class SkinVisualChecks {
         player.setYHeadRot(0);
     }
 
+    /** Server thread: a real Bolsonarista village on this spot, and the camera at the gate of its base, looking at the general. */
+    private static void placeVillage() {
+        ServerPlayer player = serverPlayer();
+        ServerLevel level = player.serverLevel();
+        var structure = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.STRUCTURE)
+                .getHolderOrThrow(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.STRUCTURE,
+                        new net.minecraft.resources.ResourceLocation(GuerraEzuberanteMod.MOD_ID, "vila_bolsonarista")));
+        var generator = level.getChunkSource().getGenerator();
+        var chunk = new net.minecraft.world.level.ChunkPos(player.blockPosition().offset(300, 0, 300));
+        var start = structure.value().generate(level.registryAccess(), generator, generator.getBiomeSource(),
+                level.getChunkSource().randomState(), level.getStructureManager(), level.getSeed(), chunk, 0, level, biome -> true);
+        if (!start.isValid()) { errors.add("The village did not generate"); return; }
+        var box = start.getBoundingBox();
+        net.minecraft.world.level.ChunkPos.rangeClosed(new net.minecraft.world.level.ChunkPos(box.minX() >> 4, box.minZ() >> 4),
+                new net.minecraft.world.level.ChunkPos(box.maxX() >> 4, box.maxZ() >> 4)).forEach(each -> {
+            level.getChunk(each.x, each.z);
+            start.placeInChunk(level, level.structureManager(), generator, level.getRandom(), new net.minecraft.world.level.levelgen.structure.BoundingBox(each.getMinBlockX(),
+                    level.getMinBuildHeight(), each.getMinBlockZ(), each.getMaxBlockX(), level.getMaxBuildHeight(), each.getMaxBlockZ()), each);
+        });
+        var base = start.getPieces().stream().filter(io.github.omarflk.guerraezuberante.village.FactionBasePiece.class::isInstance)
+                .map(io.github.omarflk.guerraezuberante.village.FactionBasePiece.class::cast).findFirst().orElse(null);
+        if (base == null) { errors.add("The village has no base"); return; }
+        var post = base.generalPost();
+        var towardsGate = base.getOrientation() == null ? net.minecraft.core.Direction.SOUTH : base.getOrientation().getOpposite();
+        // Inside the talking range of the general, from the gate side.
+        var eye = net.minecraft.world.phys.Vec3.atBottomCenterOf(post).add(towardsGate.getStepX() * 6, 1.5, towardsGate.getStepZ() * 6);
+        float yaw = towardsGate.getOpposite().toYRot();
+        player.setGameMode(GameType.CREATIVE);
+        player.getAbilities().flying = true;
+        player.onUpdateAbilities();
+        player.teleportTo(level, eye.x, eye.y, eye.z, yaw, 12);
+        player.setYHeadRot(yaw);
+    }
+
     private static void clear(ServerLevel level) {
         level.getEntitiesOfClass(Mob.class, new AABB(base).inflate(32)).forEach(Entity::discard);
     }
@@ -214,7 +248,28 @@ public final class SkinVisualChecks {
                     });
                     next(9);
                 }
-                case 9 -> { if (ticks >= 10) finish(null); }
+                case 9 -> {
+                    if (ticks < 10) return;
+                    server(SkinVisualChecks::placeVillage);
+                    next(10);
+                }
+                case 10 -> {
+                    if (ticks < 120) return;
+                    capture("base-militar");
+                    server(() -> io.github.omarflk.guerraezuberante.mission.Missions.sync(serverPlayer(), true));
+                    next(11);
+                }
+                case 11 -> {
+                    if (ticks < 20) return;
+                    if (!(mc.screen instanceof io.github.omarflk.guerraezuberante.client.screen.MissionScreen)) { errors.add("The general's screen did not open"); }
+                    else { Screenshot.grab(mc.gameDirectory, "skin-tela-do-general.png", mc.getMainRenderTarget(), ignored -> {}); results.put("tela-do-general", "captured"); }
+                    next(12);
+                }
+                case 12 -> {
+                    if (ticks < 10) return;
+                    mc.setScreen(null);
+                    finish(null);
+                }
                 default -> {}
             }
         } catch (Exception e) {

@@ -41,6 +41,8 @@ public final class ModConfig {
     public static final java.util.Map<io.github.omarflk.guerraezuberante.faction.FigurePower, ForgeConfigSpec.IntValue> FIGURE_COOLDOWN = new java.util.EnumMap<>(io.github.omarflk.guerraezuberante.faction.FigurePower.class);
     public static final java.util.Map<io.github.omarflk.guerraezuberante.faction.FigurePower, ForgeConfigSpec.DoubleValue> FIGURE_VALUE = new java.util.EnumMap<>(io.github.omarflk.guerraezuberante.faction.FigurePower.class);
     public static final ForgeConfigSpec.DoubleValue FIGURE_BACKFIRE_CHANCE;
+    public static final ForgeConfigSpec.DoubleValue CENTRO_OFFICER_HEALTH;
+    public static final ForgeConfigSpec.IntValue MISSION_MORAL, MISSION_ABANDON_MORAL, MISSION_XP;
     public static final ForgeConfigSpec.IntValue ZEMA_SALE_COOLDOWN,ZEMA_PRIVATIZE_COOLDOWN,CAIADO_LASSO_COOLDOWN,CAIADO_STAMPEDE_COOLDOWN,
             SALE_COUNT,PRIVATIZE_PARALYSIS_TICKS,STAMPEDE_COUNT,STAMPEDE_TICKS,PD_SALE_COOLDOWN,PD_PRIVATIZE_COOLDOWN,PD_LASSO_COOLDOWN,
             PD_STAMPEDE_COOLDOWN;
@@ -560,6 +562,12 @@ public final class ModConfig {
             FIGURE_VALUE.put(power, builder.defineInRange(power.id() + "_value", power.defaultValue(), 0D, 1024D));
         }
         FIGURE_BACKFIRE_CHANCE = builder.comment("Chance of Inimiga das Feministas coming back on whoever uses it.").defineInRange("inimiga_backfire_chance", .25D, 0D, 1D);
+        builder.pop();
+        builder.comment("The generals' missions.").push("missions");
+        MISSION_MORAL = builder.comment("Points of the moral bar towards the party for each mission done.").defineInRange("mission_moral", 30, 0, 600);
+        MISSION_ABANDON_MORAL = builder.comment("Points away from the party for giving up a mission.").defineInRange("abandon_moral", 15, 0, 600);
+        CENTRO_OFFICER_HEALTH = builder.defineInRange("centro_officer_max_health", 100D, 1D, 1024D);
+        MISSION_XP = builder.defineInRange("mission_xp", 200, 0, 100000);
         builder.pop();
         SPEC = builder.build();
     }

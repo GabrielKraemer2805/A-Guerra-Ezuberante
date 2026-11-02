@@ -73,6 +73,9 @@ public final class ModEntities {
         }
     }
     public static RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.FigureEntity>> figure(io.github.omarflk.guerraezuberante.faction.Figure figure) { return FIGURES.get(figure); }
+    public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.CentroOfficerEntity>> CENTRO_OFFICER = REGISTER.register(
+            "oficial_centro", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.CentroOfficerEntity::new, MobCategory.CREATURE)
+                    .sized(.6F,1.8F).clientTrackingRange(8).updateInterval(2).build(GuerraEzuberanteMod.MOD_ID+":oficial_centro"));
     /** 0.022: Romeu Zema and Ronaldo Caiado of the Direita; the appliances and oxen of their powers are never saved. */
     public static final RegistryObject<EntityType<io.github.omarflk.guerraezuberante.entity.RomeuZemaEntity>> ROMEU_ZEMA = REGISTER.register(
             "romeu_zema", () -> EntityType.Builder.of(io.github.omarflk.guerraezuberante.entity.RomeuZemaEntity::new, MobCategory.CREATURE)

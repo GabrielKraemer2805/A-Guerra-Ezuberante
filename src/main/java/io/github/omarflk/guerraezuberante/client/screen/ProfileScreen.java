@@ -31,7 +31,7 @@ public final class ProfileScreen extends Screen {
     private static final int[] MORAL_COLORS = {0xFFB91C1C, 0xFFF87171, 0xFF9CA3AF, 0xFFFACC15, 0xFF2563EB, 0xFF16A34A};
     /** Compact enough for 240 scaled pixels of height (720p window with automatic GUI scale). */
     private static final int ROW = 16, CONTENT = 44, PANEL_HEIGHT = CONTENT + 178, NODE_HEIGHT = 18, NODE_ROW = 24;
-    private enum Tab { PERFIL, ARVORE }
+    private enum Tab { PERFIL, ARVORE, MISSOES }
     /** Screen rectangle of a tree node (height {@link #NODE_HEIGHT}). */
     private record Box(int x, int y, int w) {
         boolean contains(double mouseX, double mouseY) { return mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + NODE_HEIGHT; }
@@ -71,7 +71,7 @@ public final class ProfileScreen extends Screen {
                     .bounds(left + panelWidth / 2 - 60, top + 56, 120, 20).build());
             return;
         }
-        int tabWidth = (panelWidth - 24) / 2;
+        int tabWidth = (panelWidth - 20 - 4 * (Tab.values().length - 1)) / Tab.values().length;
         for (Tab value : Tab.values()) {
             Button button = addRenderableWidget(Button.builder(Component.translatable("gui.guerra_ezuberante.profile.tab." + value.name().toLowerCase(Locale.ROOT)),
                     ignored -> { tab = value; rebuildWidgets(); }).bounds(left + 10 + value.ordinal() * (tabWidth + 4), top + 26, tabWidth, 14).build());
@@ -131,7 +131,8 @@ public final class ProfileScreen extends Screen {
             super.render(graphics, mouseX, mouseY, partialTick);
             return;
         }
-        Component tooltip = tab == Tab.PERFIL ? renderProfile(graphics, mouseX, mouseY) : renderTree(graphics, mouseX, mouseY);
+        Component tooltip = tab == Tab.PERFIL ? renderProfile(graphics, mouseX, mouseY)
+                : tab == Tab.MISSOES ? renderMissions(graphics) : renderTree(graphics, mouseX, mouseY);
         super.render(graphics, mouseX, mouseY, partialTick);
         if (tooltip != null) {
             graphics.renderTooltip(font, font.split(tooltip, 220), mouseX, mouseY);
@@ -362,6 +363,32 @@ public final class ProfileScreen extends Screen {
         graphics.drawString(font, Component.translatable("gui.guerra_ezuberante.tree.selected", ModKeyBindings.USE_POWER.getTranslatedKeyMessage(),
                 faction.powerName(selected), seconds(ProgressionClient.remaining(selected))), left + 10, treeTop() + 6 * NODE_ROW + 2, TEXT);
         return tooltip;
+    }
+
+    /** 0.025: where the player stands in the party story; the missions themselves are handled with the general. */
+    private Component renderMissions(GuiGraphics graphics) {
+        int y = top + CONTENT, x = left + 10, w = panelWidth - 20;
+        var general = io.github.omarflk.guerraezuberante.mission.Missions.general(faction).map(type -> type.getDescription());
+        if (general.isEmpty()) { return null; }
+        graphics.drawString(font, Component.translatable("gui.guerra_ezuberante.mission.general", general.get()), x, y, GOLD);
+        graphics.drawString(font, Component.translatable("gui.guerra_ezuberante.mission.done_count", io.github.omarflk.guerraezuberante.client.MissionClient.done()), x, y + 12, MUTED);
+        y += 28;
+        var mission = io.github.omarflk.guerraezuberante.client.MissionClient.mission();
+        if (mission.isEmpty()) { return null; }
+        var story = io.github.omarflk.guerraezuberante.mission.Mission.of(faction);
+        graphics.drawString(font, Component.translatable("gui.guerra_ezuberante.mission.chapter", story.indexOf(mission.get()) + 1, story.size()), x, y, MUTED);
+        graphics.drawString(font, Component.translatable(mission.get().key("title")), x, y + 12, 0xFFFFFFFF);
+        y += 26;
+        if (io.github.omarflk.guerraezuberante.client.MissionClient.active()) {
+            graphics.drawString(font, MissionScreen.goal(mission.get()), x, y, 0xFFFFE08A);
+            y += 14;
+        }
+        for (var line : font.split(Component.translatable(io.github.omarflk.guerraezuberante.client.MissionClient.active()
+                ? "gui.guerra_ezuberante.mission.go_back" : "gui.guerra_ezuberante.mission.talk", general.get()), w)) {
+            graphics.drawString(font, line, x, y, TEXT);
+            y += 10;
+        }
+        return null;
     }
 
     /** Draws one node; returns true when the mouse is over it. */

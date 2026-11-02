@@ -21,7 +21,7 @@ from render_skin import CUBES, ROOT  # noqa: E402
 TEXTURES = ROOT / "src/main/resources/assets/guerra_ezuberante/textures/entity"
 NAMES = ["marina_silva", "tabata_amaral", "haddad", "jones_manoel", "dilma", "guilherme_boulos", "tarcisio_freitas", "jair_renan",
          "eduardo_bolsonaro", "michelle_bolsonaro", "eduarda_campopiano", "nikolas_ferreira", "lucas_pavanato", "kim_kataguiri",
-         "guto_zacarias", "andre_janones"]
+         "guto_zacarias", "andre_janones", "oficial_centro"]
 # Sem skin anterior no mod: a fonte em assets-entrada nao leva o sufixo _refatorada.
 NEW = NAMES[6:]
 # Atlas: caixa = (u, v, largura, altura, profundidade)

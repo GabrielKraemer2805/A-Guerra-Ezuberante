@@ -31,6 +31,9 @@ import java.util.List;
 public abstract class VillageAllyEntity extends RetaliatingCharacterEntity {
     public static final int HOME_RADIUS = 32;
     private BlockPos home;
+    /** A general keeps to its base instead of patrolling the village. */
+    private boolean post;
+    private static final int POST_RADIUS = 6;
 
     protected VillageAllyEntity(EntityType<? extends VillageAllyEntity> type, Level level) {
         super(type, level);
@@ -53,7 +56,14 @@ public abstract class VillageAllyEntity extends RetaliatingCharacterEntity {
 
     /** False for an ally with a post of its own (Dilma around the castle): no golem walks through the village then. */
     protected boolean patrolsVillage() {
-        return true;
+        return !post;
+    }
+
+    /** Stays around this spot, coming back after a fight. */
+    public void setPost(BlockPos pos) {
+        home = pos.immutable();
+        post = true;
+        restrictTo(home, POST_RADIUS);
     }
 
     /** Set when the village creates them; spawn eggs leave it empty and they only patrol. */
@@ -71,12 +81,16 @@ public abstract class VillageAllyEntity extends RetaliatingCharacterEntity {
         super.addAdditionalSaveData(tag);
         // "LulistaHome" is the 0.015 key, kept so saved allies keep their home.
         if (home != null) { tag.put("LulistaHome", NbtUtils.writeBlockPos(home)); }
+        tag.putBoolean("VillagePost", post);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        if (tag.contains("LulistaHome")) { setHome(NbtUtils.readBlockPos(tag.getCompound("LulistaHome"))); }
+        if (tag.contains("LulistaHome")) {
+            BlockPos saved = NbtUtils.readBlockPos(tag.getCompound("LulistaHome"));
+            if (tag.getBoolean("VillagePost")) { setPost(saved); } else { setHome(saved); }
+        }
     }
 
     /** Checked when the target is picked and again on every hit, through {@link #isValidAggressor}. */

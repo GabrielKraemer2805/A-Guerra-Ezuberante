@@ -66,6 +66,18 @@ public final class Morality {
         set(player, moral < target ? Math.min(target, moral + amount) : Math.max(target, moral - amount));
     }
 
+    /** A mission done for the party: toward the centre of its zone, without passing it. */
+    public static void toward(ServerPlayer player, Faction faction, int amount) {
+        pull(player, anchor(faction), amount);
+    }
+
+    /** A mission given up: away from the centre of the party's zone, towards the Centro when standing on it. */
+    public static void awayFrom(ServerPlayer player, Faction faction, int amount) {
+        int moral = moral(player), direction = Integer.signum(moral - anchor(faction));
+        if (direction == 0) { direction = anchor(faction) > 0 ? -1 : 1; }
+        set(player, moral + direction * amount);
+    }
+
     public static void powerUsed(ServerPlayer player) {
         Factions.of(player).ifPresent(faction -> pull(player, anchor(faction), ModConfig.MORAL_POWER_USE.get()));
     }

@@ -157,7 +157,7 @@ public final class FactionVillageGameTests {
     }
     /** 0.020: two guards of the faction on each of the four towers, standing on their posts. */
     private static void assertGuards(GameTestHelper h, Faction faction, FactionCastlePiece castle) {
-        var guards = h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.TowerGuardEntity.class, area(castle.getBoundingBox()));
+        var guards = h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.TowerGuardEntity.class, AABB.of(castle.getBoundingBox()));
         var posts = castle.guardPosts();
         h.assertTrue(guards.size() == 8, faction + " castle has " + guards.size() + " guards");
         for (var guard : guards) {
@@ -222,6 +222,74 @@ public final class FactionVillageGameTests {
         h.succeed();
     }
 
+    private static io.github.omarflk.guerraezuberante.village.FactionBasePiece base(GameTestHelper h, StructureStart start) {
+        var bases = start.getPieces().stream().filter(io.github.omarflk.guerraezuberante.village.FactionBasePiece.class::isInstance)
+                .map(io.github.omarflk.guerraezuberante.village.FactionBasePiece.class::cast).toList();
+        h.assertTrue(bases.size() == 1, bases.size() + " bases");
+        return bases.get(0);
+    }
+
+    /** 0.025: the military base touches nothing else, has a soldier on each platform and the general in the yard, who stays there. */
+    @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400) public static void villageBaseHasGeneralAndSoldiers(GameTestHelper h) {
+        StructureStart start = generate(h, Faction.BOLSONARISTA, new ChunkPos(350, 250));
+        try {
+            var base = base(h, start);
+            for (var piece : start.getPieces()) {
+                h.assertTrue(piece == base || !piece.getBoundingBox().intersects(base.getBoundingBox()), "The base overlaps " + piece.getType());
+            }
+            var soldiers = h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.TowerGuardEntity.class, AABB.of(base.getBoundingBox()));
+            h.assertTrue(soldiers.size() == 4, soldiers.size() + " soldiers in the base");
+            for (var soldier : soldiers) {
+                h.assertTrue(soldier.faction() == Faction.BOLSONARISTA && base.soldierPosts().contains(soldier.blockPosition()), soldier + " off its post");
+                h.assertTrue(h.getLevel().getBlockState(soldier.blockPosition().below()).isSolid(), soldier + " in the air");
+            }
+            var tarcisio = io.github.omarflk.guerraezuberante.registry.ModEntities.figure(io.github.omarflk.guerraezuberante.faction.Figure.TARCISIO_FREITAS).get();
+            var generals = h.getLevel().getEntities(tarcisio, AABB.of(start.getBoundingBox()).inflate(2), entity -> true);
+            h.assertTrue(generals.size() == 1, generals.size() + " generals in the village");
+            h.assertTrue(generals.get(0).blockPosition().equals(base.generalPost()) && generals.get(0).home().equals(base.generalPost())
+                    && generals.get(0).isPersistenceRequired(), "The general is not at his post");
+            h.assertTrue(h.getLevel().getBlockState(base.generalPost()).isAir() && h.getLevel().getBlockState(base.generalPost().above()).isAir(), "The general is inside a block");
+        } finally {
+            cleanUp(h, start);
+        }
+        h.succeed();
+    }
+
+    private static void assertBaseOf(GameTestHelper h, Faction faction, ChunkPos chunk) {
+        StructureStart start = generate(h, faction, chunk);
+        try {
+            var base = base(h, start);
+            h.assertTrue(base.faction() == faction, "Base of " + base.faction());
+            var soldiers = h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.TowerGuardEntity.class, AABB.of(base.getBoundingBox()));
+            h.assertTrue(soldiers.size() == 4 && soldiers.stream().allMatch(soldier -> soldier.faction() == faction), faction + " base soldiers: " + soldiers.size());
+            var type = io.github.omarflk.guerraezuberante.mission.Missions.general(faction).orElseThrow();
+            var generals = h.getLevel().getEntities(type, AABB.of(base.getBoundingBox()), entity -> true);
+            h.assertTrue(generals.size() == 1 && generals.get(0).blockPosition().equals(base.generalPost()), faction + " general in the base: " + generals.size());
+        } finally {
+            cleanUp(h, start);
+        }
+        h.succeed();
+    }
+    @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400) public static void lulistaBaseHasItsGeneral(GameTestHelper h) { assertBaseOf(h, Faction.LULISTA, new ChunkPos(400, 250)); }
+    @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400) public static void missaoBaseHasItsGeneral(GameTestHelper h) { assertBaseOf(h, Faction.MISSAO, new ChunkPos(425, 250)); }
+    @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400) public static void direitaBaseHasItsGeneral(GameTestHelper h) { assertBaseOf(h, Faction.DIREITA, new ChunkPos(450, 250)); }
+
+    /** Jones stays on the throne as leader and Ciro runs the base. */
+    @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400) public static void esquerdaBaseHasCiroAndJonesKeepsTheThrone(GameTestHelper h) {
+        StructureStart start = generate(h, Faction.ESQUERDA, new ChunkPos(375, 250));
+        try {
+            var base = base(h, start);
+            h.assertTrue(h.getLevel().getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.TowerGuardEntity.class, AABB.of(base.getBoundingBox())).size() == 4, "Soldiers");
+            var jones = h.getLevel().getEntities(io.github.omarflk.guerraezuberante.registry.ModEntities.JONES_MANOEL.get(), AABB.of(start.getBoundingBox()).inflate(2), entity -> true);
+            h.assertTrue(jones.size() == 1 && castle(h, start).getBoundingBox().isInside(jones.get(0).blockPosition()), "Jones should be alone on the throne: " + jones.size());
+            var ciro = h.getLevel().getEntities(io.github.omarflk.guerraezuberante.registry.ModEntities.CIRO_GOMES.get(), AABB.of(start.getBoundingBox()).inflate(2), entity -> true);
+            h.assertTrue(ciro.size() == 1 && ciro.get(0).blockPosition().equals(base.generalPost()), "Ciro should be in the base: " + ciro.size());
+        } finally {
+            cleanUp(h, start);
+        }
+        h.succeed();
+    }
+
     /** Factions without characters still get the village, castle, flags and tower guards, but nobody on the throne. */
     @GameTest(template="empty", batch="ge_vilas", timeoutTicks=400) public static void centroVillageHasEmptyCastleAndGrayFlags(GameTestHelper h) {
         StructureStart start = generate(h, Faction.CENTRO, new ChunkPos(300, 250));
@@ -229,7 +297,9 @@ public final class FactionVillageGameTests {
             FactionCastlePiece castle = castle(h, start);
             var characters = h.getLevel().getEntitiesOfClass(RetaliatingCharacterEntity.class, area(start.getBoundingBox()),
                     character -> !(character instanceof io.github.omarflk.guerraezuberante.entity.TowerGuardEntity));
-            h.assertTrue(characters.isEmpty(), characters.size() + " characters in the Centro village");
+            // 0.025: the officer in the military base is the only one.
+            h.assertTrue(characters.size() == 1 && characters.get(0) instanceof io.github.omarflk.guerraezuberante.entity.CentroOfficerEntity
+                    && characters.get(0).blockPosition().equals(base(h, start).generalPost()), characters.size() + " characters in the Centro village");
             assertGuards(h, Faction.CENTRO, castle);
             assertFlags(h, Faction.CENTRO, castle.getBoundingBox());
             h.assertTrue(ModWorldgen.CASTLE.get() == castle.getType(), "castle piece type");

@@ -1,5 +1,13 @@
 # Contexto de trabalho — Guerra Ezuberante
 
+## Base militar, generais e missões — 0.025.0 (02/11/2026)
+
+- Fase 3 de 6 (ver 0.023.0), branch `feat/generais-exercito`.
+- **Base** (`village/FactionBasePiece`): em todas as vilas, com pátio murado, portão para a praça, barraca na cor do partido, alvos, feno, 4 soldados (`TowerGuardEntity`) nas plataformas e o general no centro (`VillageAllyEntity.setPost`, raio 6). Sobre a água o piso fica no nível da superfície, para o pátio não alagar. Só em mundos novos.
+- **Generais** (`Missions.general`): Janones, Tarcísio, Kim, Caiado, Ciro (Esquerda) e o oficial do Centro (`CentroOfficerEntity`, sem poderes). Jones segue no trono como líder; o colaborador pediu outro general na base e o agente escolheu o Ciro. O general do próprio partido abre `MissionScreen` com o botão direito (sem agachar); o de outro partido responde no chat com uma frase, sem missões.
+- **Missões** (`mission/Mission`, `Missions`): 6 por partido, em ordem, com a posição guardada por partido no jogador. Tipos: entregar itens, derrubar NPCs rivais, quebrar bandeiras de outro partido e eliminar soldados. Concluir aproxima a barra moral do partido, dá XP e às vezes item; desistir afasta a barra e mantém o capítulo. Depois da 6ª, voltam as missões a partir da 3ª como rotina. Lulistas e Esquerda têm bandeira de base vermelha: a cor não distingue as duas, e a bandeira de um não conta para o outro. Aba Missões no J. Protocolo do canal `faction` 8 → **9**. Config `[missions]`.
+- **Instabilidade em aberto:** a suíte passou a falhar em parte das rodadas, em testes antigos e variados (`protestersLookLikeTheOwnersVillagers`, `viraroVoto...`, `fazOLHits...`, `yellowBookBores...`, `haddadSlaps...`). A 0.024 passou 5 de 5; sem `MissionGameTests`, 6 de 6; sem só `onlyRivalsCount`, 5 de 6. Última medição: sem TaCZ 1 de 4 limpa, com TaCZ 234/234 em uma rodada. Causa desconhecida. Hipóteses não comprovadas: recarga da config (o Faz o L falhou também sem chaves novas) e chunks fora da área carregada (a fixture testada carregou em volta do spawn 0,0, sem confirmar que os testes rodam ali, e foi removida). Os testes novos de missão nunca falharam.
+
 ## HUD do poder selecionado e itens craftáveis — 0.024.0 (02/11/2026)
 
 - Fase 2 de 6 (ver 0.023.0), branch `feat/generais-exercito`.

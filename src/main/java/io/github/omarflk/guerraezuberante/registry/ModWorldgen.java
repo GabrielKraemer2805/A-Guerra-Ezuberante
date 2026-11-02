@@ -32,6 +32,8 @@ public final class ModWorldgen {
             PLACEMENTS.register("vilas_faccao", () -> () -> FactionVillagePlacement.CODEC);
     public static final RegistryObject<StructurePieceType> CASTLE =
             PIECES.register("castelo_faccao", () -> (StructurePieceType.ContextlessType) FactionCastlePiece::new);
+    public static final RegistryObject<StructurePieceType> BASE =
+            PIECES.register("base_militar", () -> (StructurePieceType.ContextlessType) io.github.omarflk.guerraezuberante.village.FactionBasePiece::new);
 
     public static final ResourceKey<BannerPattern> STAR = pattern("estrela");
     public static final ResourceKey<BannerPattern> SMALL_STAR = pattern("estrela_pequena");

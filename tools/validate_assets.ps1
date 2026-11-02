@@ -40,6 +40,7 @@ foreach ($skin in @(
     @{ Texture = 'kim_kataguiri'; Source = 'kim_kataguiri_skin_64x64.png' },
     @{ Texture = 'guto_zacarias'; Source = 'guto_zacarias_skin_64x64.png' },
     @{ Texture = 'andre_janones'; Source = 'andre_janones_skin_64x64.png' },
+    @{ Texture = 'oficial_centro'; Source = 'oficial_centro_skin_64x64.png' },
     @{ Texture = 'romeu_zema' },
     @{ Texture = 'ronaldo_caiado' },
     @{ Texture = 'direitista\direitista_0' },

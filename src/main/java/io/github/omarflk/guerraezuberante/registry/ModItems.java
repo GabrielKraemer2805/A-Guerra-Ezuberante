@@ -68,6 +68,8 @@ public final class ModItems {
         }
     }
     public static RegistryObject<Item> figureEgg(io.github.omarflk.guerraezuberante.faction.Figure figure) { return FIGURE_EGGS.get(figure); }
+    public static final RegistryObject<Item> CENTRO_OFFICER_SPAWN_EGG = REGISTER.register("oficial_centro_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntities.CENTRO_OFFICER, 0x6B7280, 0xE5E7EB, new Item.Properties()));
     public static final RegistryObject<Item> ROMEU_ZEMA_SPAWN_EGG = REGISTER.register("romeu_zema_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.ROMEU_ZEMA,0xF97316,0xE5E7EB,new Item.Properties()));
     public static final RegistryObject<Item> RONALDO_CAIADO_SPAWN_EGG = REGISTER.register("ronaldo_caiado_spawn_egg",

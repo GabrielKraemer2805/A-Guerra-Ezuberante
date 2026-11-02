@@ -37,6 +37,7 @@ public final class ClientModEvents {
         for (var figure : io.github.omarflk.guerraezuberante.faction.Figure.values()) {
             event.registerEntityRenderer(ModEntities.figure(figure).get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, figure.id(), 1));
         }
+        event.registerEntityRenderer(ModEntities.CENTRO_OFFICER.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "oficial_centro", 1));
         event.registerEntityRenderer(ModEntities.ROMEU_ZEMA.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "romeu_zema", 1));
         event.registerEntityRenderer(ModEntities.RONALDO_CAIADO.get(), c -> new io.github.omarflk.guerraezuberante.client.renderer.CharacterGeoRenderer<>(c, "ronaldo_caiado", 1));
         event.registerEntityRenderer(ModEntities.APPLIANCE.get(), io.github.omarflk.guerraezuberante.client.renderer.ApplianceRenderer::new);

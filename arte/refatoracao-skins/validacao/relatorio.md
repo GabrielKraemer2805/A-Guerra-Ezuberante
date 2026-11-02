@@ -18,6 +18,7 @@
 - **kim_kataguiri**: APROVADA (75 cores)
 - **guto_zacarias**: APROVADA (66 cores)
 - **andre_janones**: APROVADA (67 cores)
+- **oficial_centro**: APROVADA (76 cores)
 
 ## Originais (linha de base)
 
@@ -99,6 +100,7 @@
 - marina_silva x kim_kataguiri: 32.1
 - marina_silva x guto_zacarias: 49.6
 - marina_silva x andre_janones: 33.7
+- marina_silva x oficial_centro: 50.6
 - tabata_amaral x haddad: 45.3
 - tabata_amaral x jones_manoel: 64.3
 - tabata_amaral x dilma: 28.8
@@ -113,6 +115,7 @@
 - tabata_amaral x kim_kataguiri: 42.4
 - tabata_amaral x guto_zacarias: 72.5
 - tabata_amaral x andre_janones: 59.8
+- tabata_amaral x oficial_centro: 55.6
 - haddad x jones_manoel: 68.5
 - haddad x dilma: 36.9
 - haddad x guilherme_boulos: 66.5
@@ -126,6 +129,7 @@
 - haddad x kim_kataguiri: 28.4
 - haddad x guto_zacarias: 81.5
 - haddad x andre_janones: 39.7
+- haddad x oficial_centro: 15.8
 - jones_manoel x dilma: 71.3
 - jones_manoel x guilherme_boulos: 45.8
 - jones_manoel x tarcisio_freitas: 66.7
@@ -138,6 +142,7 @@
 - jones_manoel x kim_kataguiri: 58.4
 - jones_manoel x guto_zacarias: 18.3
 - jones_manoel x andre_janones: 41.7
+- jones_manoel x oficial_centro: 82.4
 - dilma x guilherme_boulos: 66.6
 - dilma x tarcisio_freitas: 40.2
 - dilma x jair_renan: 48.6
@@ -149,6 +154,7 @@
 - dilma x kim_kataguiri: 44.9
 - dilma x guto_zacarias: 82.1
 - dilma x andre_janones: 61.3
+- dilma x oficial_centro: 41.1
 - guilherme_boulos x tarcisio_freitas: 51.6
 - guilherme_boulos x jair_renan: 67.3
 - guilherme_boulos x eduardo_bolsonaro: 34.6
@@ -159,6 +165,7 @@
 - guilherme_boulos x kim_kataguiri: 54.9
 - guilherme_boulos x guto_zacarias: 60.7
 - guilherme_boulos x andre_janones: 59.4
+- guilherme_boulos x oficial_centro: 70.7
 - tarcisio_freitas x jair_renan: 40.5
 - tarcisio_freitas x eduardo_bolsonaro: 46.1
 - tarcisio_freitas x michelle_bolsonaro: 40.5
@@ -168,6 +175,7 @@
 - tarcisio_freitas x kim_kataguiri: 27.5
 - tarcisio_freitas x guto_zacarias: 82.8
 - tarcisio_freitas x andre_janones: 44.7
+- tarcisio_freitas x oficial_centro: 24.4
 - jair_renan x eduardo_bolsonaro: 53.4
 - jair_renan x michelle_bolsonaro: 52.6
 - jair_renan x eduarda_campopiano: 46.0
@@ -176,6 +184,7 @@
 - jair_renan x kim_kataguiri: 22.6
 - jair_renan x guto_zacarias: 79.5
 - jair_renan x andre_janones: 34.2
+- jair_renan x oficial_centro: 50.5
 - eduardo_bolsonaro x michelle_bolsonaro: 61.8
 - eduardo_bolsonaro x eduarda_campopiano: 56.3
 - eduardo_bolsonaro x nikolas_ferreira: 53.8
@@ -183,27 +192,35 @@
 - eduardo_bolsonaro x kim_kataguiri: 44.7
 - eduardo_bolsonaro x guto_zacarias: 47.0
 - eduardo_bolsonaro x andre_janones: 39.8
+- eduardo_bolsonaro x oficial_centro: 60.8
 - michelle_bolsonaro x eduarda_campopiano: 34.5
 - michelle_bolsonaro x nikolas_ferreira: 51.2
 - michelle_bolsonaro x lucas_pavanato: 42.4
 - michelle_bolsonaro x kim_kataguiri: 52.7
 - michelle_bolsonaro x guto_zacarias: 93.9
 - michelle_bolsonaro x andre_janones: 73.0
+- michelle_bolsonaro x oficial_centro: 39.3
 - eduarda_campopiano x nikolas_ferreira: 51.6
 - eduarda_campopiano x lucas_pavanato: 43.6
 - eduarda_campopiano x kim_kataguiri: 46.5
 - eduarda_campopiano x guto_zacarias: 73.0
 - eduarda_campopiano x andre_janones: 61.3
+- eduarda_campopiano x oficial_centro: 63.0
 - nikolas_ferreira x lucas_pavanato: 20.6
 - nikolas_ferreira x kim_kataguiri: 21.3
 - nikolas_ferreira x guto_zacarias: 80.2
 - nikolas_ferreira x andre_janones: 42.0
+- nikolas_ferreira x oficial_centro: 39.6
 - lucas_pavanato x kim_kataguiri: 21.2
 - lucas_pavanato x guto_zacarias: 75.4
 - lucas_pavanato x andre_janones: 32.8
+- lucas_pavanato x oficial_centro: 27.1
 - kim_kataguiri x guto_zacarias: 71.6
 - kim_kataguiri x andre_janones: 30.0
+- kim_kataguiri x oficial_centro: 41.2
 - guto_zacarias x andre_janones: 48.7
+- guto_zacarias x oficial_centro: 97.2
+- andre_janones x oficial_centro: 55.0
 
 ## Integracao: textura do jogo igual a skin refatorada
 
@@ -223,3 +240,4 @@
 - kim_kataguiri: textura igual; fonte em assets-entrada igual
 - guto_zacarias: textura igual; fonte em assets-entrada igual
 - andre_janones: textura igual; fonte em assets-entrada igual
+- oficial_centro: textura igual; fonte em assets-entrada igual

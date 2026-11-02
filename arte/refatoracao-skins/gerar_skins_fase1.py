@@ -390,7 +390,27 @@ def boulos():
     return s.img
 
 
-SKINS = {"tarcisio_freitas": tarcisio, "jair_renan": jair_renan, "eduardo_bolsonaro": eduardo, "michelle_bolsonaro": michelle,
+def oficial_centro():
+    """Sem rosto famoso de proposito: grisalho, oculos discretos, terno cinza e gravata cinza. Nem contra, nem a favor."""
+    s = Skin(palette(["ecbd9b", "daa682", "b87f62", "8c5a45", "e0a98a"], ["2e2a28", "1b1817", "4a433f"],
+                     a="b5b5b2", b="8f8f8c", c="6a6a68", e="454547", w="e0dbd0", i="2e2520", k="5c5854",
+                     r="b5795f", R="864a3a", x="eef0f0", y="cdd2d5", f="7b8087", g="a2a7ad", h="5a5f66", G="9aa0a6", J="3a3d42",
+                     m="858a91", n="6e737a", o="565a61", p="3e4147", q="62666d", s="4f5359", u="3e4147", v="2c2f34"))
+    s.head(0, 0,
+           front=["cbaabbac", "bbabbabb", "cc2112cc", "2kk12kk2", "2wi21iw2", "23231232", "32rRRr23", "33233233"],
+           right=["cbbabbab", "cbabbabb", "cbbabbcb", "cbbc3222", "ccc34222", "ccc34322", "e4332223", "e4333334"],
+           back=["cbbabbac", "cbabbabc", "cbbabbbc", "ccbabbcc", "ccbbabcc", "eccbbcce", "ecccccce", "43333334"],
+           top=["cbabbabc", "babbabab", "bbabbabb", "babbabab", "bbabbabb", "babbabab", "bbabbabb", "cbabbabc"],
+           bottom=["33333333"] * 8)
+    s.face(40, 8, 8, 8, ["........", "........", "........", "JJJGGJJJ", "J......J", "........", "........", "........"], MUL["F"])
+    s.face(32, 8, 8, 8, ["........", "........", "........", "...JJJJJ", "........", "........", "........", "........"], MUL["R"])
+    s.face(48, 8, 8, 8, ["........", "........", "........", "JJJJJ...", "........", "........", "........", "........"], MUL["L"])
+    s.torso(SUIT_BODY, ["nmmmmmmn", "mmx33xmm", "nmx22xmn", "nnmmmmnn"], "o")
+    limbs(s, leg=LEG_CREASE)
+    return s.img
+
+
+SKINS = {"oficial_centro": oficial_centro, "tarcisio_freitas": tarcisio, "jair_renan": jair_renan, "eduardo_bolsonaro": eduardo, "michelle_bolsonaro": michelle,
          "eduarda_campopiano": campopiano, "nikolas_ferreira": nikolas, "lucas_pavanato": pavanato,
          "kim_kataguiri": kim, "guto_zacarias": guto, "andre_janones": janones, "guilherme_boulos": boulos}
 
