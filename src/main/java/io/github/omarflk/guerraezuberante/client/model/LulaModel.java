@@ -8,8 +8,8 @@ import software.bernie.geckolib.constant.DataTickets;
 
 public final class LulaModel extends GeoModel<LulaEntity> {
     private static ResourceLocation resource(String path){return new ResourceLocation("guerra_ezuberante",path);}
-    @Override public ResourceLocation getModelResource(LulaEntity entity){return resource("geo/lula.geo.json");}
-    @Override public ResourceLocation getTextureResource(LulaEntity entity){return resource("textures/entity/lula_skin_64x64.png");}
+    @Override public ResourceLocation getModelResource(LulaEntity entity){return resource(entity.isSecondPhase()?"geo/lula_eleitoral.geo.json":"geo/lula.geo.json");}
+    @Override public ResourceLocation getTextureResource(LulaEntity entity){return resource(entity.isSecondPhase()?"textures/entity/lula_eleitoral.png":"textures/entity/lula_skin_64x64.png");}
     @Override public ResourceLocation getAnimationResource(LulaEntity entity){return resource("animations/lula.animation.json");}
     @Override public void setCustomAnimations(LulaEntity entity,long id,AnimationState<LulaEntity> state){
         super.setCustomAnimations(entity,id,state);

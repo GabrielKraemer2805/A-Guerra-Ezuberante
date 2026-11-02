@@ -16,7 +16,7 @@ public class NpcRangedGoal extends Goal {
     public NpcRangedGoal(RetaliatingCharacterEntity owner,NpcGunUser gun){
         this.owner=owner;this.gun=gun;setFlags(EnumSet.of(Flag.MOVE,Flag.LOOK));
     }
-    @Override public boolean canUse(){return !owner.isActionLocked() && gun.isArmed() && gun.validRangedTarget(owner.getTarget());}
+    @Override public boolean canUse(){return !owner.isActionLocked() && gun.isArmed() && !gun.prefersMelee() && gun.validRangedTarget(owner.getTarget());}
     @Override public boolean canContinueToUse(){return canUse();}
     @Override public boolean requiresUpdateEveryTick(){return true;}
     @Override public void start(){gun.cancelStrikeForRanged();repath=0;}

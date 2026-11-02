@@ -85,6 +85,11 @@ minecraft {
                 property 'guerra.direitaTest', 'true'
                 mods { "${mod_id}" { source sourceSets.gameTest } }
             }
+            if (project.hasProperty('bossPhaseTest')) {
+                args '--width', '1280', '--height', '720'
+                property 'guerra.bossPhaseTest', 'true'
+                mods { "${mod_id}" { source sourceSets.gameTest } }
+            }
             if (project.hasProperty('skinsTest')) {
                 args '--width', '1280', '--height', '720'
                 property 'guerra.skinsTest', 'true'

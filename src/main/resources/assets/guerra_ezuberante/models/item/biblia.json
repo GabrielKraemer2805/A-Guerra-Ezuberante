@@ -1,6 +1,33 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "guerra_ezuberante:item/biblia"
+  "loader": "forge:separate_transforms",
+  "gui_light": "front",
+  "base": {
+    "parent": "guerra_ezuberante:item/mao/biblia"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "minecraft:item/generated",
+      "textures": {
+        "layer0": "guerra_ezuberante:item/biblia"
+      }
+    },
+    "ground": {
+      "parent": "minecraft:item/generated",
+      "textures": {
+        "layer0": "guerra_ezuberante:item/biblia"
+      }
+    },
+    "fixed": {
+      "parent": "minecraft:item/generated",
+      "textures": {
+        "layer0": "guerra_ezuberante:item/biblia"
+      }
+    },
+    "head": {
+      "parent": "minecraft:item/generated",
+      "textures": {
+        "layer0": "guerra_ezuberante:item/biblia"
+      }
+    }
   }
 }

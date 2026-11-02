@@ -21,6 +21,12 @@ public class RenanSantosEntity extends SpecialDeathEntity implements io.github.o
         equipmentChecked = isArmed();
     }
     private boolean equipmentChecked;
+    @Override protected String secondPhaseName() { return "entity.guerra_ezuberante.renan_santos.akatsuki"; }
+    /** Renan Akatsuki: the cloak (in the renderer), many more shots and a lot more speed. */
+    @Override protected void onSecondPhase(net.minecraft.server.level.ServerLevel server) {
+        getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(io.github.omarflk.guerraezuberante.config.ModConfig.RENAN_PHASE_SPEED.get());
+    }
+    public int shotInterval() { return isSecondPhase() ? io.github.omarflk.guerraezuberante.config.ModConfig.RENAN_PHASE_SHOT_INTERVAL.get() : SHOT_INTERVAL; }
     private static final net.minecraft.network.syncher.EntityDataAccessor<Long> SHOT_START = net.minecraft.network.syncher.SynchedEntityData.defineId(
             RenanSantosEntity.class, net.minecraft.network.syncher.EntityDataSerializers.LONG);
     private static final net.minecraft.network.syncher.EntityDataAccessor<Long> AIM_START = net.minecraft.network.syncher.SynchedEntityData.defineId(
@@ -54,7 +60,7 @@ public class RenanSantosEntity extends SpecialDeathEntity implements io.github.o
     }
     public boolean tryRifleShot() {
         if (level().isClientSide || !isArmed() || !validRangedTarget(getTarget()) || !hasSafeShot(getTarget())
-                || !isRifleAiming() || rifleAimAge(0)<PREPARE_TICKS || level().getGameTime()-lastShot<SHOT_INTERVAL)return false;
+                || !isRifleAiming() || rifleAimAge(0)<PREPARE_TICKS || level().getGameTime()-lastShot<shotInterval())return false;
         if (!io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.fireRenan(this)) return false;
         lastShot=level().getGameTime();entityData.set(SHOT_START,lastShot);noteCombatProgress();return true;
     }

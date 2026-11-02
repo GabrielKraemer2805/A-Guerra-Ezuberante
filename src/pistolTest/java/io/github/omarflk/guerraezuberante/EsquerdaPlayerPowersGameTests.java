@@ -522,7 +522,7 @@ public final class EsquerdaPlayerPowersGameTests {
             ModConfig.BALANCE_REVISION.set(2); ModConfig.HADDAD_HEALTH.set(30D); ModConfig.DILMA_HEALTH.set(40D); ModConfig.CIRO_HEALTH.set(55D);
             io.github.omarflk.guerraezuberante.config.ConfigMigrations.upgradeLegacyDefaults();
             h.assertTrue(ModConfig.HADDAD_HEALTH.get() == 80 && ModConfig.DILMA_HEALTH.get() == 150 && ModConfig.CIRO_HEALTH.get() == 55
-                    && ModConfig.BALANCE_REVISION.get() == 4, "Old defaults not upgraded or custom value overwritten");
+                    && ModConfig.BALANCE_REVISION.get() == 5, "Old defaults not upgraded or custom value overwritten");
         } finally {
             ModConfig.HADDAD_HEALTH.set(haddad); ModConfig.DILMA_HEALTH.set(dilma); ModConfig.CIRO_HEALTH.set(ciro); ModConfig.BALANCE_REVISION.set(revision);
         }

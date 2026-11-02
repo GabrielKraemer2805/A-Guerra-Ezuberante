@@ -41,6 +41,13 @@ public final class FigureEntity extends VillageAllyEntity implements PosingChara
 
     public Figure figure() { return figure; }
 
+    /** 0.029: called by Bolsonaro hipotetico; fights at his side, leaves with him and is never saved. */
+    private java.util.UUID summonerId;
+    public java.util.UUID summonerId() { return summonerId; }
+    public void bindToSummoner(JairBolsonaroEntity owner) { summonerId = owner.getUUID(); assist(owner.getTarget()); }
+    private void assist(LivingEntity target) { if (target != null && isValidAggressor(target)) { setTarget(target); noteCombatProgress(); } }
+    @Override public boolean shouldBeSaved() { return summonerId == null && super.shouldBeSaved(); }
+
     // Called by the base constructors before the field is set.
     @Override public Faction faction() { return figure == null ? null : figure.faction(); }
     @Override protected double configuredHealth() { return figure == null ? 100 : ModConfig.FIGURE_HEALTH.get(figure).get(); }
@@ -59,7 +66,11 @@ public final class FigureEntity extends VillageAllyEntity implements PosingChara
     @Override
     public void tick() {
         super.tick();
-        if (!(level() instanceof ServerLevel) || !isAlive() || tickCount % 10 != 0) { return; }
+        if (!(level() instanceof ServerLevel server) || !isAlive() || tickCount % 10 != 0) { return; }
+        if (summonerId != null) {
+            if (!(server.getEntity(summonerId) instanceof JairBolsonaroEntity owner) || !owner.isAlive() || owner.deathState() != SpecialDeathEntity.ALIVE) { discard(); return; }
+            assist(owner.getTarget());
+        }
         LivingEntity target = getTarget();
         if (target == null || !isValidAggressor(target)) { return; }
         long now = level().getGameTime();

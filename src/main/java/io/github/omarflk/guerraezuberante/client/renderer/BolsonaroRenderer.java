@@ -16,13 +16,17 @@ public final class BolsonaroRenderer<T extends RetaliatingCharacterEntity> exten
     public BolsonaroRenderer(EntityRendererProvider.Context context,String character){
         super(context,new BolsonaroModel<T>(character));shadowRadius=.35F;
         addRenderLayer(new BlockAndItemGeoLayer<T>(this){
-            @Override protected ItemStack getStackForBone(GeoBone bone,T e){return bone.getName().equals("right_hand")?e.getMainHandItem():null;}
+            @Override protected ItemStack getStackForBone(GeoBone bone,T e){return e instanceof JairBolsonaroEntity j && j.isSecondPhase()?null:bone.getName().equals("right_hand")?e.getMainHandItem():null;}
             @Override protected ItemDisplayContext getTransformTypeForStack(GeoBone bone,ItemStack stack,T e){return ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;}
             @Override protected void renderStackForBone(PoseStack pose,GeoBone bone,ItemStack stack,T e,MultiBufferSource buffers,float partial,int light,int overlay){
                 pose.pushPose();pose.mulPose(Axis.XP.rotationDegrees(-90));pose.translate(0,.05,-.1);
                 super.renderStackForBone(pose,bone,stack,e,buffers,partial,light,overlay);pose.popPose();
             }
         });
+    }
+    /** GeckoLib does not apply the entity's own scale: the second phase asks for it here. */
+    @Override public void scaleModelForRender(float width,float height,com.mojang.blaze3d.vertex.PoseStack pose,T entity,software.bernie.geckolib.cache.object.BakedGeoModel model,boolean rerender,float partial,int light,int overlay){
+        super.scaleModelForRender(width*entity.getScale(),height*entity.getScale(),pose,entity,model,rerender,partial,light,overlay);
     }
     @Override protected float getDeathMaxRotation(T e){return e instanceof SpecialDeathEntity?0:super.getDeathMaxRotation(e);}
     @Override public Color getRenderColor(T e,float partial,int light){return e instanceof SpecialDeathEntity d?SpecialDeathTint.color(d,partial):Color.WHITE;}

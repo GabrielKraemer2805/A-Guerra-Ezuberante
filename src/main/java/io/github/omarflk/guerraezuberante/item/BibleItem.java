@@ -44,12 +44,16 @@ public final class BibleItem extends Item {
         int alive = level.getEntitiesOfClass(AngelEntity.class, new AABB(owner.blockPosition()).inflate(64),
                 angel -> owner.getUUID().equals(angel.getOwnerId())).size();
         int created = 0;
+        // A different choir at each call, never two of the same kind while the kinds last.
+        var kinds = new java.util.ArrayList<>(java.util.List.of(AngelEntity.Kind.values()));
+        java.util.Collections.shuffle(kinds, new java.util.Random(level.getRandom().nextLong()));
         for (int index = 0; index < Math.min(count, MAX_ALIVE - alive); index++) {
             AngelEntity angel = ModEntities.ANGEL.get().create(level);
             if (angel == null) { continue; }
             double turn = index * Math.PI * 2 / Math.max(1, count);
             angel.moveTo(owner.getX() + Math.cos(turn) * 2, owner.getY() + 2, owner.getZ() + Math.sin(turn) * 2, owner.getYRot(), 0);
             angel.bindTo(owner, ModConfig.BIBLE_ANGEL_TICKS.get());
+            angel.setKind(kinds.get(index % kinds.size()));
             level.addFreshEntity(angel);
             level.sendParticles(ParticleTypes.END_ROD, angel.getX(), angel.getY() + .5, angel.getZ(), 12, .3, .4, .3, .03);
             created++;

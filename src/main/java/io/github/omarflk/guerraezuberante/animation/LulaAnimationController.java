@@ -13,6 +13,7 @@ public final class LulaAnimationController extends AnimationController<LulaEntit
             "faz_o_l",RawAnimation.begin().thenPlay("animation.guerra.lula_faz_o_l"),
             "manifestacao",RawAnimation.begin().thenPlay("animation.guerra.lula_manifestacao"),
             "hurt",RawAnimation.begin().thenPlay("animation.guerra.lula_hurt"),
+            "punch",RawAnimation.begin().thenPlay("animation.guerra.lula_punch"),
             "death",RawAnimation.begin().thenPlayAndHold("animation.guerra.lula_death"));
     private final LulaEntity owner;
     private float partial;
@@ -21,7 +22,7 @@ public final class LulaAnimationController extends AnimationController<LulaEntit
     public LulaAnimationController(LulaEntity entity){super(entity,"lula_body",2,state->PlayState.CONTINUE);owner=entity;}
     @Override protected PlayState handleAnimationState(AnimationState<LulaEntity> state){
         partial=state.getPartialTick();String clip;
-        if(owner.isActionLocked()){
+        if(owner.deathState()!=LulaEntity.ALIVE){
             if(!deathStarted){forceAnimationReset();setTransitionLength(0);deathStarted=true;}clip="death";
         }else if(owner.fazOLAge(partial)<LulaEntity.FAZ_O_L_LENGTH){
             if(lastFazOL!=owner.fazOLToken()){forceAnimationReset();lastFazOL=owner.fazOLToken();}clip="faz_o_l";
@@ -29,6 +30,7 @@ public final class LulaAnimationController extends AnimationController<LulaEntit
             if(lastProtest!=owner.protestToken()){forceAnimationReset();lastProtest=owner.protestToken();}clip="manifestacao";
         }else if(owner.throwAge(partial)<LulaEntity.THROW_LENGTH){
             if(lastThrow!=owner.throwToken()){forceAnimationReset();lastThrow=owner.throwToken();}clip="attack";
+        }else if(owner.isSecondPhase() && owner.attackAnimationAge(partial)<LulaEntity.PUNCH_LENGTH){clip="punch";
         }else if(owner.hurtTime>0)clip="hurt";
         else clip=state.isMoving()?"walk":"idle";
         return state.setAndContinue(CLIPS.get(clip));
@@ -36,10 +38,11 @@ public final class LulaAnimationController extends AnimationController<LulaEntit
     @Override protected double adjustTick(double tick){
         double normal=super.adjustTick(tick);
         if(getAnimationState()!=State.RUNNING || owner==null)return normal;
-        if(owner.isActionLocked())return Math.min(59.999,owner.deathAnimationAge(partial));
+        if(owner.deathState()!=LulaEntity.ALIVE)return Math.min(59.999,owner.deathAnimationAge(partial));
         if(owner.fazOLAge(partial)<LulaEntity.FAZ_O_L_LENGTH)return Math.max(0,owner.fazOLAge(partial));
         if(owner.protestAge(partial)<LulaEntity.PROTEST_LENGTH)return Math.min(LulaEntity.PROTEST_LENGTH-.001,Math.max(0,owner.protestAge(partial)));
         if(owner.throwAge(partial)<LulaEntity.THROW_LENGTH)return Math.max(0,owner.throwAge(partial));
+        if(owner.isSecondPhase() && owner.attackAnimationAge(partial)<LulaEntity.PUNCH_LENGTH)return Math.max(0,owner.attackAnimationAge(partial));
         if(owner.hurtTime>0)return Math.min(9.999,10-owner.hurtTime+partial);
         return normal;
     }

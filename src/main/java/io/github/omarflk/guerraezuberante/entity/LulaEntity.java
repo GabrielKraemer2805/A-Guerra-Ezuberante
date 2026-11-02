@@ -21,7 +21,7 @@ public final class LulaEntity extends SpecialDeathEntity {
     private static final EntityDataAccessor<Long> FAZ_O_L_START=SynchedEntityData.defineId(LulaEntity.class,EntityDataSerializers.LONG);
     /** Manifestação: fists up while the crowd arrives, as long as the players' Manifestando pose. */
     private static final EntityDataAccessor<Long> PROTEST_START=SynchedEntityData.defineId(LulaEntity.class,EntityDataSerializers.LONG);
-    public static final int PROTEST_LENGTH=30;
+    public static final int PROTEST_LENGTH=30,PUNCH_LENGTH=12;
     private long nextThrow;
     private LivingEntity pendingBean;
     private int hitsTaken;
@@ -32,7 +32,17 @@ public final class LulaEntity extends SpecialDeathEntity {
     public static AttributeSupplier.Builder createAttributes(){return createMobAttributes()
             .add(Attributes.MAX_HEALTH,ModConfig.LULA_HEALTH.getDefault()).add(Attributes.ATTACK_DAMAGE,4)
             .add(Attributes.MOVEMENT_SPEED,.23).add(Attributes.FOLLOW_RANGE,20);}
-    @Override protected float getStandingEyeHeight(Pose pose,EntityDimensions dimensions){return 1.62F;}
+    @Override protected float getStandingEyeHeight(Pose pose,EntityDimensions dimensions){return 1.62F*getScale();}
+    private static final double PHASE_BEAN_RANGE=10;
+    @Override protected String secondPhaseName(){return "entity.guerra_ezuberante.lula.eleitoral";}
+    @Override protected float secondPhaseSize(){return 1.15F;}
+    @Override protected void onTransformationStart(){pendingBean=null;entityData.set(PROTEST_START,level().getGameTime());}
+    /** Punches from now on. The biggest crowd of the fight comes with the explosion. */
+    @Override protected void onSecondPhase(ServerLevel server){
+        getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(ModConfig.LULA_PHASE_SPEED.get());
+        getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ModConfig.LULA_PHASE_MELEE.get());
+        callProtest();
+    }
     @Override protected void defineSynchedData(){super.defineSynchedData();entityData.define(THROW_START,-1000L);entityData.define(FAZ_O_L_START,-1000L);entityData.define(PROTEST_START,-1000L);}
     public float throwAge(float partialTick){return level().getGameTime()-entityData.get(THROW_START)+partialTick;}
     public long throwToken(){return entityData.get(THROW_START);}
@@ -42,7 +52,7 @@ public final class LulaEntity extends SpecialDeathEntity {
     public float protestAge(float partialTick){return level().getGameTime()-entityData.get(PROTEST_START)+partialTick;}
     public long protestToken(){return entityData.get(PROTEST_START);}
 
-    @Override protected boolean allowsMeleeCombat(){return false;}
+    @Override protected boolean allowsMeleeCombat(){return isSecondPhase();}
     @Override protected List<ModSounds.VoiceLine> interactionVoices(){return List.of();}
     @Override public io.github.omarflk.guerraezuberante.faction.Faction faction(){return io.github.omarflk.guerraezuberante.faction.Faction.LULISTA;}
     @Override public List<MusicTrack> musicTracks(){return CharacterAudio.LULA;}
@@ -77,6 +87,11 @@ public final class LulaEntity extends SpecialDeathEntity {
         if(isActionLocked()){setDeltaMovement(Vec3.ZERO);getNavigation().stop();}
         super.tick();
         if(!level().isClientSide && deathState()==ALIVE && pendingBean!=null && throwAge(0)>=THROW_RELEASE)releaseBean();
+        // Lula eleitoral only throws beans at someone out of his reach, and even then less often.
+        if(!level().isClientSide && isSecondPhase() && isAlive() && tickCount%10==0){
+            var target=getTarget();
+            if(validBeanTarget(target) && distanceToSqr(target)>PHASE_BEAN_RANGE*PHASE_BEAN_RANGE && beginBeanThrow())nextThrow+=THROW_INTERVAL*2;
+        }
     }
     /**
      * Hits that really took health from a valid attacker. Every [lula] faz_o_l_every_hits one may answer with a Faz o L
@@ -91,8 +106,9 @@ public final class LulaEntity extends SpecialDeathEntity {
     }
     private void onHitTaken(LivingEntity attacker){
         hitsTaken++;
+        if(hitsTaken%(isSecondPhase()?Math.max(1,ModConfig.LULA_PROTEST_HITS.get()/2):ModConfig.LULA_PROTEST_HITS.get())==0
+                && random.nextDouble()<ModConfig.LULA_PROTEST_CHANCE.get())callProtest();
         if(hitsTaken%ModConfig.LULA_FAZ_O_L_HITS.get()==0 && random.nextDouble()<ModConfig.LULA_FAZ_O_L_CHANCE.get())throwFazOL(attacker);
-        if(hitsTaken%ModConfig.LULA_PROTEST_HITS.get()==0 && random.nextDouble()<ModConfig.LULA_PROTEST_CHANCE.get())callProtest();
     }
     public int hitsTaken(){return hitsTaken;}
     /** The player power's giant L, thrown straight at the target. Public for GameTests. */
@@ -116,7 +132,7 @@ public final class LulaEntity extends SpecialDeathEntity {
     public int callProtest(){
         if(!(level() instanceof ServerLevel server) || deathState()!=ALIVE)return 0;
         var before=new java.util.HashSet<>(io.github.omarflk.guerraezuberante.faction.ConvictionPowers.protesters(this));
-        int missing=ModConfig.PROTEST_COUNT.get()-before.size();
+        int missing=ModConfig.PROTEST_COUNT.get()*(isSecondPhase()?ModConfig.LULA_PHASE_CROWD.get():1)-before.size();
         int created=missing<=0?0:io.github.omarflk.guerraezuberante.faction.ConvictionPowers.spawnProtesters(server,this,missing,1);
         if(created>0){
             io.github.omarflk.guerraezuberante.faction.PowerEffects.manifestando(this,io.github.omarflk.guerraezuberante.faction.ConvictionPowers.protesters(this)

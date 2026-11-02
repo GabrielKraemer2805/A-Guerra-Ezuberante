@@ -310,7 +310,7 @@ public final class LulistaDireitaPowersGameTests {
         var p = arena(h);
         double radius = ModConfig.ENEIAS_NUKE_RADIUS.get(), lethal = ModConfig.ENEIAS_NUKE_LETHAL_RADIUS.get(), damage = ModConfig.ENEIAS_NUKE_DAMAGE.get();
         int crater = ModConfig.ENEIAS_NUKE_CRATER_RADIUS.get();
-        // A small bomb for the test arena: the real one reaches 300 blocks.
+        // A small bomb for the test arena: the real one reaches 100 blocks.
         ModConfig.ENEIAS_NUKE_RADIUS.set(30D); ModConfig.ENEIAS_NUKE_LETHAL_RADIUS.set(6D); ModConfig.ENEIAS_NUKE_DAMAGE.set(100D); ModConfig.ENEIAS_NUKE_CRATER_RADIUS.set(4);
         var eneias = mob(h, ModEntities.ENEIAS.get(), p, 300);
         var close = mob(h, EntityType.HUSK, p.add(4, 0, 0), 300);

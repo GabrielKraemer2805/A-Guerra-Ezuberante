@@ -8,7 +8,7 @@ public final class LulaBeanGoal extends Goal {
     private final LulaEntity owner;
     private int repath;
     public LulaBeanGoal(LulaEntity owner){this.owner=owner;setFlags(EnumSet.of(Flag.MOVE,Flag.LOOK));}
-    @Override public boolean canUse(){return !owner.isActionLocked() && owner.validBeanTarget(owner.getTarget());}
+    @Override public boolean canUse(){return !owner.isActionLocked() && !owner.isSecondPhase() && owner.validBeanTarget(owner.getTarget());}
     @Override public boolean canContinueToUse(){return canUse();}
     @Override public boolean requiresUpdateEveryTick(){return true;}
     @Override public void stop(){owner.getNavigation().stop();}

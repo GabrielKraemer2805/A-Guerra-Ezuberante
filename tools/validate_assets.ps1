@@ -8,6 +8,8 @@ if ($difference) { throw 'As traduções pt_br e en_us possuem chaves diferentes
 
 foreach ($skin in @(
     @{ Texture = 'renan_santos'; Source = 'renan_santos_skin_64x64.png' },
+    @{ Texture = 'renan_akatsuki'; Source = 'renan_akatsuki_skin_64x64.png' },
+    @{ Texture = 'lula_eleitoral'; Source = 'lula_eleitoral_skin_64x64.png' },
     @{ Texture = 'arthur_do_val'; Source = 'arthur_do_val_skin_64x64_corrigida.png' },
     @{ Texture = 'combatente_ucraniana'; Source = 'skin-loira.png' },
     @{ Texture = 'haddad'; Source = 'haddad_skin_64x64_refatorada.png' },

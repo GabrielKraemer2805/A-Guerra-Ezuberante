@@ -32,6 +32,22 @@ Trabalho parado a pedido do colaborador. Depois disso, ele testou a Fase 6 no jo
 - `SkinVisualChecks` (Fase 6): a primeira captura saiu com 4 imagens idênticas e "aprovado", porque gerar estrutura trava o servidor; agora espera com `serverAndWait`, **mas a versão corrigida nunca terminou**: a janela foi fechada 1 s depois de abrir o mundo. Olhar as imagens em `.tools/run-skins-client/screenshots`; "passed" sozinho não basta.
 - Outros: `tools/gradle.ps1` com saída redirecionada no PowerShell pode derrubar o wrapper; no Bash, redirecionar para arquivo. A `libraries.minecraft.net` falhou uma vez na validação de certificado, passageira. O mundo antigo de testes está em `.tools/run-gametest-world-antigo-1225` (132 MB, ignorado pelo Git; pode apagar).
 
+## Segundas fases dos bosses, itens na mão e anjos — 0.029.0 (02/11/2026)
+
+- Pedido do colaborador: bomba do Enéias de 300 para 100 blocos; itens com forma real na mão (megafone, Bíblia, foice e martelo, motosserra), com foice e martelo um em cada mão; mais variedade de anjos; fases novas para Lula, Bolsonaro e Renan ao chegar à metade da vida.
+- **Bomba do Enéias:** `eneias_nuke_radius` passa a 100. Mundos antigos com 300 migram (`balance_revision` 5); valor personalizado fica. Dano cheio até 60 blocos e cratera de 80 não mudaram: o pedido foi só o alcance.
+- **Segunda fase** (`SpecialDeathEntity`, config `[boss_phases]`): a 50% da vida o boss carrega por 1,5 s, parado e sem levar dano (o `/kill` ainda funciona), e explode sem quebrar blocos. Depois muda de nome (`getTypeName`, barra de chefe) e de tamanho (`getScale`, que a GeckoLib não aplica sozinha: por isso `scaleModelForRender`). A fase fica salva no NBT.
+  - **Lula Eleitoral:** skin `lula_eleitoral` sem camisa e modelo `lula_eleitoral.geo.json` (sem barriga, tronco e braços largos), 1,15× o tamanho. Soca (clipe `lula_punch`), joga feijão só em quem está a mais de 10 blocos, e a Manifestação traz 3× mais gente, vindo também na explosão.
+  - **Bolsonaro Hipotético:** 2× o tamanho, mesma skin, guarda a arma (`NpcGunUser.prefersMelee`) e soca (`jair_punch`). Chama de uma vez os filhos que faltam (`JairSummoning.summonSons`). Flávio, Eduardo e Jair Renan são os únicos filhos que existem no mod: **Carlos não é personagem**. Eduardo e Jair Renan não são salvos e somem com ele.
+  - **Renan Akatsuki:** skin `renan_akatsuki`, tiro a cada 4 ticks (eram 20) e velocidade 0,46 (era 0,25). Sem TaCZ ele luta com os punhos, então só a velocidade muda.
+- **Itens na mão** (`arte/itens/gerar_modelos_mao.py`): modelos de cubos em `models/item/mao`. Inventário, chão e moldura seguem com o sprite plano (`forge:separate_transforms`). A translação é calculada a partir do ponto de pegada. **Foice e martelo:** é um item só; o martelo é só um modelo, desenhado na outra mão se ela estiver livre (`HeldItemsClient`).
+- **Anjos** (`AngelEntity.Kind`, texturas de `gerar_fases_boss.py`): Anjo; Querubim (pequeno e fraco); Serafim (põe fogo); Arcanjo (grande, espada de ouro, mais dano); Anjo da Guarda (cura o dono); Anjo Trombeteiro (empurra e fere inimigos a 6 blocos). Cada chamada sorteia tipos diferentes.
+- Testada pelo colaborador no jogo em 02/11/2026: "testei e tá funcionando".
+- Testes: `BossPhaseGameTests` (7) e `BossPhaseVisualChecks` + `tools/fases_visual_test.ps1` (perfil `.tools/run-fases-client`, volume 0).
+- Validação com TaCZ: em mundo de teste novo, 253 de 253 na 1ª rodada; na 2ª, 2 falhas: `comunistaEgg...` (já conhecida) e `eneiasBombReachesOneHundredBlocks` ("An old world keeps the 300 blocks", uma vez, sem causa confirmada; `oldDefaults...` mexe na mesma config e também falha às vezes).
+- **Pista nova sobre a instabilidade:** teste que falha sem limpar deixa entidades em `run-gametest/world`, e elas afetam rodadas seguintes. `beamWithLula...` falhou 3 vezes seguidas com um Lula deixado por uma falha dos testes novos e passou ao trocar o mundo. Isso não explica as falhas que já ocorriam em mundo novo.
+- Visual: capturas conferidas de primeira pessoa, frente e costas dos itens, dos bosses e dos anjos. **Não vistos:** a vista lateral dos itens (a câmera de lado não funcionou e foi retirada), o combate real das segundas fases e o Renan Akatsuki atirando em ritmo real.
+
 ## Daciolo, igrejas e aldeões nerds — 0.028.0 (02/11/2026)
 
 - Fase 6 de 6 (ver 0.023.0). Aprovada pelo colaborador no jogo; a captura automática segue sem validar.

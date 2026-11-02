@@ -11,4 +11,6 @@ public interface NpcGunUser {
     boolean tryGunShot();
     void maintainFiringPosition();
     void cancelStrikeForRanged();
+    /** A second phase that would rather punch keeps the gun down. */
+    default boolean prefersMelee() { return false; }
 }

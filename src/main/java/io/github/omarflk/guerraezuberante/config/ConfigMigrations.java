@@ -7,7 +7,7 @@ public final class ConfigMigrations {
     public static void loading(ModConfigEvent.Loading event){migrate(event);}
     public static void reloading(ModConfigEvent.Reloading event){migrate(event);}
     private static void migrate(ModConfigEvent event){
-        if(event.getConfig().getSpec()!=ModConfig.SPEC || ModConfig.BALANCE_REVISION.get()>=4)return;
+        if(event.getConfig().getSpec()!=ModConfig.SPEC || ModConfig.BALANCE_REVISION.get()>=5)return;
         upgradeLegacyDefaults();event.getConfig().save();
     }
     public static void upgradeLegacyDefaults(){
@@ -39,6 +39,11 @@ public final class ConfigMigrations {
         if(ModConfig.BALANCE_REVISION.get()<4){
             if(ModConfig.RENAN_HEALTH.get()==80D || ModConfig.RENAN_HEALTH.get()==30D)ModConfig.RENAN_HEALTH.set(300D);
             ModConfig.BALANCE_REVISION.set(4);
+        }
+        // 0.029: Eneias's bomb reaches 100 blocks instead of 300.
+        if(ModConfig.BALANCE_REVISION.get()<5){
+            if(ModConfig.ENEIAS_NUKE_RADIUS.get()==300D)ModConfig.ENEIAS_NUKE_RADIUS.set(100D);
+            ModConfig.BALANCE_REVISION.set(5);
         }
     }
     private ConfigMigrations(){}

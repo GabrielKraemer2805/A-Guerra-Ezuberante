@@ -43,6 +43,9 @@ public final class ModConfig {
     public static final ForgeConfigSpec.DoubleValue FIGURE_BACKFIRE_CHANCE;
     public static final ForgeConfigSpec.DoubleValue CENTRO_OFFICER_HEALTH, DACIOLO_HEALTH;
     public static final ForgeConfigSpec.IntValue DACIOLO_ANGEL_COOLDOWN, BIBLE_ANGELS, BIBLE_COOLDOWN, BIBLE_ANGEL_TICKS;
+    public static final ForgeConfigSpec.BooleanValue BOSS_PHASES_ENABLED;
+    public static final ForgeConfigSpec.DoubleValue BOSS_PHASE_HEALTH, BOSS_PHASE_BLAST, LULA_PHASE_MELEE, LULA_PHASE_SPEED, JAIR_PHASE_MELEE, JAIR_PHASE_SPEED, JAIR_PHASE_SCALE, RENAN_PHASE_SPEED;
+    public static final ForgeConfigSpec.IntValue LULA_PHASE_CROWD, JAIR_PHASE_SUMMON_COOLDOWN, RENAN_PHASE_SHOT_INTERVAL;
     public static final ForgeConfigSpec.BooleanValue MISSION_CASTLE_DEMOLITION;
     public static final ForgeConfigSpec.IntValue MISSION_RECRUIT_MIN_DONE, MISSION_RECRUIT_MAX, MISSION_MILITIA_COST, MISSION_SOLDIER_COST, MISSION_MILITIA_TICKS, MISSION_SOLDIER_TICKS;
     public static final ForgeConfigSpec.IntValue MISSION_MORAL, MISSION_ABANDON_MORAL, MISSION_XP;
@@ -101,7 +104,7 @@ public final class ModConfig {
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         BALANCE_REVISION=builder.comment("Internal migration marker; upgrades only unchanged legacy default values.")
-                .defineInRange("balance_revision",0,0,4);
+                .defineInRange("balance_revision",0,0,5);
         builder.comment("Renan Santos, leader of the Missão village.").push("renan");
         RENAN_HEALTH=builder.comment("A boss since 0.020, with a yellow boss bar.").defineInRange("max_health",300D,1D,1024D);
         RENAN_EXPLOSION_ENABLED=builder.define("death_explosion_enabled",true);
@@ -424,7 +427,7 @@ public final class ModConfig {
         ENEIAS_NUKE_HEALTH=builder.comment("Fraction of his health that starts the countdown.").defineInRange("eneias_nuke_health_fraction",.25D,.01D,1D);
         ENEIAS_NUKE_COUNTDOWN=builder.defineInRange("eneias_nuke_countdown_ticks",300,20,6000);
         ENEIAS_NUKE_RADIUS=builder.comment("Everything alive this close is hit; the damage falls off from the lethal radius to here.")
-                .defineInRange("eneias_nuke_radius",300D,10D,512D);
+                .defineInRange("eneias_nuke_radius",100D,10D,512D);
         ENEIAS_NUKE_LETHAL_RADIUS=builder.defineInRange("eneias_nuke_full_damage_radius",60D,1D,512D);
         ENEIAS_NUKE_DAMAGE=builder.defineInRange("eneias_nuke_damage",400D,0D,10000D);
         ENEIAS_NUKE_BREAK_BLOCKS=builder.comment("The crater; also needs the mobGriefing game rule. Bedrock and unbreakable blocks stay.")
@@ -578,6 +581,20 @@ public final class ModConfig {
         MISSION_CASTLE_DEMOLITION = builder.comment("Finishing Destrua o Castelo blows up the target castle's blocks.").define("castle_demolition", true);
         CENTRO_OFFICER_HEALTH = builder.defineInRange("centro_officer_max_health", 100D, 1D, 1024D);
         MISSION_XP = builder.defineInRange("mission_xp", 200, 0, 100000);
+        builder.pop();
+        builder.comment("Second phase of the bosses: at this fraction of their health they transform, with an explosion.").push("boss_phases");
+        BOSS_PHASES_ENABLED = builder.define("enabled", true);
+        BOSS_PHASE_HEALTH = builder.defineInRange("health_fraction", .5D, .05D, .95D);
+        BOSS_PHASE_BLAST = builder.comment("Power of the explosion at the transformation; it never breaks blocks.").defineInRange("explosion_power", 3D, 0D, 8D);
+        LULA_PHASE_MELEE = builder.comment("Lula eleitoral: shirtless and muscular, prefers punching to beans.").defineInRange("lula_melee_damage", 12D, 0D, 100D);
+        LULA_PHASE_SPEED = builder.defineInRange("lula_movement_speed", .32D, .05D, 1D);
+        LULA_PHASE_CROWD = builder.comment("How many times the usual crowd his Manifestacao brings.").defineInRange("lula_crowd_multiplier", 3, 1, 8);
+        JAIR_PHASE_MELEE = builder.comment("Bolsonaro hipotetico: much bigger, prefers punching to shooting, calls all his sons at once.").defineInRange("jair_melee_damage", 16D, 0D, 100D);
+        JAIR_PHASE_SPEED = builder.defineInRange("jair_movement_speed", .3D, .05D, 1D);
+        JAIR_PHASE_SCALE = builder.defineInRange("jair_size", 2D, 1D, 4D);
+        JAIR_PHASE_SUMMON_COOLDOWN = builder.defineInRange("jair_sons_cooldown_ticks", 500, 40, 72000);
+        RENAN_PHASE_SHOT_INTERVAL = builder.comment("Renan Akatsuki: ticks between shots (20 in his first phase).").defineInRange("renan_shot_interval_ticks", 4, 1, 40);
+        RENAN_PHASE_SPEED = builder.defineInRange("renan_movement_speed", .46D, .05D, 1D);
         builder.pop();
         builder.comment("Cabo Daciolo, his Bible and angels.").push("cabo_daciolo");
         DACIOLO_HEALTH = builder.defineInRange("max_health", 300D, 1D, 2048D);

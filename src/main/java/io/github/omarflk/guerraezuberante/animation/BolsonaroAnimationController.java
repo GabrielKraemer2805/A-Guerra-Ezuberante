@@ -9,7 +9,7 @@ import java.util.*;
 public final class BolsonaroAnimationController extends AnimationController<RetaliatingCharacterEntity> {
     private static final Map<String,RawAnimation> CLIPS=new HashMap<>();
     static{
-        for(String name:List.of("jair_idle","jair_walk","jair_armed_idle","jair_aim","jair_shoot","jair_hurt","jair_summon_flavio","jair_death_special",
+        for(String name:List.of("jair_idle","jair_walk","jair_armed_idle","jair_aim","jair_shoot","jair_hurt","jair_summon_flavio","jair_death_special","jair_punch",
                 "flavio_idle","flavio_walk","flavio_attack","flavio_hurt","flavio_rachadinha_prepare","flavio_rachadinha_ground_hit","flavio_rachadinha_recover")){
             var raw=RawAnimation.begin();String id="animation.guerra."+name;
             CLIPS.put(name,name.endsWith("death_special")?raw.thenPlayAndHold(id):
@@ -26,11 +26,12 @@ public final class BolsonaroAnimationController extends AnimationController<Reta
         if(owner instanceof JairBolsonaroEntity j){
             if(j.deathState()!=SpecialDeathEntity.ALIVE){if(!dying){forceAnimationReset();dying=true;}name="jair_death_special";}
             else if(j.castAge(partial)<20){reset(j.castToken()*2);name="jair_summon_flavio";}
-            else if(j.isArmed() && j.shotAge(partial)<9){reset(j.shotToken()*2+1);name="jair_shoot";}
+            else if(j.isSecondPhase() && j.attackAnimationAge(partial)<JairBolsonaroEntity.PUNCH_LENGTH)name="jair_punch";
+            else if(j.isArmed() && !j.isSecondPhase() && j.shotAge(partial)<9){reset(j.shotToken()*2+1);name="jair_shoot";}
             else if(j.hurtTime>0)name="jair_hurt";
             else if(j.isArmed() && j.isGunAiming())name="jair_aim";
             else if(state.isMoving())name="jair_walk";
-            else name=j.isArmed()?"jair_armed_idle":"jair_idle";
+            else name=j.isArmed() && !j.isSecondPhase()?"jair_armed_idle":"jair_idle";
         }else{
             var f=(FlavioBolsonaroEntity)owner;float age=f.castAge(partial);
             if(age<24){reset(f.castToken());name=age<8?"flavio_rachadinha_prepare":age<12?"flavio_rachadinha_ground_hit":"flavio_rachadinha_recover";}
@@ -46,7 +47,8 @@ public final class BolsonaroAnimationController extends AnimationController<Reta
         if(owner instanceof JairBolsonaroEntity j){
             if(j.deathState()!=SpecialDeathEntity.ALIVE)return Math.min(59.999,j.deathAnimationAge(partial));
             if(j.castAge(partial)<20)return Math.max(0,j.castAge(partial));
-            if(j.isArmed() && j.shotAge(partial)<9)return Math.max(0,j.shotAge(partial));
+            if(j.isSecondPhase() && j.attackAnimationAge(partial)<JairBolsonaroEntity.PUNCH_LENGTH)return Math.max(0,j.attackAnimationAge(partial));
+            if(j.isArmed() && !j.isSecondPhase() && j.shotAge(partial)<9)return Math.max(0,j.shotAge(partial));
             if(j.hurtTime>0)return Math.min(9.999,10-j.hurtTime+partial);
         }else{
             var f=(FlavioBolsonaroEntity)owner;float age=f.castAge(partial);

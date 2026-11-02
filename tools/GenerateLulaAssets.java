@@ -59,6 +59,12 @@ public final class GenerateLulaAssets {
         rot("right_forearm",.9,k(0,0,0,0),k(.25,-85,0,0),k(.4,-35,0,0),k(.55,-25,0,0),k(.9,0,0,0));
         rot("left_arm",.9,k(0,-2,0,5),k(.25,-18,0,14),k(.55,-22,0,14),k(.9,-2,0,5));
         GenerateGeckoAssets.finish("lula_attack_bean",.9,false);
+        // 0.029: Lula eleitoral punches.
+        GenerateGeckoAssets.begin();
+        rot("body",.6,k(0,0,0,0),k(.15,0,-22,0),k(.25,5,20,0),k(.6,0,0,0));
+        rot("right_arm",.6,k(0,0,0,-5),k(.15,35,-15,-8),k(.25,-82,0,-4),k(.6,0,0,-5));
+        rot("right_forearm",.6,k(0,0,0,0),k(.15,-82,0,0),k(.25,-8,0,0),k(.6,0,0,0));
+        GenerateGeckoAssets.finish("lula_punch",.6,false);
         GenerateGeckoAssets.begin();
         // Faz o L: the right arm shoots straight forward toward the target, holds, then comes back.
         rot("body",.9,k(0,4,0,0),k(.1,8,-8,0),k(.6,8,-8,0),k(.9,4,0,0));

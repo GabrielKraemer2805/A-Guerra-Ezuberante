@@ -31,7 +31,7 @@ public final class GenerateBolsonaroAssets {
         r("left_arm",1,k(0,-52,15,18),k(1,-52,15,18));r("left_forearm",1,k(0,-62,-12,0),k(1,-62,-12,0));r("body",1,k(0,2,-8,0),k(1,2,-8,0));finish("jair_aim",1,true);
         begin();r("right_arm",.45,k(0,-80,-4,-4),k(.05,-98,-4,-4),k(.2,-84,-4,-4),k(.45,-80,-4,-4));
         r("right_forearm",.45,k(0,-8,0,0),k(.05,-22,0,0),k(.45,-8,0,0));r("body",.45,k(0,2,-8,0),k(.05,-3,-8,0),k(.45,2,-8,0));
-        r("left_arm",.45,k(0,-52,15,18),k(.45,-52,15,18));r("left_forearm",.45,k(0,-62,-12,0),k(.45,-62,-12,0));finish("jair_shoot",.45,false);hurt("jair_hurt");
+        r("left_arm",.45,k(0,-52,15,18),k(.45,-52,15,18));r("left_forearm",.45,k(0,-62,-12,0),k(.45,-62,-12,0));finish("jair_shoot",.45,false);begin();r("body",.6,k(0,0,0,0),k(.15,0,-22,0),k(.25,5,20,0),k(.6,0,0,0));r("right_arm",.6,k(0,0,0,-5),k(.15,35,-15,-8),k(.25,-82,0,-4),k(.6,0,0,-5));r("right_forearm",.6,k(0,0,0,0),k(.15,-82,0,0),k(.25,-8,0,0),k(.6,0,0,0));finish("jair_punch",.6,false);hurt("jair_hurt");
         begin();r("left_arm",1,k(0,-2,0,4),k(.3,-128,0,30),k(.6,-155,0,15),k(.8,-120,0,28),k(1,-2,0,4));
         r("left_forearm",1,k(0,0,0,0),k(.3,-35,0,0),k(.6,-12,0,0),k(1,0,0,0));r("right_arm",1,k(0,-12,0,-4),k(1,-12,0,-4));
         r("body",1,k(0,0,0,0),k(.6,-5,12,0),k(1,0,0,0));finish("jair_summon_flavio",1,false);

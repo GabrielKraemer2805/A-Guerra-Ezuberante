@@ -31,5 +31,49 @@ public final class JairSummoning {
         }
         return created;
     }
+    /** 0.029: the sons that exist in the mod and are not at his side. */
+    public static java.util.List<net.minecraft.world.entity.EntityType<?>> missingSons(JairBolsonaroEntity owner){
+        var missing=new java.util.ArrayList<net.minecraft.world.entity.EntityType<?>>();
+        if(!(owner.level() instanceof ServerLevel server))return missing;
+        var around=new net.minecraft.world.phys.AABB(owner.blockPosition()).inflate(64);
+        if(server.getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.FlavioBolsonaroEntity.class,around,son->owner.getUUID().equals(son.getOwnerId())).isEmpty())
+            missing.add(ModEntities.FLAVIO_BOLSONARO.get());
+        for(var figure:new io.github.omarflk.guerraezuberante.faction.Figure[]{io.github.omarflk.guerraezuberante.faction.Figure.EDUARDO_BOLSONARO,io.github.omarflk.guerraezuberante.faction.Figure.JAIR_RENAN}){
+            if(server.getEntitiesOfClass(io.github.omarflk.guerraezuberante.entity.FigureEntity.class,around,son->son.figure()==figure && owner.getUUID().equals(son.summonerId())).isEmpty())
+                missing.add(ModEntities.figure(figure).get());
+        }
+        return missing;
+    }
+    /** Bolsonaro hipotetico: every missing son at once. Returns how many came. */
+    public static int summonSons(JairBolsonaroEntity owner){
+        if(!(owner.level() instanceof ServerLevel server) || !owner.isAlive() || owner.deathState()!=JairBolsonaroEntity.ALIVE
+                || !ModConfig.JAIR_SUMMON_ENABLED.get() || !owner.validRangedTarget(owner.getTarget()))return 0;
+        var ledger=SummonLedger.get(server);if(ledger.isClosed(owner.getUUID()))return 0;
+        int created=0;
+        for(var type:missingSons(owner)){
+            var unit=type.create(server);
+            if(unit==null || !place(server,owner,unit))continue;
+            if(unit instanceof io.github.omarflk.guerraezuberante.entity.FlavioBolsonaroEntity flavio)flavio.bindTo(owner);
+            if(unit instanceof io.github.omarflk.guerraezuberante.entity.FigureEntity son)son.bindToSummoner(owner);
+            if(!server.addFreshEntity(unit))continue;
+            if(unit instanceof io.github.omarflk.guerraezuberante.entity.FlavioBolsonaroEntity)ledger.register(owner.getUUID(),unit.getUUID());
+            created++;
+            server.sendParticles(new DustParticleOptions(new Vector3f(.05F,1,.1F),1.1F),unit.getX(),unit.getY()+1,unit.getZ(),14,.4,.7,.4,.02);
+            server.sendParticles(new DustParticleOptions(new Vector3f(1,.9F,.02F),1),unit.getX(),unit.getY()+.4,unit.getZ(),8,.4,.3,.4,.01);
+        }
+        return created;
+    }
+    private static boolean place(ServerLevel server,JairBolsonaroEntity owner,net.minecraft.world.entity.Entity unit){
+        for(int radius=3;radius<=7;radius++)for(int attempt=0;attempt<24;attempt++){
+            double angle=attempt*2.399963229728653;
+            var center=owner.blockPosition().offset((int)Math.round(Math.cos(angle)*radius),0,(int)Math.round(Math.sin(angle)*radius));
+            for(int dy:new int[]{0,1,-1,2,-2}){
+                var pos=center.above(dy);if(!ArthurSummoning.isSafe(server,pos))continue;
+                unit.moveTo(pos.getX()+.5,pos.getY(),pos.getZ()+.5,owner.getYRot(),0);
+                if(server.noCollision(unit,unit.getBoundingBox()) && server.getEntities(unit,unit.getBoundingBox()).isEmpty())return true;
+            }
+        }
+        return false;
+    }
     private JairSummoning(){}
 }

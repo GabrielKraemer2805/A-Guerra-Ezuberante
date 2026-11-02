@@ -9,11 +9,16 @@ import net.minecraft.world.entity.monster.Vex;
 
 /** The vanilla vex model with a white robe and golden wings. */
 public final class AngelRenderer extends VexRenderer {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(GuerraEzuberanteMod.MOD_ID, "textures/entity/anjo.png");
+    private static final java.util.Map<AngelEntity.Kind, ResourceLocation> TEXTURES = new java.util.EnumMap<>(AngelEntity.Kind.class);
+    static {
+        for (AngelEntity.Kind kind : AngelEntity.Kind.values()) {
+            TEXTURES.put(kind, new ResourceLocation(GuerraEzuberanteMod.MOD_ID, kind == AngelEntity.Kind.ANJO ? "textures/entity/anjo.png" : "textures/entity/anjo_" + kind.id + ".png"));
+        }
+    }
 
     private AngelRenderer(EntityRendererProvider.Context context) { super(context); }
 
-    @Override public ResourceLocation getTextureLocation(Vex vex) { return TEXTURE; }
+    @Override public ResourceLocation getTextureLocation(Vex vex) { return TEXTURES.get(((AngelEntity) vex).kind()); }
 
     /** VexRenderer is typed on Vex; an angel is one, so the renderer serves it as it is. */
     @SuppressWarnings({"unchecked", "rawtypes"})

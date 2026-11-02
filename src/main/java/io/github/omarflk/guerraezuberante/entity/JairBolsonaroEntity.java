@@ -33,7 +33,18 @@ public final class JairBolsonaroEntity extends SpecialDeathEntity implements Npc
     }
     public static AttributeSupplier.Builder createAttributes(){return createMobAttributes().add(Attributes.MAX_HEALTH,300)
             .add(Attributes.ATTACK_DAMAGE,4).add(Attributes.MOVEMENT_SPEED,.24).add(Attributes.FOLLOW_RANGE,20);}
-    @Override protected float getStandingEyeHeight(Pose pose,EntityDimensions size){return 1.62F;}
+    @Override protected float getStandingEyeHeight(Pose pose,EntityDimensions size){return 1.62F*getScale();}
+    public static final int PUNCH_LENGTH=12;
+    @Override protected String secondPhaseName(){return "entity.guerra_ezuberante.jair_bolsonaro.hipotetico";}
+    @Override protected float secondPhaseSize(){return ModConfig.JAIR_PHASE_SCALE.get().floatValue();}
+    @Override protected void onTransformationStart(){castPending=false;setGunAiming(false);entityData.set(CAST,level().getGameTime());}
+    /** Fists instead of the gun, and all his sons at his next chance. */
+    @Override protected void onSecondPhase(ServerLevel server){
+        getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(ModConfig.JAIR_PHASE_SPEED.get());
+        getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ModConfig.JAIR_PHASE_MELEE.get());
+        setGunAiming(false);nextSummon=0;
+    }
+    @Override public boolean prefersMelee(){return isSecondPhase();}
     @Override protected void defineSynchedData(){
         super.defineSynchedData();entityData.define(SHOT,-1000L);entityData.define(AIM_START,-1000L);entityData.define(AIMING,false);entityData.define(CAST,-1000L);
     }
@@ -45,7 +56,7 @@ public final class JairBolsonaroEntity extends SpecialDeathEntity implements Npc
     public long castToken(){return entityData.get(CAST);}
     @Override public boolean isActionLocked(){return super.isActionLocked() || castAge(0)<CAST_TICKS;}
     @Override public boolean isArmed(){return TaczIntegration.jairArmed(this);}
-    @Override protected boolean allowsMeleeCombat(){return !isArmed();}
+    @Override protected boolean allowsMeleeCombat(){return !isArmed() || isSecondPhase();}
     public boolean needCheckAmmo(){return false;}
     public boolean consumesAmmoOrNot(){return false;}
     @Override public boolean validRangedTarget(LivingEntity target){return deathState()==ALIVE && target!=null && isValidAggressor(target);}
@@ -66,8 +77,9 @@ public final class JairBolsonaroEntity extends SpecialDeathEntity implements Npc
     public boolean tryBeginSummon(){
         long now=level().getGameTime();
         if(!(level() instanceof ServerLevel server) || !isAlive() || isActionLocked() || !ModConfig.JAIR_SUMMON_ENABLED.get()
-                || !validRangedTarget(getTarget()) || now<nextSummon || SummonLedger.get(server).count(getUUID())>=ModConfig.JAIR_MAX_SUMMONS.get())return false;
-        entityData.set(CAST,now);nextSummon=now+ModConfig.JAIR_SUMMON_COOLDOWN.get();castPending=true;
+                || !validRangedTarget(getTarget()) || now<nextSummon)return false;
+        if(isSecondPhase()?JairSummoning.missingSons(this).isEmpty():SummonLedger.get(server).count(getUUID())>=ModConfig.JAIR_MAX_SUMMONS.get())return false;
+        entityData.set(CAST,now);nextSummon=now+(isSecondPhase()?ModConfig.JAIR_PHASE_SUMMON_COOLDOWN.get():ModConfig.JAIR_SUMMON_COOLDOWN.get());castPending=true;
         setGunAiming(false);cancelStrike();getNavigation().stop();noteCombatProgress();return true;
     }
     @Override public void tick(){
@@ -75,7 +87,8 @@ public final class JairBolsonaroEntity extends SpecialDeathEntity implements Npc
         if(level().isClientSide || deathState()!=ALIVE || isRemoved())return;
         if(!equipmentChecked && tickCount%20==0){TaczIntegration.equipJair(this);equipmentChecked=!getMainHandItem().isEmpty();}
         if(castPending && castAge(0)>=SUMMON_RELEASE){
-            castPending=false;if(validRangedTarget(getTarget()))JairSummoning.summon(this);
+            castPending=false;
+            if(validRangedTarget(getTarget())){if(isSecondPhase())JairSummoning.summonSons(this);else JairSummoning.summon(this);}
         }
         if(!isActionLocked() && validRangedTarget(getTarget()))tryBeginSummon();
         if((isActionLocked() || !validRangedTarget(getTarget())) && isGunAiming())setGunAiming(false);
