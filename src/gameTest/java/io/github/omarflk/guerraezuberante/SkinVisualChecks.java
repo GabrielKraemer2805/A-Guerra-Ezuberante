@@ -180,7 +180,41 @@ public final class SkinVisualChecks {
                     capture("grupo");
                     next(6);
                 }
-                case 6 -> { if (ticks >= 10) finish(null); }
+                case 6 -> {
+                    if (ticks < 10) return;
+                    mc.options.hideGui = false;
+                    server(() -> {
+                        ServerPlayer player = serverPlayer();
+                        ServerLevel level = player.serverLevel();
+                        posing = null;
+                        clear(level);
+                        Factions.assign(player, Faction.BOLSONARISTA);
+                        player.setGameMode(GameType.SURVIVAL);
+                        player.setInvulnerable(true);
+                        io.github.omarflk.guerraezuberante.progression.Progression.addXp(player, 1_000_000);
+                        for (int i = 0; i < 10; i++) io.github.omarflk.guerraezuberante.progression.Progression.spend(player, io.github.omarflk.guerraezuberante.progression.Stat.CONVICCAO);
+                        io.github.omarflk.guerraezuberante.progression.SkillTree.buy(player, io.github.omarflk.guerraezuberante.progression.SkillTree.powerNode(Faction.BOLSONARISTA, 3).orElseThrow());
+                        io.github.omarflk.guerraezuberante.progression.SkillTree.buy(player, io.github.omarflk.guerraezuberante.progression.SkillTree.powerNode(Faction.BOLSONARISTA, 11).orElseThrow());
+                    });
+                    next(7);
+                }
+                case 7 -> {
+                    if (ticks < 30) return;
+                    capture("hud-primeiro-poder");
+                    if (io.github.omarflk.guerraezuberante.client.PowerHudClient.cycle(1) != 3) errors.add("The cycle did not reach Alagamento");
+                    next(8);
+                }
+                case 8 -> {
+                    if (ticks < 20) return;
+                    capture("hud-apos-rolagem");
+                    server(() -> {
+                        ServerPlayer player = serverPlayer();
+                        if (io.github.omarflk.guerraezuberante.progression.Progression.selectedPower(player) != 3) errors.add("The server did not accept the cycle");
+                        player.setInvulnerable(false);
+                    });
+                    next(9);
+                }
+                case 9 -> { if (ticks >= 10) finish(null); }
                 default -> {}
             }
         } catch (Exception e) {

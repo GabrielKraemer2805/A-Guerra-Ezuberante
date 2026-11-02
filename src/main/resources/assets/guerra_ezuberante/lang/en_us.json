@@ -584,5 +584,21 @@
     "power.guerra_ezuberante.fig.grande_manifestacao":  "%s: Calling the people through the networks!",
     "power.guerra_ezuberante.fig.textao":  "%s: Read the thread, just 47 posts.",
     "power.guerra_ezuberante.fig.crowd_full":  "Your protesters are all on the street already.",
-    "gui.guerra_ezuberante.tree.scroll_hint":  "Scroll for more"
+    "gui.guerra_ezuberante.tree.scroll_hint":  "Scroll for more",
+    "item.guerra_ezuberante.picanha":  "Promised Picanha",
+    "item.guerra_ezuberante.picanha.desc":  "It was promised; it costs a gold ingot. Very filling, Strength for 30 s.",
+    "item.guerra_ezuberante.cerveja":  "Cold Beer",
+    "item.guerra_ezuberante.cerveja.desc":  "Speed for 30 s and dizziness for 5 s. Gives the bottle back.",
+    "item.guerra_ezuberante.feijoada":  "Full Feijoada",
+    "item.guerra_ezuberante.feijoada.desc":  "Very filling, regenerates for 10 s. Gives the bowl back.",
+    "item.guerra_ezuberante.bolo_de_mandioca":  "Cassava Cake",
+    "item.guerra_ezuberante.bolo_de_mandioca.desc":  "Stocking cassava is politics too.",
+    "item.guerra_ezuberante.cloroquina":  "Box of Chloroquine",
+    "item.guerra_ezuberante.cloroquina.desc":  "Cures nothing: no health or food back, just dizziness and a little Luck.",
+    "item.guerra_ezuberante.megafone":  "Megaphone",
+    "item.guerra_ezuberante.megafone.desc":  "Right click: pushes enemies within 6 blocks. Needs 10 s of breath and wears out.",
+    "item.guerra_ezuberante.foice_e_martelo":  "Hammer and Sickle",
+    "item.guerra_ezuberante.foice_e_martelo.desc":  "Stronger than an iron sword: the union of two tools.",
+    "item.guerra_ezuberante.motosserra":  "Liberal Chainsaw",
+    "item.guerra_ezuberante.motosserra.desc":  "Spending cuts: high damage, slow swing."
 }

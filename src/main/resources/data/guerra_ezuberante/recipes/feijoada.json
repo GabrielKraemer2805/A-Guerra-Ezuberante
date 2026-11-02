@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:bowl"
+    },
+    {
+      "item": "guerra_ezuberante:semente_feijao"
+    },
+    {
+      "item": "guerra_ezuberante:semente_feijao"
+    },
+    {
+      "item": "minecraft:cooked_porkchop"
+    }
+  ],
+  "result": {
+    "item": "guerra_ezuberante:feijoada"
+  }
+}

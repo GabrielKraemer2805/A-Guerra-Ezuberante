@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "guerra_ezuberante:mandioca"
+    },
+    {
+      "item": "guerra_ezuberante:mandioca"
+    },
+    {
+      "item": "guerra_ezuberante:mandioca"
+    },
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:egg"
+    }
+  ],
+  "result": {
+    "item": "guerra_ezuberante:bolo_de_mandioca"
+  }
+}

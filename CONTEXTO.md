@@ -1,5 +1,12 @@
 # Contexto de trabalho — Guerra Ezuberante
 
+## HUD do poder selecionado e itens craftáveis — 0.024.0 (02/11/2026)
+
+- Fase 2 de 6 (ver 0.023.0), branch `feat/generais-exercito`.
+- **HUD** (`client/PowerHudClient`): painel à direita da hotbar (acima dela em janela estreita) com o nome do poder, a posição entre os comprados e a barra de recarga. A barra enche conforme o maior valor de recarga que o servidor informou para aquele poder. Agachar + rolar o mouse percorre os poderes comprados (`progression/PowerCycle`), com os vizinhos listados enquanto a tecla de agachar está pressionada; com um só poder, a rolagem continua na hotbar. A escolha aparece na hora (`ProgressionClient.selectLocally`) e o servidor valida (`Progression.select`).
+- **Itens** (receitas em `data/guerra_ezuberante/recipes`, sprites por `arte/itens/gerar_itens.py`, descrição em `item.guerra_ezuberante.<id>.desc`, mostrada por `client/ItemTooltipClient`): Picanha Prometida, Cervejinha, Feijoada Completa, Bolo de Mandioca, Caixa de Cloroquina (não recupera vida nem fome), Megafone (empurra inimigos a até 6 blocos, 64 usos, 10 s entre usos), Foice e Martelo, Motosserra Liberal. Semente de feijão e mandioca, que não tinham como ser obtidas sem criativo, ganharam receita.
+- Testes: `CraftableItemGameTests` (4) e, em `SkinVisualChecks`, duas capturas do HUD e a confirmação de que o servidor aceitou a troca. **222 GameTests com TaCZ e 158 sem TaCZ** aprovados. A troca foi exercitada chamando `PowerHudClient.cycle`; a rolagem física do mouse e a lista de vizinhos com a tecla pressionada ficam para o teste do colaborador.
+
 ## Novos personagens, poderes e árvores — 0.023.0 (02/11/2026)
 
 - Pedido do colaborador (branch `feat/generais-exercito`): primeira fase de uma entrega em 6, combinada com ele. **Fases:** 1) personagens, skins e poderes (esta); 2) HUD com Shift+scroll e itens craftáveis; 3) base militar, generais e missões ligadas à barra moral; 4) aba Twitter/X no J; 5) recrutamento e "Destrua o castelo"; 6) Cabo Daciolo (chefe independente, igreja enorme, bíblia que invoca anjos), igrejas evangélicas nas vilas bolsonaristas e aldeões nerds do Missão.

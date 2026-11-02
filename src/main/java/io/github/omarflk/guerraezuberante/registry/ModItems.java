@@ -22,6 +22,29 @@ public final class ModItems {
             () -> new ForgeSpawnEggItem(ModEntities.BOULOS,0xB71C26,0x1F3FA8,new Item.Properties()));
     public static final RegistryObject<Item> DILMA_SPAWN_EGG = REGISTER.register("dilma_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.DILMA,0xC8102E,0x2E7D32,new Item.Properties()));
+    // 0.024: craftable items. Recipes in data/guerra_ezuberante/recipes; each description comes from "<item>.desc".
+    public static final RegistryObject<Item> PICANHA = REGISTER.register("picanha", () -> new Item(new Item.Properties().food(
+            new net.minecraft.world.food.FoodProperties.Builder().nutrition(10).saturationMod(1F).meat()
+                    .effect(() -> new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.DAMAGE_BOOST, 600, 0), 1F).build())));
+    public static final RegistryObject<Item> CERVEJA = REGISTER.register("cerveja", () -> new io.github.omarflk.guerraezuberante.item.DrinkItem(new Item.Properties().stacksTo(16).food(
+            new net.minecraft.world.food.FoodProperties.Builder().nutrition(2).saturationMod(.2F).alwaysEat()
+                    .effect(() -> new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED, 600, 0), 1F)
+                    .effect(() -> new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.CONFUSION, 100, 0), 1F).build())));
+    public static final RegistryObject<Item> FEIJOADA = REGISTER.register("feijoada", () -> new net.minecraft.world.item.BowlFoodItem(new Item.Properties().stacksTo(1).food(
+            new net.minecraft.world.food.FoodProperties.Builder().nutrition(9).saturationMod(.9F)
+                    .effect(() -> new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.REGENERATION, 200, 0), 1F).build())));
+    public static final RegistryObject<Item> BOLO_DE_MANDIOCA = REGISTER.register("bolo_de_mandioca", () -> new Item(new Item.Properties().food(
+            new net.minecraft.world.food.FoodProperties.Builder().nutrition(7).saturationMod(.6F).build())));
+    public static final RegistryObject<Item> CLOROQUINA = REGISTER.register("cloroquina", () -> new Item(new Item.Properties().food(
+            new net.minecraft.world.food.FoodProperties.Builder().nutrition(0).saturationMod(0F).alwaysEat().fast()
+                    .effect(() -> new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.CONFUSION, 200, 0), 1F)
+                    .effect(() -> new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.LUCK, 600, 0), 1F).build())));
+    public static final RegistryObject<Item> MEGAFONE = REGISTER.register("megafone",
+            () -> new io.github.omarflk.guerraezuberante.item.MegaphoneItem(new Item.Properties().durability(64)));
+    public static final RegistryObject<Item> FOICE_E_MARTELO = REGISTER.register("foice_e_martelo",
+            () -> new SwordItem(Tiers.IRON, 4, -2.4F, new Item.Properties()));
+    public static final RegistryObject<Item> MOTOSSERRA = REGISTER.register("motosserra",
+            () -> new SwordItem(Tiers.IRON, 6, -3F, new Item.Properties()));
     public static final RegistryObject<Item> MANDIOCA = REGISTER.register("mandioca", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> PETISTA_SPAWN_EGG = REGISTER.register("petista_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntities.PETISTA,0xD8262E,0xF4E04D,new Item.Properties()));

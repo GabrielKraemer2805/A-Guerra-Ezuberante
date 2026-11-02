@@ -41,6 +41,8 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.FLAVIO_SPAWN_EGG.get());
                         output.accept(ModItems.BEAN.get());
                         output.accept(ModItems.MANDIOCA.get());
+                        for (var item : java.util.List.of(ModItems.PICANHA, ModItems.CERVEJA, ModItems.FEIJOADA, ModItems.BOLO_DE_MANDIOCA, ModItems.CLOROQUINA,
+                                ModItems.MEGAFONE, ModItems.FOICE_E_MARTELO, ModItems.MOTOSSERRA)) { output.accept(item.get()); }
                         output.accept(ModItems.GE_P12.get());
                         output.accept(ModItems.PISTOL_AMMO.get());
                         output.acceptAll(io.github.omarflk.guerraezuberante.arsenal.TaczIntegration.creativeEntries());

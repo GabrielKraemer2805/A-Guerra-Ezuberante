@@ -19,9 +19,14 @@ public final class ProgressionClient {
     private static FactionNetwork.Profile profile;
     private static final long[] READY_AT = new long[Progression.POWER_SLOTS];
     private static long classReadyAt;
+    /** Shift + scroll shows the new power at once; the next profile from the server replaces this. */
+    private static int pendingSelection = -1;
+    private static final int[] LONGEST = new int[Progression.POWER_SLOTS];
 
     public static void apply(FactionNetwork.Profile packet) {
         profile = packet;
+        pendingSelection = -1;
+        for (int slot = 0; slot < LONGEST.length; slot++) { LONGEST[slot] = packet.cooldowns()[slot] == 0 ? 0 : Math.max(LONGEST[slot], packet.cooldowns()[slot]); }
         Minecraft minecraft = Minecraft.getInstance();
         long now = minecraft.level == null ? 0 : minecraft.level.getGameTime();
         for (int slot = 0; slot < READY_AT.length; slot++) { READY_AT[slot] = now + packet.cooldowns()[slot]; }
@@ -37,7 +42,10 @@ public final class ProgressionClient {
     public static int points() { return profile == null ? 0 : profile.points(); }
     public static int stat(Stat stat) { return profile == null ? 0 : profile.stats()[stat.ordinal()]; }
     public static int statMax() { return profile == null ? 10 : profile.statMax(); }
-    public static int selected() { return profile == null ? 0 : profile.selected(); }
+    public static int selected() { return pendingSelection >= 0 ? pendingSelection : profile == null ? 0 : profile.selected(); }
+    public static void selectLocally(int slot) { pendingSelection = slot; }
+    /** Largest cooldown the server reported for the running one: the full length of the HUD bar. */
+    public static int longestCooldown(int slot) { return LONGEST[slot]; }
     public static int unlocked() { return profile == null ? 1 : profile.unlocked(); }
     public static java.util.Optional<PlayerClass> playerClass() { return profile == null ? java.util.Optional.empty() : PlayerClass.byOrdinal(profile.playerClass()); }
     public static int classChanges() { return profile == null ? 0 : profile.classChanges(); }
@@ -67,6 +75,8 @@ public final class ProgressionClient {
     @SubscribeEvent
     public static void loggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         profile = null;
+        pendingSelection = -1;
+        java.util.Arrays.fill(LONGEST, 0);
         java.util.Arrays.fill(READY_AT, 0);
         classReadyAt = 0;
     }

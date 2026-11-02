@@ -584,5 +584,21 @@
     "power.guerra_ezuberante.fig.grande_manifestacao":  "%s: Convoco o povo pelas redes!",
     "power.guerra_ezuberante.fig.textao":  "%s: Segue o fio, são só 47 tweets.",
     "power.guerra_ezuberante.fig.crowd_full":  "Seus manifestantes já estão todos na rua.",
-    "gui.guerra_ezuberante.tree.scroll_hint":  "Role o mouse para ver mais"
+    "gui.guerra_ezuberante.tree.scroll_hint":  "Role o mouse para ver mais",
+    "item.guerra_ezuberante.picanha":  "Picanha Prometida",
+    "item.guerra_ezuberante.picanha.desc":  "Foi prometida; custa uma barra de ouro. Enche bem e dá Força por 30 s.",
+    "item.guerra_ezuberante.cerveja":  "Cervejinha",
+    "item.guerra_ezuberante.cerveja.desc":  "Velocidade por 30 s e tontura por 5 s. Devolve a garrafa.",
+    "item.guerra_ezuberante.feijoada":  "Feijoada Completa",
+    "item.guerra_ezuberante.feijoada.desc":  "Enche bem e regenera por 10 s. Devolve a tigela.",
+    "item.guerra_ezuberante.bolo_de_mandioca":  "Bolo de Mandioca",
+    "item.guerra_ezuberante.bolo_de_mandioca.desc":  "Estocar mandioca também é política.",
+    "item.guerra_ezuberante.cloroquina":  "Caixa de Cloroquina",
+    "item.guerra_ezuberante.cloroquina.desc":  "Não cura nada: não recupera vida nem fome, só dá tontura e um pouco de Sorte.",
+    "item.guerra_ezuberante.megafone":  "Megafone",
+    "item.guerra_ezuberante.megafone.desc":  "Botão direito: empurra os inimigos a até 6 blocos. Precisa de 10 s de fôlego e desgasta com o uso.",
+    "item.guerra_ezuberante.foice_e_martelo":  "Foice e Martelo",
+    "item.guerra_ezuberante.foice_e_martelo.desc":  "Mais forte que a espada de ferro: a união de duas ferramentas.",
+    "item.guerra_ezuberante.motosserra":  "Motosserra Liberal",
+    "item.guerra_ezuberante.motosserra.desc":  "Corte de gastos: muito dano, golpe lento."
 }
